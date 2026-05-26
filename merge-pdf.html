@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DocuCraft - Merge PDF Workspace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { 
+      --ink: #1a1a18; 
+      --ink-2: #4a4a46;
+      --ink-3: #8a8a84; 
+      --surface: #f7f6f2; 
+      --surface-3: #e4e2dd; 
+      --white: #ffffff; 
+      --radius: 10px; 
+      --radius-lg: 16px; 
+      --transition: all 0.2s ease;
+      --accent: #2d5a3d;
+      --accent-hover: #22442e;
+      --danger: #ba2525;
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--surface); color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; }
+    header { background: var(--ink); padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+    .header-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    header svg { color: #7ec898; flex-shrink: 0; }
+    .header-text h1 { font-family: 'Instrument Serif', serif; font-size: 24px; color: #fff; letter-spacing: -0.01em; }
+    
+    .back-to-hub {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+    .back-to-hub:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: #7ec898;
+    }
+
+    main { flex: 1; max-width: 1000px; width: 100%; margin: 0 auto; padding: 40px 24px 60px; }
+    .panel { background: var(--white); border-radius: var(--radius-lg); border: 1px solid var(--surface-3); padding: 40px 30px; text-align: center; }
+    .panel h2 { font-family: 'Instrument Serif', serif; font-size: 32px; font-weight: 400; margin-bottom: 8px; }
+    .panel p { color: var(--ink-3); font-size: 14px; margin-bottom: 30px; }
+
+    /* Dropzone Styles */
+    .dropzone {
+      border: 2px dashed var(--surface-3);
+      padding: 40px 20px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      background: #fafaf9;
+      transition: var(--transition);
+      margin-bottom: 30px;
+    }
+    .dropzone:hover, .dropzone.dragover {
+      border-color: var(--accent);
+      background: #f1f5f2;
+    }
+    .dropzone svg { color: var(--ink-3); margin-bottom: 12px; }
+    .dropzone p { margin-bottom: 0; font-weight: 500; color: var(--ink-2); }
+    .dropzone span { font-size: 12px; color: var(--ink-3); display: block; margin-top: 4px; }
+    #file-input { display: none; }
+
+    /* File List Layout */
+    .file-list { text-align: left; margin-bottom: 30px; display: flex; flex-direction: column; gap: 10px; }
+    .file-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: #fafaf9;
+      border: 1px solid var(--surface-3);
+      border-radius: var(--radius);
+    }
+    .file-info { display: flex; align-items: center; gap: 12px; overflow: hidden; }
+    .file-info svg { color: var(--accent); flex-shrink: 0; }
+    .file-name { font-size: 14px; font-weight: 500; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+    .file-size { font-size: 12px; color: var(--ink-3); }
+    
+    .file-actions { display: flex; align-items: center; gap: 8px; }
+    .btn-icon {
+      background: transparent;
+      border: 1px solid var(--surface-3);
+      border-radius: 6px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--ink-2);
+      transition: var(--transition);
+    }
+    .btn-icon:hover:not(:disabled) { background: var(--surface-3); color: var(--ink); }
+    .btn-icon:disabled { opacity: 0.3; cursor: not-allowed; }
+    .btn-delete:hover { background: #fdf2f2 !important; color: var(--danger) !important; border-color: #f5c2c2; }
+
+    /* Primary Processing Button */
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 14px 28px;
+      border-radius: var(--radius);
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: var(--transition);
+    }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-primary:disabled { background: var(--surface-3); color: var(--ink-3); cursor: not-allowed; }
+
+    /* Status Messages */
+    .status-msg { margin-top: 16px; font-size: 14px; font-weight: 500; display: none; }
+    .status-success { color: var(--accent); }
+    .status-error { color: var(--danger); }
+    
+    footer { text-align: center; padding: 20px 24px; font-size: 12px; color: var(--ink-3); border-top: 1px solid var(--surface-3); background: var(--white); margin-top: auto;}
+    footer .dot { width: 4px; height: 4px; border-radius: 50%; background: #2d5a3d; display: inline-block; margin: 0 6px; vertical-align: middle; }
+  </style>
+</head>
+<body>
+<header>
+  <a href="index.html" class="header-logo">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>
+    </svg>
+    <div class="header-text"><h1>DocuCraft</h1></div>
+  </a>
+  <a href="index.html" class="back-to-hub">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    Back to Tools Hub
+  </a>
+</header>
+<main>
+  <div class="panel">
+    <h2>Merge PDF Workspace</h2>
+    <p>Combine multiple PDF documents into a single organized file seamlessly.</p>
+
+    <div class="dropzone" id="dropzone">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+      </svg>
+      <p>Drag & drop your PDF files here or click to browse</p>
+      <span>Supports multiple PDF files</span>
+      <input type="file" id="file-input" accept="application/pdf" multiple />
+    </div>
+
+    <div class="file-list" id="file-list"></div>
+
+    <button class="btn-primary" id="btn-merge" disabled>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+      Merge & Download PDF
+    </button>
+
+    <div id="status" class="status-msg"></div>
+  </div>
+</main>
+<footer>
+  <span class="dot"></span>No sign up required, Free forever<span class="dot"></span>
+</footer>
+
+<script>
+  const dropzone = document.getElementById('dropzone');
+  const fileInput = document.getElementById('file-input');
+  const fileListContainer = document.getElementById('file-list');
+  const btnMerge = document.getElementById('btn-merge');
+  const statusMsg = document.getElementById('status');
+
+  let selectedFiles = [];
+
+  dropzone.addEventListener('click', () => fileInput.click());
+
+  dropzone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropzone.classList.add('dragover');
+  });
+
+  dropzone.addEventListener('dragleave', () => {
+    dropzone.classList.remove('dragover');
+  });
+
+  dropzone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropzone.classList.remove('dragover');
+    handleFiles(e.dataTransfer.files);
+  });
+
+  fileInput.addEventListener('change', (e) => {
+    handleFiles(e.target.files);
+  });
+
+  function handleFiles(files) {
+    for (let file of files) {
+      if (file.type === "application/pdf") {
+        selectedFiles.push(file);
+      }
+    }
+    updateUI();
+  }
+
+  function formatBytes(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+
+  function updateUI() {
+    fileListContainer.innerHTML = '';
+    
+    selectedFiles.forEach((file, index) => {
+      const fileItem = document.createElement('div');
+      fileItem.className = 'file-item';
+      
+      fileItem.innerHTML = `
+        <div class="file-info">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 02 2h12a2 2 0 0 02-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <div>
+            <div class="file-name">${file.name}</div>
+            <div class="file-size">${formatBytes(file.size)}</div>
+          </div>
+        </div>
+        <div class="file-actions">
+          <button class="btn-icon" onclick="moveFile(${index}, -1)" ${index === 0 ? 'disabled' : ''} title="Move Up">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+          </button>
+          <button class="btn-icon" onclick="moveFile(${index}, 1)" ${index === selectedFiles.length - 1 ? 'disabled' : ''} title="Move Down">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <button class="btn-icon btn-delete" onclick="removeFile(${index})" title="Remove">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      `;
+      fileListContainer.appendChild(fileItem);
+    });
+
+    btnMerge.disabled = selectedFiles.length < 2;
+  }
+
+  window.moveFile = function(index, direction) {
+    const targetIndex = index + direction;
+    if (targetIndex >= 0 && targetIndex < selectedFiles.length) {
+      const temp = selectedFiles[index];
+      selectedFiles[index] = selectedFiles[targetIndex];
+      selectedFiles[targetIndex] = temp;
+      updateUI();
+    }
+  }
+
+  window.removeFile = function(index) {
+    selectedFiles.splice(index, 1);
+    updateUI();
+  }
+
+  btnMerge.addEventListener('click', async () => {
+    if (selectedFiles.length < 2) return;
+    
+    showStatus('Merging documents... Please wait.', 'ink-2');
+    btnMerge.disabled = true;
+
+    try {
+      const mergedPdf = await PDFLib.PDFDocument.create();
+      
+      for (const file of selectedFiles) {
+        const fileArrayBuffer = await file.arrayBuffer();
+        const pdfDoc = await PDFLib.PDFDocument.load(fileArrayBuffer);
+        const copiedPages = await mergedPdf.copyPages(pdfDoc, pdfDoc.getPageIndices());
+        copiedPages.forEach((page) => mergedPdf.addPage(page));
+      }
+      
+      const mergedPdfBytes = await mergedPdf.save();
+      
+      const blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'DocuCraft_Merged.pdf';
+      link.click();
+      
+      showStatus('PDF files merged successfully!', 'status-success');
+    } catch (error) {
+      console.error(error);
+      showStatus('An error occurred while merging your PDFs. Ensure files are not corrupted or encrypted.', 'status-error');
+    } finally {
+      btnMerge.disabled = false;
+    }
+  });
+
+  function showStatus(msg, className) {
+    statusMsg.innerText = msg;
+    statusMsg.className = `status-msg ${className}`;
+    statusMsg.style.display = 'block';
+  }
+</script>
+</body>
+</html>
