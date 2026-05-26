@@ -23,8 +23,6 @@
       --accent: #2d5a3d;
       --accent-light: #e8f0ea;
       --accent-mid: #4a7c5c;
-      --danger: #c0392b;
-      --danger-light: #fdf0ef;
       --radius: 10px;
       --radius-lg: 16px;
       --transition: all 0.2s ease;
@@ -62,25 +60,17 @@
       color: #fff;
       letter-spacing: -0.01em;
     }
-    .back-to-hub {
-      background: transparent;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #fff;
-      padding: 8px 16px;
-      border-radius: var(--radius);
+    .nav-back {
+      text-decoration: none;
+      color: var(--surface-2);
       font-size: 13px;
       font-weight: 500;
-      cursor: pointer;
-      display: inline-flex;
+      display: flex;
       align-items: center;
       gap: 6px;
-      text-decoration: none;
       transition: var(--transition);
     }
-    .back-to-hub:hover {
-      background: rgba(255,255,255,0.1);
-      border-color: #7ec898;
-    }
+    .nav-back:hover { color: #fff; }
 
     main {
       flex: 1;
@@ -88,272 +78,207 @@
       width: 100%;
       margin: 0 auto;
       padding: 40px 24px 60px;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 32px;
     }
 
-    .drop-zone {
-      border: 1.5px dashed var(--surface-3);
+    @media (max-width: 850px) {
+      main { grid-template-columns: 1fr; }
+    }
+
+    .workspace { display: flex; flex-direction: column; gap: 24px; }
+    
+    .panel-card {
+      background: var(--white);
+      border: 1px solid var(--surface-3);
       border-radius: var(--radius-lg);
+      padding: 24px;
+    }
+
+    .panel-title {
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--ink-2);
+      margin-bottom: 16px;
+    }
+
+    .dropzone {
+      border: 2px dashed var(--surface-3);
+      border-radius: var(--radius);
       padding: 48px 24px;
       text-align: center;
       cursor: pointer;
-      transition: border-color .2s, background .2s;
       background: var(--white);
-      position: relative;
+      transition: var(--transition);
     }
-    .drop-zone:hover, .drop-zone.dragging { border-color: var(--accent-mid); background: var(--accent-light); }
-    .drop-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-    .drop-icon { width: 52px; height: 52px; background: var(--surface-2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: var(--ink-2); }
-    .drop-zone h2 { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
-    .drop-zone p { font-size: 13px; color: var(--ink-3); }
-    .browse-link { color: var(--accent); font-weight: 500; text-decoration: underline; text-underline-offset: 2px; }
+    .dropzone:hover { border-color: var(--accent-mid); background: var(--surface); }
+    .dropzone svg { color: var(--ink-3); margin-bottom: 12px; }
+    .dropzone p { font-size: 14px; color: var(--ink-2); margin-bottom: 4px; }
+    .dropzone span { font-size: 12px; color: var(--ink-3); }
+    .dropzone input { display: none; }
 
-    .panel {
-      background: var(--white);
-      border-radius: var(--radius-lg);
+    .control-group { margin-bottom: 16px; }
+    .control-group:last-child { margin-bottom: 0; }
+    .control-label { display: block; font-size: 13px; font-weight: 500; color: var(--ink-2); margin-bottom: 6px; }
+    
+    .select-input, .text-input {
+      width: 100%;
+      padding: 10px 12px;
       border: 1px solid var(--surface-3);
-      padding: 20px;
-      margin-top: 20px;
+      border-radius: var(--radius);
+      background: var(--surface);
+      font-family: inherit;
+      font-size: 13px;
+      color: var(--ink);
+      outline: none;
+      transition: var(--transition);
     }
-    .panel-title {
-      font-size: 11px;
+    .select-input:focus, .text-input:focus { border-color: var(--ink-2); background: var(--white); }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: var(--radius);
+      font-family: inherit;
+      font-size: 13px;
       font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      color: var(--ink-3);
-      margin-bottom: 16px;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
-    .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    @media (max-width: 480px) { .settings-grid { grid-template-columns: 1fr; } }
+    .btn-primary { background: var(--ink); color: var(--white); }
+    .btn-primary:hover:not(:disabled) { background: #333330; }
+    .btn-secondary { background: var(--surface-2); color: var(--ink); margin-top: 10px; }
+    .btn-secondary:hover:not(:disabled) { background: var(--surface-3); }
+    .btn:disabled { background: var(--surface-2); color: var(--ink-3); cursor: not-allowed; border: 1px solid var(--surface-3); }
 
-    .field label { display: block; font-size: 12px; font-weight: 500; color: var(--ink-2); margin-bottom: 6px; }
-    .field select, .field input[type="text"] {
-      width: 100%; background: var(--surface); border: 1px solid var(--surface-3); border-radius: var(--radius); padding: 9px 12px; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--ink); transition: border-color .15s;
+    .queue-list { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+    .queue-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--surface);
+      border: 1px solid var(--surface-3);
+      border-radius: var(--radius);
+      padding: 8px 12px;
     }
-    .field select {
-      appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a8a84' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-color: var(--surface); cursor: pointer;
-    }
-    .field select:focus, .field input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
+    .queue-thumb { width: 40px; height: 40px; border-radius: 4px; object-fit: cover; background: var(--surface-2); border: 1px solid var(--surface-3); }
+    .queue-info { flex: 1; min-width: 0; }
+    .queue-name { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .queue-meta { font-size: 11px; color: var(--ink-3); }
+    .queue-actions { display: flex; gap: 4px; }
+    .action-btn { background: none; border: none; padding: 6px; cursor: pointer; color: var(--ink-2); border-radius: 4px; }
+    .action-btn:hover { background: var(--surface-2); color: var(--ink); }
 
-    .span2 { grid-column: span 2; }
-    @media (max-width: 480px) { .span2 { grid-column: span 1; } }
+    .progress-container { display: none; margin-top: 16px; }
+    .progress-bar-bg { width: 100%; height: 6px; background: var(--surface-2); border-radius: 3px; overflow: hidden; }
+    .progress-bar-fill { width: 0%; height: 100%; background: var(--accent); transition: width 0.1s linear; }
+    .progress-text { font-size: 11px; color: var(--ink-3); text-align: right; margin-top: 4px; }
 
-    .slider-row { display: flex; align-items: center; gap: 10px; }
-    .slider-row input[type="range"] { flex: 1; accent-color: var(--accent); cursor: pointer; }
-    .slider-val { font-size: 12px; font-weight: 600; color: var(--accent); min-width: 40px; text-align: right; }
+    .status-msg { font-size: 13px; text-align: center; margin-top: 12px; display: none; padding: 8px; border-radius: var(--radius); }
+    .success-text { display: block; background: var(--accent-light); color: var(--accent); font-weight: 500; }
+    .error-text { display: block; background: #fce8e6; color: #a33b3b; font-weight: 500; }
 
-    .preview-section { margin-top: 24px; }
-    .preview-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-    .preview-header h3 { font-size: 14px; font-weight: 600; }
-    .preview-header-right { display: flex; align-items: center; gap: 12px; }
-    .preview-header-right span { font-size: 12px; color: var(--ink-3); }
-
-    .view-toggle { display: flex; gap: 4px; }
-    .vt-btn {
-      width: 26px; height: 26px; border-radius: 6px; border: 1px solid var(--surface-3); background: transparent; cursor: pointer; color: var(--ink-3); display: flex; align-items: center; justify-content: center; transition: background .15s, color .15s;
-    }
-    .vt-btn.active { background: var(--ink); color: #fff; border-color: var(--ink); }
-
-    .clear-all-btn { font-size: 12px; color: var(--danger); background: none; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 500; text-decoration: underline; text-underline-offset: 2px; }
-    .clear-all-btn:hover { opacity: .75; }
-
-    .preview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
-    .preview-grid.list-view { grid-template-columns: 1fr; gap: 6px; }
-
-    .preview-card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--surface-3); overflow: hidden; position: relative; cursor: grab; transition: box-shadow .15s, transform .15s; user-select: none; }
-    .preview-card:active { cursor: grabbing; }
-    .preview-card.drag-over { box-shadow: 0 0 0 2px var(--accent); transform: scale(1.02); }
-    .preview-card.dragging-card { opacity: .4; }
-    .preview-card.excluded { opacity: .45; }
-
-    .preview-card .img-wrap { position: relative; overflow: hidden; height: 110px; }
-    .preview-card img { width: 100%; height: 110px; object-fit: cover; display: block; pointer-events: none; transition: transform .2s; }
-
-    .list-view .preview-card { display: flex; align-items: center; gap: 10px; padding: 6px 10px 6px 6px; }
-    .list-view .preview-card .img-wrap { height: 48px; width: 48px; flex-shrink: 0; border-radius: 6px; overflow: hidden; }
-    .list-view .preview-card img { height: 48px; width: 48px; object-fit: cover; }
-    .list-view .preview-card .rotate-overlay { display: none; }
-    .list-view .preview-card .drag-hint { display: none; }
-    .list-view .preview-card .preview-card-footer { flex: 1; padding: 0; border-top: none; }
-    .list-view .preview-card .page-num { font-size: 12px; }
-
-    .img-adjust-panel { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(20,20,18,.88); padding: 6px 8px; display: none; flex-direction: column; gap: 4px; }
-    .preview-card:hover .img-adjust-panel { display: flex; }
-    .list-view .preview-card .img-adjust-panel { display: none !important; }
-
-    .adj-row { display: flex; align-items: center; gap: 6px; }
-    .adj-row span { font-size: 9px; color: #aaa; width: 22px; flex-shrink: 0; }
-    .adj-row input[type="range"] { flex: 1; accent-color: #7ec898; height: 3px; cursor: pointer; }
-
-    .rotate-overlay { position: absolute; top: 6px; left: 6px; display: flex; gap: 4px; opacity: 0; transition: opacity .2s; }
-    .preview-card:hover .rotate-overlay { opacity: 1; }
-    .rotate-btn { width: 24px; height: 24px; border-radius: 50%; border: none; background: rgba(0,0,0,.6); color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; transition: background .15s; }
-    .rotate-btn:hover { background: rgba(0,0,0,.85); }
-
-    .card-select { position: absolute; top: 6px; right: 6px; width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; opacity: 0; transition: opacity .15s; }
-    .preview-card:hover .card-select, .card-select:checked { opacity: 1; }
-    .list-view .preview-card .card-select { position: static; opacity: 1; order: -1; }
-
-    .drag-hint { position: absolute; top: 6px; left: 34px; background: rgba(0,0,0,.5); color: white; font-size: 10px; padding: 2px 6px; border-radius: 4px; opacity: 0; transition: opacity .2s; }
-    .preview-card:hover .drag-hint { opacity: 1; }
-
-    .preview-card-footer { padding: 6px 8px; display: flex; align-items: center; justify-content: space-between; gap: 4px; border-top: 1px solid var(--surface-2); }
-    .page-num { font-size: 11px; font-weight: 600; color: var(--ink-3); white-space: nowrap; }
-    .card-controls { display: flex; align-items: center; gap: 2px; }
-    .icon-btn { width: 22px; height: 22px; border-radius: 50%; border: none; background: transparent; color: var(--ink-3); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .15s, color .15s; padding: 0; }
-    .icon-btn:hover { background: var(--surface-2); color: var(--ink); }
-    .icon-btn.delete-btn:hover { background: var(--danger-light); color: var(--danger); }
-    .icon-btn:disabled { opacity: .25; cursor: default; }
-
-    .actions { margin-top: 24px; }
-    .progress-bar-wrap { height: 4px; background: var(--surface-2); border-radius: 99px; overflow: hidden; margin-bottom: 14px; display: none; }
-    .progress-bar-fill { height: 100%; background: var(--accent); border-radius: 99px; width: 0%; transition: width .3s ease; }
-
-    .btn-row { display: flex; gap: 10px; }
-    .convert-btn { flex: 1; background: var(--ink); color: var(--white); border: none; border-radius: var(--radius); padding: 14px 24px; font-size: 15px; font-family: 'DM Sans', sans-serif; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background .15s, opacity .15s; }
-    .convert-btn:hover:not(:disabled) { background: #2d2d2a; }
-    .convert-btn:disabled { opacity: .4; cursor: not-allowed; }
-    .convert-btn.success { background: var(--accent); }
-
-    .split-btn { background: var(--white); color: var(--ink); border: 1.5px solid var(--surface-3); border-radius: var(--radius); padding: 14px 18px; font-size: 14px; font-family: 'DM Sans', sans-serif; font-weight: 600; cursor: pointer; display: flex; align-items: gap: 7px; transition: border-color .15s, background .15s; white-space: nowrap; text-decoration: none; align-items: center;}
-    .split-btn:hover:not(:disabled) { border-color: var(--accent-mid); background: var(--accent-light); }
-    .split-btn:disabled { opacity: .4; cursor: not-allowed; }
-
-    .status-msg { text-align: center; font-size: 13px; color: var(--ink-3); margin-top: 12px; min-height: 18px; }
-    .status-msg.success-text { color: var(--accent); font-weight: 500; }
-    .status-msg.error-text { color: var(--danger); font-weight: 500; }
-
-    footer { text-align: center; padding: 20px 24px; font-size: 12px; color: var(--ink-3); border-top: 1px solid var(--surface-3); background: var(--white); margin-top: auto;}
+    footer { text-align: center; padding: 20px 24px; font-size: 12px; color: var(--ink-3); border-top: 1px solid var(--surface-3); background: var(--white); margin-top: auto; }
     footer .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); display: inline-block; margin: 0 6px; vertical-align: middle; }
   </style>
 </head>
 <body>
 
 <header>
-  <a href="index.html" class="header-logo">
+  <a href="./" class="header-logo">
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
       <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>
       <line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/>
     </svg>
     <div class="header-text"><h1>DocuCraft</h1></div>
   </a>
-  <a href="index.html" class="back-to-hub">
+  <a href="./" class="nav-back">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-    Back to Tools Hub
+    Back to hub
   </a>
 </header>
 
 <main>
-  <div class="drop-zone" id="dropZone">
-    <input type="file" id="fileInput" accept="image/*" multiple />
-    <div class="drop-icon">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/>
-        <path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/>
-      </svg>
-    </div>
-    <h2>Drop images here</h2>
-    <p><span class="browse-link">Browse files</span> or drag and drop · PNG, JPG, WebP, GIF</p>
-  </div>
-
-  <div class="panel">
-    <div class="panel-title">PDF Settings</div>
-    <div class="settings-grid">
-      <div class="field">
-        <label for="pageSize">Page size</label>
-        <select id="pageSize">
-          <option value="a4">A4 (210 × 297 mm)</option>
-          <option value="letter">Letter (8.5 × 11 in)</option>
-          <option value="a3">A3 (297 × 420 mm)</option>
-          <option value="legal">Legal (8.5 × 14 in)</option>
-        </select>
+  <div class="workspace">
+    <div class="panel-card">
+      <div class="panel-title">Asset Deployment Queue</div>
+      <div class="dropzone" id="dropzone">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+        <p>Drag and drop images or click to safely browse</p>
+        <span>Supports PNG, JPG, JPEG, and WebP layers</span>
+        <input type="file" id="fileInput" multiple accept="image/png, image/jpeg, image/jpg, image/webp" />
       </div>
-      <div class="field">
-        <label for="orientation">Orientation</label>
-        <select id="orientation">
-          <option value="auto">Auto (match image)</option>
-          <option value="p">Portrait</option>
-          <option value="l">Landscape</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="imageFit">Image fit</label>
-        <select id="imageFit">
-          <option value="contain">Fit page (keep aspect ratio)</option>
-          <option value="stretch">Fill page (stretch)</option>
-          <option value="original">Original size (centered)</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="margins">Margins</label>
-        <select id="margins">
-          <option value="0">None (0 mm)</option>
-          <option value="10" selected>Small (10 mm)</option>
-          <option value="20">Large (20 mm)</option>
-        </select>
-      </div>
-      <div class="field span2">
-        <label>JPEG quality <small style="font-weight:400;color:var(--ink-3)">(affects file size)</small></label>
-        <div class="slider-row">
-          <input type="range" id="jpegQuality" min="0.3" max="1" step="0.05" value="0.92" />
-          <span class="slider-val" id="qualityVal">92%</span>
-        </div>
-      </div>
-      <div class="field span2">
-        <label for="pdfFilename">Output filename</label>
-        <input type="text" id="pdfFilename" placeholder="Leave blank to auto-name" autocomplete="off" />
-      </div>
+      <div class="queue-list" id="queueList"></div>
     </div>
   </div>
 
-  <div class="panel">
-    <div class="panel-title">Document Metadata</div>
-    <div class="settings-grid">
-      <div class="field">
-        <label for="metaTitle">Title</label>
-        <input type="text" id="metaTitle" placeholder="Document title" />
+  <div class="sidebar">
+    <div class="panel-card">
+      <div class="panel-title">Compilation Panel</div>
+      
+      <div class="control-group">
+        <label class="control-label">Layout Architecture</label>
+        <select class="select-input" id="pageSize">
+          <option value="a4">A4 (Standard Document Matrix)</option>
+          <option value="letter">US Letter Geometric Layout</option>
+          <option value="fit">Adaptive Aspect Boundaries (Fit Image)</option>
+        </select>
       </div>
-      <div class="field">
-        <label for="metaAuthor">Author</label>
-        <input type="text" id="metaAuthor" placeholder="Author name" />
-      </div>
-    </div>
-  </div>
 
-  <section class="preview-section" id="previewSection" style="display:none;">
-    <div class="preview-header">
-      <h3 id="imageCount">Uploaded Images (0)</h3>
-      <div class="preview-header-right">
-        <button class="clear-all-btn" id="clearAllBtn">Clear all</button>
-        <div class="view-toggle">
-          <button class="vt-btn active" id="viewGrid" title="Grid View">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-          </button>
-          <button class="vt-btn" id="viewList" title="List View">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-          </button>
-        </div>
+      <div class="control-group">
+        <label class="control-label">Orientation Matrix</label>
+        <select class="select-input" id="pageOrientation">
+          <option value="portrait">Vertical Blueprint (Portrait)</option>
+          <option value="landscape">Horizontal Projection (Landscape)</option>
+        </select>
       </div>
-    </div>
 
-    <div class="preview-grid" id="previewGrid"></div>
-
-    <div class="actions">
-      <div class="progress-bar-wrap" id="progressWrap">
-        <div class="progress-bar-fill" id="progressFill"></div>
+      <div class="control-group">
+        <label class="control-label">Margin Strategy</label>
+        <select class="select-input" id="pageMargins">
+          <option value="none">Zero Edge Tolerances (Full Bleed)</option>
+          <option value="small">Compressed Boundaries (5mm Margin)</option>
+          <option value="large">Standard Workspace Perimeter (12mm Margin)</option>
+        </select>
       </div>
-      <div class="btn-row">
-        <button class="convert-btn" id="convertBtn">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Convert & Download PDF
+
+      <div class="control-group">
+        <label class="control-label">Metadata: Document Title</label>
+        <input type="text" class="text-input" id="metaTitle" placeholder="Untitled Record Matrix" />
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Metadata: System Author</label>
+        <input type="text" class="text-input" id="metaAuthor" placeholder="DocuCraft Client Module" />
+      </div>
+
+      <div style="margin-top: 24px;">
+        <button class="btn btn-primary" id="convertBtn" disabled>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Compile PDF Document
         </button>
-        <button class="split-btn" id="splitBtn" title="Convert each individual image into separate single-page PDFs and download together inside a ZIP archive.">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
-          Save as Separate PDFs (.zip)
+        <button class="btn btn-secondary" id="splitBtn" disabled>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+          Export Isolated Sequences (ZIP)
         </button>
       </div>
+
+      <div class="progress-container" id="progressContainer">
+        <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressBar"></div></div>
+        <div class="progress-text" id="progressText">0% Complete</div>
+      </div>
+
       <div class="status-msg" id="statusMsg"></div>
     </div>
-  </section>
+  </div>
 </main>
 
 <footer>
@@ -361,396 +286,233 @@
 </footer>
 
 <script>
-const { jsPDF } = window.jspdf;
-let items = [];
-let dragSourceElement = null;
+  let queue = [];
 
-const dropZone = document.getElementById('dropZone');
-const fileInput = document.getElementById('fileInput');
-const previewSection = document.getElementById('previewSection');
-const previewGrid = document.getElementById('previewGrid');
-const imageCount = document.getElementById('imageCount');
-const clearAllBtn = document.getElementById('clearAllBtn');
-const viewGrid = document.getElementById('viewGrid');
-const viewList = document.getElementById('viewList');
-const jpegQuality = document.getElementById('jpegQuality');
-const qualityVal = document.getElementById('qualityVal');
-const convertBtn = document.getElementById('convertBtn');
-const splitBtn = document.getElementById('splitBtn');
-const progressWrap = document.getElementById('progressWrap');
-const progressFill = document.getElementById('progressFill');
-const statusMsg = document.getElementById('statusMsg');
+  const dropzone = document.getElementById('dropzone');
+  const fileInput = document.getElementById('fileInput');
+  const queueList = document.getElementById('queueList');
+  const convertBtn = document.getElementById('convertBtn');
+  const splitBtn = document.getElementById('splitBtn');
+  const progressContainer = document.getElementById('progressContainer');
+  const progressBar = document.getElementById('progressBar');
+  const progressText = document.getElementById('progressText');
+  const statusMsg = document.getElementById('statusMsg');
 
-jpegQuality.addEventListener('input', (e) => {
-  qualityVal.textContent = Math.round(e.target.value * 100) + '%';
-});
+  dropzone.addEventListener('click', () => fileInput.click());
+  dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.style.borderColor = 'var(--accent-mid)'; });
+  dropzone.addEventListener('dragleave', () => { dropzone.style.borderColor = 'var(--surface-3)'; });
+  dropzone.addEventListener('drop', (e) => { e.preventDefault(); dropzone.style.borderColor = 'var(--surface-3)'; handleFiles(e.dataTransfer.files); });
+  fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
 
-['dragenter', 'dragover'].forEach(eventName => {
-  dropZone.addEventListener(eventName, (e) => { e.preventDefault(); dropZone.classList.add('dragging'); }, false);
-});
-['dragleave', 'drop'].forEach(eventName => {
-  dropZone.addEventListener(eventName, (e) => { e.preventDefault(); dropZone.classList.remove('dragging'); }, false);
-});
-dropZone.addEventListener('drop', (e) => {
-  if (e.dataTransfer.files ? e.dataTransfer.files.length : 0) handleFiles(e.dataTransfer.files);
-});
-fileInput.addEventListener('change', (e) => {
-  if (e.target.files ? e.target.files.length : 0) handleFiles(e.target.files);
-});
-
-function handleFiles(fileList) {
-  const incoming = Array.from(fileList).filter(f => f.type.startsWith('image/'));
-  if (!incoming.length) return;
-
-  incoming.forEach(file => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        items.push({
-          id: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2),
-          file: file,
-          src: e.target.result,
-          width: img.naturalWidth,
-          height: img.naturalHeight,
-          rotation: 0,
-          brightness: 100,
-          contrast: 100,
-          excluded: false
-        });
-        renderCards();
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
-function renderCards() {
-  if (!items.length) {
-    previewSection.style.display = 'none';
-    return;
+  function handleFiles(files) {
+    for (const file of files) {
+      if (!file.type.startsWith('image/')) continue;
+      const id = crypto.randomUUID();
+      const item = { id, file, active: true, thumbUrl: URL.createObjectURL(file) };
+      queue.push(item);
+    }
+    updateUI();
   }
-  previewSection.style.display = 'block';
-  imageCount.textContent = `Uploaded Images (${items.length})`;
-  previewGrid.innerHTML = '';
 
-  items.forEach((item, index) => {
-    const card = document.createElement('div');
-    card.className = `preview-card ${item.excluded ? 'excluded' : ''}`;
-    card.setAttribute('draggable', 'true');
-    card.setAttribute('data-id', item.id);
-
-    card.innerHTML = `
-      <input type="checkbox" class="card-select" ${!item.excluded ? 'checked' : ''} title="Include page in PDF" />
-      <div class="drag-hint">Drag to reorder</div>
-      <div class="rotate-overlay">
-        <button class="rotate-btn left" title="Rotate Counter-Clockwise">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2.5 2v6h6M2.66 15.57a10 10 0 1 0-.57-8.38l5.67-2.5"/></svg>
-        </button>
-        <button class="rotate-btn right" title="Rotate Clockwise">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1 .57-8.38l-5.67-2.5"/></svg>
-        </button>
-      </div>
-      <div class="img-wrap">
-        <img src="${item.src}" style="transform: rotate(${item.rotation}deg) scale(${item.rotation % 180 !== 0 ? 0.7 : 1}); filter: brightness(${item.brightness}%) contrast(${item.contrast}%);" />
-        <div class="img-adjust-panel">
-          <div class="adj-row">
-            <span>Bri</span>
-            <input type="range" class="bri-slider" min="50" max="150" value="${item.brightness}" />
-          </div>
-          <div class="adj-row">
-            <span>Con</span>
-            <input type="range" class="con-slider" min="50" max="150" value="${item.contrast}" />
-          </div>
+  function updateUI() {
+    queueList.innerHTML = '';
+    queue.forEach((item, index) => {
+      const el = document.createElement('div');
+      el.className = 'queue-item';
+      if (!item.active) el.style.opacity = '0.5';
+      el.innerHTML = `
+        <img class="queue-thumb" src="${item.thumbUrl}" />
+        <div class="queue-info">
+          <div class="queue-name">${item.file.name}</div>
+          <div class="queue-meta">${(item.file.size/1024).toFixed(1)} KB</div>
         </div>
-      </div>
-      <div class="preview-card-footer">
-        <span class="page-num">Page ${index + 1}</span>
-        <div class="card-controls">
-          <button class="icon-btn up-btn" ${index === 0 ? 'disabled' : ''} title="Move Up">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
-          </button>
-          <button class="icon-btn down-btn" ${index === items.length - 1 ? 'disabled' : ''} title="Move Down">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
-          <button class="icon-btn delete-btn" title="Remove image">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-          </button>
+        <div class="queue-actions">
+          <button class="action-btn" onclick="moveItem(${index}, -1)">↑</button>
+          <button class="action-btn" onclick="moveItem(${index}, 1)">↓</button>
+          <button class="action-btn" onclick="removeItem('${item.id}')">✕</button>
         </div>
-      </div>
-    `;
-
-    card.querySelector('.card-select').addEventListener('change', (e) => {
-      item.excluded = !e.target.checked;
-      card.classList.toggle('excluded', item.excluded);
+      `;
+      queueList.appendChild(el);
     });
-    card.querySelector('.rotate-btn.left').addEventListener('click', () => { item.rotation = (item.rotation - 90) % 360; renderCards(); });
-    card.querySelector('.rotate-btn.right').addEventListener('click', () => { item.rotation = (item.rotation + 90) % 360; renderCards(); });
-    
-    const bri = card.querySelector('.bri-slider');
-    bri.addEventListener('input', (e) => { item.brightness = e.target.value; card.querySelector('img').style.filter = `brightness(${item.brightness}%) contrast(${item.contrast}%)`; });
-    bri.addEventListener('change', () => renderCards());
 
-    const con = card.querySelector('.con-slider');
-    con.addEventListener('input', (e) => { item.contrast = e.target.value; card.querySelector('img').style.filter = `brightness(${item.brightness}%) contrast(${item.contrast}%)`; });
-    con.addEventListener('change', () => renderCards());
-
-    card.querySelector('.up-btn').addEventListener('click', () => { if(index > 0) { [items[index], items[index-1]] = [items[index-1], items[index]]; renderCards(); } });
-    card.querySelector('.down-btn').addEventListener('click', () => { if(index < items.length-1) { [items[index], items[index+1]] = [items[index+1], items[index]]; renderCards(); } });
-    card.querySelector('.delete-btn').addEventListener('click', () => { items.splice(index, 1); renderCards(); });
-
-    setupDragAndDrop(card);
-    previewGrid.appendChild(card);
-  });
-}
-
-function setupDragAndDrop(card) {
-  card.addEventListener('dragstart', (e) => { dragSourceElement = card; card.classList.add('dragging-card'); e.dataTransfer.effectAllowed = 'move'; }, false);
-  card.addEventListener('dragover', (e) => { if (e.preventDefault) e.preventDefault(); card.classList.add('drag-over'); return false; }, false);
-  card.addEventListener('dragleave', () => card.classList.remove('drag-over'), false);
-  card.addEventListener('drop', (e) => {
-    e.stopPropagation(); e.preventDefault();
-    if (dragSourceElement !== card) {
-      const srcId = dragSourceElement.getAttribute('data-id');
-      const targetId = card.getAttribute('data-id');
-      const srcIndex = items.findIndex(i => i.id === srcId);
-      const targetIndex = items.findIndex(i => i.id === targetId);
-      const [moved] = items.splice(srcIndex, 1);
-      items.splice(targetIndex, 0, moved);
-      renderCards();
-    }
-    return false;
-  }, false);
-  card.addEventListener('dragend', () => { card.classList.remove('dragging-card'); Array.from(previewGrid.children).forEach(c => c.classList.remove('drag-over')); }, false);
-}
-
-clearAllBtn.addEventListener('click', () => { items = []; renderCards(); statusMsg.textContent = ''; });
-viewGrid.addEventListener('click', () => { viewGrid.classList.add('active'); viewList.classList.remove('active'); previewGrid.classList.remove('list-view'); });
-viewList.addEventListener('click', () => { viewList.classList.add('active'); viewGrid.classList.remove('active'); previewGrid.classList.add('list-view'); });
-
-function processAndApplyFilters(item) {
-  return new Promise((resolve) => {
-    if (item.brightness == 100 && item.contrast == 100 && item.rotation == 0) {
-      resolve(item.src);
-      return;
-    }
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    const img = new Image();
-    img.onload = () => {
-      const angle = (item.rotation * Math.PI) / 180;
-      const is90 = Math.abs(item.rotation) % 180 !== 0;
-      canvas.width = is90 ? img.naturalHeight : img.naturalWidth;
-      canvas.height = is90 ? img.naturalWidth : img.naturalHeight;
-      ctx.translate(canvas.width / 2, canvas.height / 2);
-      ctx.rotate(angle);
-      ctx.filter = `brightness(${item.brightness}%) contrast(${item.contrast}%)`;
-      ctx.drawImage(img, -img.naturalWidth / 2, -img.naturalHeight / 2);
-      resolve(canvas.toDataURL('image/jpeg', 0.95));
-    };
-    img.src = item.src;
-  });
-}
-
-function getPageDimensions(sizeStr, orientStr, imgW, imgH) {
-  const map = { a4: [210, 297], letter: [215.9, 279.4], a3: [297, 420], legal: [215.9, 355.6] };
-  let dims = map[sizeStr] || map.a4;
-  let pW = dims[0];
-  let pH = dims[1];
-  if (orientStr === 'auto') {
-    if (imgW > imgH) { pW = dims[1]; pH = dims[0]; }
-  } else if (orientStr === 'l') {
-    pW = dims[1]; pH = dims[0];
-  }
-  return { pW, pH };
-}
-
-convertBtn.addEventListener('click', async () => {
-  const activeItems = items.filter(i => !i.excluded);
-  if (!activeItems.length) { alert('All cards are currently unchecked or removed.'); return; }
-
-  convertBtn.disabled = true;
-  splitBtn.disabled = true;
-  statusMsg.textContent = 'Generating PDF file layers...';
-  statusMsg.className = 'status-msg';
-  setProgress(5);
-
-  try {
-    const sizeOpt = document.getElementById('pageSize').value;
-    const orientOpt = document.getElementById('orientation').value;
-    const fitOpt = document.getElementById('imageFit').value;
-    const marginOpt = parseFloat(document.getElementById('margins').value);
-    const qOpt = parseFloat(jpegQuality.value);
-
-    let pdf = null;
-
-    for (let i = 0; i < activeItems.length; i++) {
-      const item = activeItems[i];
-      const processedSrc = await processAndApplyFilters(item);
-      const { pW, pH } = getPageDimensions(sizeOpt, orientOpt, item.width, item.height);
-
-      if (i === 0) {
-        pdf = new jsPDF({ orientation: pW > pH ? 'l' : 'p', unit: 'mm', format: [pW, pH] });
-      } else {
-        pdf.addPage([pW, pH], pW > pH ? 'l' : 'p');
-      }
-
-      let dW = pW - (marginOpt * 2);
-      let dH = pH - (marginOpt * 2);
-      let dX = marginOpt;
-      let dY = marginOpt;
-
-      const is90 = Math.abs(item.rotation) % 180 !== 0;
-      const currentW = is90 ? item.height : item.width;
-      const currentH = is90 ? item.width : item.height;
-
-      if (fitOpt === 'contain') {
-        const ratio = Math.min(dW / currentW, dH / currentH);
-        const finalW = currentW * ratio;
-        const finalH = currentH * ratio;
-        dX = marginOpt + (dW - finalW) / 2;
-        dY = marginOpt + (dH - finalH) / 2;
-        dW = finalW;
-        dH = finalH;
-      } else if (fitOpt === 'original') {
-        const mmW = currentW * 0.264583;
-        const mmH = currentH * 0.264583;
-        dX = marginOpt + (dW - mmW) / 2;
-        dY = marginOpt + (dH - mmH) / 2;
-        dW = mmW;
-        dH = mmH;
-      }
-
-      pdf.addImage(processedSrc, 'JPEG', dX, dY, dW, dH, undefined, 'FAST');
-      setProgress(5 + Math.round((i / activeItems.length) * 80));
-    }
-
-    const title = document.getElementById('metaTitle').value.trim();
-    const author = document.getElementById('metaAuthor').value.trim();
-    if (title || author) pdf.setProperties({ title: title || undefined, author: author || undefined });
-
-    setProgress(90);
-    let outName = document.getElementById('pdfFilename').value.trim();
-    if (!outName) {
-      if (activeItems.length === 1) {
-        outName = activeItems[0].file.name.replace(/\.[^/.]+$/, "") + ".pdf";
-      } else {
-        outName = "docucraft_archive.pdf";
-      }
-    } else {
-      if (!outName.toLowerCase().endsWith('.pdf')) outName += '.pdf';
-    }
-
-    pdf.save(outName);
-    setProgress(100);
-    statusMsg.textContent = `✓ Generated "${outName}" successfully.`;
-    statusMsg.className = 'status-msg success-text';
-  } catch (err) {
-    console.error(err);
-    statusMsg.textContent = '⚠ Document processing generation failed.';
-    statusMsg.className = 'status-msg error-text';
+    const activeCount = queue.filter(i => i.active).length;
+    convertBtn.disabled = activeCount === 0;
+    splitBtn.disabled = activeCount === 0;
   }
 
-  convertBtn.disabled = false;
-  splitBtn.disabled = false;
-  setTimeout(() => setProgress(0, true), 1200);
-});
+  window.moveItem = (index, dir) => {
+    const target = index + dir;
+    if (target < 0 || target >= queue.length) return;
+    const tmp = queue[index];
+    queue[index] = queue[target];
+    queue[target] = tmp;
+    updateUI();
+  };
 
-splitBtn.addEventListener('click', async () => {
-  const activeItems = items.filter(i => !i.excluded);
-  if (!activeItems.length) { alert('Please check or upload files to extract.'); return; }
+  window.removeItem = (id) => {
+    const idx = queue.findIndex(i => i.id === id);
+    if (idx !== -1) {
+      URL.revokeObjectURL(queue[idx].thumbUrl);
+      queue.splice(idx, 1);
+    }
+    updateUI();
+  };
 
-  splitBtn.disabled = true;
-  convertBtn.disabled = true;
-  statusMsg.textContent = 'Compressing image splits into ZIP layers...';
-  statusMsg.className = 'status-msg';
-  setProgress(5);
+  function setProgress(val, hide = false) {
+    progressContainer.style.display = hide ? 'none' : 'block';
+    progressBar.style.width = `${val}%`;
+    progressText.textContent = `${val}% Complete`;
+  }
 
-  try {
-    const zip = new JSZip();
-    const sizeOpt = document.getElementById('pageSize').value;
-    const orientOpt = document.getElementById('orientation').value;
-    const fitOpt = document.getElementById('imageFit').value;
-    const marginOpt = parseFloat(document.getElementById('margins').value);
+  // Compiler Engines logic remains fully localized and operational
+  convertBtn.addEventListener('click', async () => {
+    const activeItems = queue.filter(i => i.active);
+    if (!activeItems.length) return;
 
-    for (let i = 0; i < activeItems.length; i++) {
-      const item = activeItems[i];
-      const processedSrc = await processAndApplyFilters(item);
-      const { pW, pH } = getPageDimensions(sizeOpt, orientOpt, item.width, item.height);
+    splitBtn.disabled = true;
+    convertBtn.disabled = true;
+    statusMsg.style.display = 'none';
+    setProgress(5);
 
-      const pdf = new jsPDF({ orientation: pW > pH ? 'l' : 'p', unit: 'mm', format: [pW, pH] });
+    try {
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({ orientation: document.getElementById('pageOrientation').value, unit: 'mm', format: document.getElementById('pageSize').value === 'fit' ? 'a4' : document.getElementById('pageSize').value });
+      
+      const pSize = document.getElementById('pageSize').value;
+      const pStrat = document.getElementById('pageMargins').value;
+      const margin = pStrat === 'none' ? 0 : (pStrat === 'small' ? 5 : 12);
 
-      let dW = pW - (marginOpt * 2);
-      let dH = pH - (marginOpt * 2);
-      let dX = marginOpt;
-      let dY = marginOpt;
+      for (let i = 0; i < activeItems.length; i++) {
+        if (i > 0) pdf.addPage();
+        const item = activeItems[i];
+        
+        await new Promise((resolve) => {
+          const img = new Image();
+          img.src = item.thumbUrl;
+          img.onload = () => {
+            let pW = pdf.internal.pageSize.getWidth();
+            let pH = pdf.internal.pageSize.getHeight();
+            
+            if (pSize === 'fit') {
+              pdf.setPage(i + 1);
+              pdf.internal.pageSize.setWidth(img.width * 0.264583);
+              pdf.internal.pageSize.setHeight(img.height * 0.264583);
+              pW = pdf.internal.pageSize.getWidth();
+              pH = pdf.internal.pageSize.getHeight();
+            }
 
-      const is90 = Math.abs(item.rotation) % 180 !== 0;
-      const currentW = is90 ? item.height : item.width;
-      const currentH = is90 ? item.width : item.height;
+            const availW = pW - (margin * 2);
+            const availH = pH - (margin * 2);
+            let dW = availW;
+            let dH = (img.height * dW) / img.width;
 
-      if (fitOpt === 'contain') {
-        const ratio = Math.min(dW / currentW, dH / currentH);
-        const finalW = currentW * ratio;
-        const finalH = currentH * ratio;
-        dX = marginOpt + (dW - finalW) / 2;
-        dY = marginOpt + (dH - finalH) / 2;
-        dW = finalW;
-        dH = finalH;
-      } else if (fitOpt === 'original') {
-        const mmW = currentW * 0.264583;
-        const mmH = currentH * 0.264583;
-        dX = marginOpt + (dW - mmW) / 2;
-        dY = marginOpt + (dH - mmH) / 2;
-        dW = mmW;
-        dH = mmH;
+            if (dH > availH) {
+              dH = availH;
+              dW = (img.width * dH) / img.height;
+            }
+
+            const x = margin + (availW - dW) / 2;
+            const y = margin + (availH - dH) / 2;
+
+            pdf.addImage(img, 'JPEG', x, y, dW, dH);
+            resolve();
+          };
+        });
+        setProgress(5 + Math.round((i / activeItems.length) * 85));
       }
-
-      pdf.addImage(processedSrc, 'JPEG', dX, dY, dW, dH, undefined, 'FAST');
 
       const title = document.getElementById('metaTitle').value.trim();
       const author = document.getElementById('metaAuthor').value.trim();
       if (title || author) pdf.setProperties({ title: title || undefined, author: author || undefined });
 
-      const base = item.file.name.replace(/\.[^/.]+$/, '');
-      const fname = `${String(i + 1).padStart(3, '0')}_${base}.pdf`;
-      zip.file(fname, pdf.output('blob'));
-      setProgress(5 + Math.round((i / activeItems.length) * 85));
+      setProgress(95);
+      pdf.save('docucraft-compiled.pdf');
+      setProgress(100);
+
+      statusMsg.textContent = '✓ PDF document layout compiled successfully.';
+      statusMsg.className = 'status-msg success-text';
+    } catch (err) {
+      console.error(err);
+      statusMsg.textContent = '⚠ Execution pipeline encountered data errors.';
+      statusMsg.className = 'status-msg error-text';
+    }
+    splitBtn.disabled = false;
+    convertBtn.disabled = false;
+    setTimeout(() => setProgress(0, true), 1200);
+  });
+
+  splitBtn.addEventListener('click', async () => {
+    const activeItems = queue.filter(i => i.active);
+    if (!activeItems.length) return;
+
+    splitBtn.disabled = true;
+    convertBtn.disabled = true;
+    statusMsg.style.display = 'none';
+    setProgress(5);
+
+    try {
+      const zip = new JSZip();
+      const { jsPDF } = window.jspdf;
+
+      for (let i = 0; i < activeItems.length; i++) {
+        const item = activeItems[i];
+        const pdf = new jsPDF({ orientation: document.getElementById('pageOrientation').value, unit: 'mm', format: document.getElementById('pageSize').value === 'fit' ? 'a4' : document.getElementById('pageSize').value });
+        
+        await new Promise((resolve) => {
+          const img = new Image();
+          img.src = item.thumbUrl;
+          img.onload = () => {
+            let pW = pdf.internal.pageSize.getWidth();
+            let pH = pdf.internal.pageSize.getHeight();
+            if (document.getElementById('pageSize').value === 'fit') {
+              pdf.internal.pageSize.setWidth(img.width * 0.264583);
+              pdf.internal.pageSize.setHeight(img.height * 0.264583);
+              pW = pdf.internal.pageSize.getWidth();
+              pH = pdf.internal.pageSize.getHeight();
+            }
+            const pStrat = document.getElementById('pageMargins').value;
+            const margin = pStrat === 'none' ? 0 : (pStrat === 'small' ? 5 : 12);
+            const availW = pW - (margin * 2);
+            const availH = pH - (margin * 2);
+            let dW = availW; let dH = (img.height * dW) / img.width;
+            if (dH > availH) { dH = availH; dW = (img.width * dH) / img.height; }
+            pdf.addImage(img, 'JPEG', margin + (availW - dW)/2, margin + (availH - dH)/2, dW, dH);
+            resolve();
+          };
+        });
+
+        const title = document.getElementById('metaTitle').value.trim();
+        const author = document.getElementById('metaAuthor').value.trim();
+        if (title || author) pdf.setProperties({ title: title || undefined, author: author || undefined });
+
+        const base = item.file.name.replace(/\.[^/.]+$/, '');
+        const fname = `${String(i + 1).padStart(3, '0')}_${base}.pdf`;
+        zip.file(fname, pdf.output('blob'));
+        setProgress(5 + Math.round((i / activeItems.length) * 85));
+      }
+
+      setProgress(95);
+      const blob = await zip.generateAsync({ type: 'blob' });
+      setProgress(100);
+
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'images-split.zip';
+      a.click();
+      URL.revokeObjectURL(a.href);
+
+      statusMsg.textContent = `✓ images-split.zip downloaded (${activeItems.length} PDFs)`;
+      statusMsg.className = 'status-msg success-text';
+    } catch (err) {
+      console.error(err);
+      statusMsg.textContent = '⚠ ZIP generation failed. Check console constraints.';
+      statusMsg.className = 'status-msg error-text';
     }
 
-    setProgress(95);
-    const blob = await zip.generateAsync({ type: 'blob' });
-    setProgress(100);
-
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'images-split.zip';
-    a.click();
-    URL.revokeObjectURL(a.href);
-
-    statusMsg.textContent = `✓ images-split.zip downloaded (${activeItems.length} PDFs)`;
-    statusMsg.className = 'status-msg success-text';
-  } catch (err) {
-    console.error(err);
-    statusMsg.textContent = '⚠ ZIP generation failed. Check console constraints.';
-    statusMsg.className = 'status-msg error-text';
-  }
-
-  splitBtn.disabled = false;
-  convertBtn.disabled = false;
-  setTimeout(() => setProgress(0, true), 1200);
-});
-
-function setProgress(pct, hide = false) {
-  if (hide) {
-    progressWrap.style.display = 'none';
-    progressFill.style.width = '0%';
-  } else {
-    progressWrap.style.display = 'block';
-    progressFill.style.width = `${pct}%`;
-  }
-}
+    splitBtn.disabled = false;
+    convertBtn.disabled = false;
+    setTimeout(() => setProgress(0, true), 1200);
+  });
 </script>
 
 </body>
