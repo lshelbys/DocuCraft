@@ -59,7 +59,6 @@
       letter-spacing: -0.01em;
     }
 
-    /* GitHub Button & Tooltip Styling */
     .github-link {
       color: #fff;
       display: flex;
@@ -74,9 +73,7 @@
       opacity: 1;
       transform: scale(1.05);
     }
-    .github-link svg {
-      color: #fff;
-    }
+    .github-link svg { color: #fff; }
     .github-link::after {
       content: "Repo";
       position: absolute;
@@ -128,6 +125,7 @@
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 20px;
+      margin-bottom: 60px;
     }
 
     .tool-link {
@@ -180,6 +178,78 @@
       line-height: 1.4;
     }
 
+    /* New Section: Features/Trust Badges */
+    .features-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 24px;
+      border-top: 1px solid var(--surface-3);
+      padding-top: 50px;
+      margin-bottom: 60px;
+    }
+    .feature-item {
+      display: flex;
+      gap: 16px;
+    }
+    .feature-item svg {
+      color: var(--accent);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .feature-item h4 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .feature-item p {
+      font-size: 13px;
+      color: var(--ink-2);
+      line-height: 1.5;
+    }
+
+    /* New Section: FAQ Details Accordions */
+    .faq-section {
+      border-top: 1px solid var(--surface-3);
+      padding-top: 50px;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .faq-section h3 {
+      font-family: 'Instrument Serif', serif;
+      font-size: 32px;
+      font-weight: 400;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    details {
+      background: var(--white);
+      border: 1px solid var(--surface-3);
+      border-radius: var(--radius);
+      margin-bottom: 12px;
+      overflow: hidden;
+      transition: var(--transition);
+    }
+    details[open] {
+      border-color: var(--ink-3);
+    }
+    summary {
+      padding: 16px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      user-select: none;
+      outline: none;
+    }
+    summary:hover {
+      background: var(--surface-2);
+    }
+    .faq-content {
+      padding: 0 16px 16px 16px;
+      font-size: 13px;
+      color: var(--ink-2);
+      line-height: 1.5;
+    }
+
     footer { 
       text-align: center; 
       padding: 20px 24px; 
@@ -188,6 +258,10 @@
       border-top: 1px solid var(--surface-3); 
       background: var(--white); 
       margin-top: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
     }
     footer .dot { 
       width: 4px; 
@@ -195,8 +269,10 @@
       border-radius: 50%; 
       background: var(--accent); 
       display: inline-block; 
-      margin: 0 6px; 
-      vertical-align: middle; 
+    }
+    .status-dot {
+      background: #22c55e !important;
+      box-shadow: 0 0 8px #22c55e;
     }
   </style>
 </head>
@@ -285,10 +361,53 @@
       </div>
     </a>
   </div>
+
+  <section class="features-row">
+    <div class="feature-item">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <div>
+        <h4>Absolute Privacy</h4>
+        <p>Your documents never leave your computer. All rendering and transformations happen inside your client browser environment.</p>
+      </div>
+    </div>
+    <div class="feature-item">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      <div>
+        <h4>Zero Friction</h4>
+        <p>No waiting rooms, no premium upload speed limits, and completely free of distracting advertisement structures.</p>
+      </div>
+    </div>
+    <div class="feature-item">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 9.4 7.55 4.24a1.79 1.79 0 0 0-2.5 1.53v12.46a1.79 1.79 0 0 0 2.5 1.53L16.5 14.6a1.79 1.79 0 0 0 0-3.2z"/></svg>
+      <div>
+        <h4>Open & Scalable</h4>
+        <p>Built with reliable, pure modern web libraries. Completely audited, transparent, and hosted open-source on GitHub.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="faq-section">
+    <h3>Frequently Asked Questions</h3>
+    
+    <details>
+      <summary>Where are my uploaded files stored?</summary>
+      <div class="faq-content">
+        They aren't stored anywhere! DocuCraft processes your images and PDFs completely inside your browser locally using client-side JavaScript APIs. Your file details never interact with external servers.
+      </div>
+    </details>
+
+    <details>
+      <summary>Is there a file size or limit threshold?</summary>
+      <div class="faq-content">
+        No. Since processing happens natively using your computer's processing power rather than our cloud hardware resources, you can process as many documents as your system's hardware allows.
+      </div>
+    </details>
+  </section>
 </main>
 
 <footer>
   <span class="dot"></span>No sign up required, Free forever<span class="dot"></span>
+  <span class="dot status-dot"></span>Engine: Operational
 </footer>
 
 <script>
