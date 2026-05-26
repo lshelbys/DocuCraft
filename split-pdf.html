@@ -15,6 +15,7 @@
       --ink-2: #4a4a46;
       --ink-3: #8a8a84; 
       --surface: #f7f6f2; 
+      --surface-2: #eeecea;
       --surface-3: #e4e2dd; 
       --white: #ffffff; 
       --radius: 10px; 
@@ -30,25 +31,17 @@
     header svg { color: #7ec898; flex-shrink: 0; }
     .header-text h1 { font-family: 'Instrument Serif', serif; font-size: 24px; color: #fff; letter-spacing: -0.01em; }
     
-    .back-to-hub {
-      background: transparent;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #fff;
-      padding: 8px 16px;
-      border-radius: var(--radius);
+    .nav-back {
+      text-decoration: none;
+      color: var(--surface-2);
       font-size: 13px;
       font-weight: 500;
-      cursor: pointer;
-      display: inline-flex;
+      display: flex;
       align-items: center;
       gap: 6px;
-      text-decoration: none;
       transition: var(--transition);
     }
-    .back-to-hub:hover {
-      background: rgba(255,255,255,0.1);
-      border-color: #7ec898;
-    }
+    .nav-back:hover { color: #fff; }
 
     main { flex: 1; max-width: 1000px; width: 100%; margin: 0 auto; padding: 40px 24px 60px; }
     .panel { background: var(--white); border-radius: var(--radius-lg); border: 1px solid var(--surface-3); padding: 40px 30px; text-align: center; }
@@ -114,9 +107,9 @@
         <h1>DocuCraft</h1>
       </div>
     </a>
-    <a href="index.html" class="back-to-hub">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-      Workspace Hub
+    <a href="index.html" class="nav-back">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Back to hub
     </a>
   </header>
 
