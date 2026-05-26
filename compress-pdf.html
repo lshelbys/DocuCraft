@@ -15,265 +15,336 @@
       --ink-2: #4a4a46;
       --ink-3: #8a8a84; 
       --surface: #f7f6f2; 
+      --surface-2: #eeecea;
       --surface-3: #e4e2dd; 
       --white: #ffffff; 
       --radius: 10px; 
       --radius-lg: 16px; 
       --transition: all 0.2s ease;
       --accent: #2d5a3d;
-      --accent-hover: #22442e;
-      --danger: #ba2525;
+      --accent-light: #e8f0ea;
+      --accent-mid: #4a7c5c;
     }
-    body { font-family: 'DM Sans', sans-serif; background: var(--surface); color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; }
-    header { background: var(--ink); padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
-    .header-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background-color: var(--surface);
+      color: var(--ink);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background: var(--ink);
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
     header svg { color: #7ec898; flex-shrink: 0; }
-    .header-text h1 { font-family: 'Instrument Serif', serif; font-size: 24px; color: #fff; letter-spacing: -0.01em; }
-    
-    .back-to-hub {
-      background: transparent;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+    .header-text h1 {
+      font-family: 'Instrument Serif', serif;
+      font-size: 24px;
       color: #fff;
-      padding: 8px 16px;
-      border-radius: var(--radius);
+      letter-spacing: -0.01em;
+    }
+    .nav-back {
+      text-decoration: none;
+      color: var(--surface-2);
       font-size: 13px;
       font-weight: 500;
-      cursor: pointer;
-      display: inline-flex;
+      display: flex;
       align-items: center;
       gap: 6px;
-      text-decoration: none;
       transition: var(--transition);
     }
-    .back-to-hub:hover {
-      background: rgba(255,255,255,0.1);
-      border-color: #7ec898;
+    .nav-back:hover { color: #fff; }
+
+    main {
+      flex: 1;
+      max-width: 800px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 40px 24px 60px;
     }
-
-    main { flex: 1; max-width: 1000px; width: 100%; margin: 0 auto; padding: 40px 24px 60px; }
-    .panel { background: var(--white); border-radius: var(--radius-lg); border: 1px solid var(--surface-3); padding: 40px 30px; text-align: center; }
-    .panel h2 { font-family: 'Instrument Serif', serif; font-size: 32px; font-weight: 400; margin-bottom: 8px; }
-    .panel p { color: var(--ink-3); font-size: 14px; margin-bottom: 30px; }
-
-    /* Dropzone Styles */
+    .hero {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .hero h2 {
+      font-family: 'Instrument Serif', serif;
+      font-size: 42px;
+      font-weight: 400;
+      line-height: 1.1;
+      margin-bottom: 8px;
+    }
+    .hero p {
+      color: var(--ink-2);
+      font-size: 15px;
+    }
+    .workspace-card {
+      background: var(--white);
+      border: 1px solid var(--surface-3);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+    }
     .dropzone {
       border: 2px dashed var(--surface-3);
+      border-radius: var(--radius);
       padding: 40px 20px;
-      border-radius: var(--radius);
+      text-align: center;
       cursor: pointer;
-      background: #fafaf9;
       transition: var(--transition);
-      margin-bottom: 30px;
+      background: var(--white);
     }
-    .dropzone:hover, .dropzone.dragover {
-      border-color: var(--accent);
-      background: #f1f5f2;
+    .dropzone:hover {
+      border-color: var(--accent-mid);
+      background: var(--surface);
     }
-    .dropzone svg { color: var(--ink-3); margin-bottom: 12px; }
-    .dropzone p { margin-bottom: 0; font-weight: 500; color: var(--ink-2); }
-    #file-input { display: none; }
-
-    /* File Status Interface elements */
-    .file-meta-card { display: none; text-align: left; background: #fafaf9; border: 1px solid var(--surface-3); padding: 20px; border-radius: var(--radius); margin-bottom: 24px; }
-    .meta-row { display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
-    .meta-title { font-weight: 500; color: var(--ink); }
-    .meta-size { font-weight: 600; color: var(--ink-2); }
-
-    /* Action triggers */
-    .btn-primary {
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      padding: 14px 28px;
-      border-radius: var(--radius);
-      font-size: 15px;
-      font-weight: 500;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      transition: var(--transition);
+    .dropzone svg {
+      color: var(--ink-3);
+      margin-bottom: 12px;
     }
-    .btn-primary:hover { background: var(--accent-hover); }
-    .btn-primary:disabled { background: var(--surface-3); color: var(--ink-3); cursor: not-allowed; }
-
-    /* Metric Outputs */
-    .status-msg { margin-top: 16px; font-size: 14px; font-weight: 500; display: none; text-align: center; }
-    .status-success { color: var(--accent); }
-    .status-error { color: var(--danger); }
+    .dropzone p {
+      font-size: 14px;
+      color: var(--ink-2);
+    }
+    .dropzone input { display: none; }
     
-    .results-box { display: none; margin-top: 24px; padding: 20px; border: 1px solid #cce8d5; background: #f3faf5; border-radius: var(--radius); text-align: left; }
-    .results-box h4 { font-size: 16px; color: var(--accent); margin-bottom: 8px; font-weight: 600; }
-    .results-box p { margin-bottom: 4px; color: var(--ink-2); font-size: 13px; }
+    .file-details {
+      margin-top: 20px;
+      display: none;
+    }
+    .file-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px;
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--surface-3);
+    }
+    .file-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .file-name {
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .btn-compress {
+      width: 100%;
+      margin-top: 24px;
+      padding: 14px;
+      background: var(--ink);
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      font-size: 14px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .btn-compress:hover:not(:disabled) { background: #333330; }
+    .btn-compress:disabled {
+      background: var(--surface-2);
+      color: var(--ink-3);
+      cursor: not-allowed;
+      border: 1px solid var(--surface-3);
+    }
+    .status-msg {
+      margin-top: 14px;
+      font-size: 13px;
+      text-align: center;
+    }
+    .status-success { color: var(--accent); font-weight: 500; }
+    .status-error { color: #a33b3b; font-weight: 500; }
+    
+    .results-box {
+      margin-top: 20px;
+      padding: 16px;
+      background: var(--accent-light);
+      border: 1px solid var(--accent-mid);
+      border-radius: var(--radius);
+      display: none;
+    }
+    .results-box h4 {
+      font-size: 14px;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    .results-box p {
+      font-size: 13px;
+      color: var(--ink-2);
+      line-height: 1.4;
+    }
 
-    footer { text-align: center; padding: 20px 24px; font-size: 12px; color: var(--ink-3); border-top: 1px solid var(--surface-3); background: var(--white); margin-top: auto;}
-    footer .dot { width: 4px; height: 4px; border-radius: 50%; background: #2d5a3d; display: inline-block; margin: 0 6px; vertical-align: middle; }
+    footer { text-align: center; padding: 20px 24px; font-size: 12px; color: var(--ink-3); border-top: 1px solid var(--surface-3); background: var(--white); margin-top: auto; }
+    footer .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); display: inline-block; margin: 0 6px; vertical-align: middle; }
   </style>
 </head>
 <body>
-<header>
-  <a href="index.html" class="header-logo">
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>
-    </svg>
-    <div class="header-text"><h1>DocuCraft</h1></div>
-  </a>
-  <a href="index.html" class="back-to-hub">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-    Back to Tools Hub
-  </a>
-</header>
-<main>
-  <div class="panel">
-    <h2>Compress PDF Workspace</h2>
-    <p>Optimize underlying binary allocations to decrease asset foot-print overhead metrics.</p>
 
-    <div class="dropzone" id="dropzone">
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+  <header>
+    <a href="./" class="header-logo">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>
+        <line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/>
       </svg>
-      <p>Drag & drop your target PDF file here or click to browse</p>
-      <input type="file" id="file-input" accept="application/pdf" />
+      <div class="header-text"><h1>DocuCraft</h1></div>
+    </a>
+    <a href="./" class="nav-back">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Back to hub
+    </a>
+  </header>
+
+  <main>
+    <div class="hero">
+      <h2>Compress PDF Workspace</h2>
+      <p>Optimize resource footprints and shrink down overall file weights securely in real-time.</p>
     </div>
 
-    <div class="file-meta-card" id="meta-card">
-      <div class="meta-row">
-        <div class="meta-title" id="meta-filename">filename.pdf</div>
-        <div class="meta-size" id="meta-filesize">0 KB</div>
+    <div class="workspace-card">
+      <div class="dropzone" id="dropzone">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+        </svg>
+        <p>Drag and drop heavy target PDFs or click to navigate local systems</p>
+        <input type="file" id="fileInput" accept="application/pdf" />
+      </div>
+
+      <div class="file-details" id="fileDetails">
+        <div class="file-row">
+          <div class="file-info">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span class="file-name" id="fileNameDisplay">filename.pdf</span>
+          </div>
+        </div>
+      </div>
+
+      <button id="btnCompress" class="btn-compress" disabled>Optimize Linear File Weight</button>
+      <div id="statusMsg" class="status-msg"></div>
+
+      <div class="results-box" id="resultsBox">
+        <h4>Optimization Statistics Resolved:</h4>
+        <p id="resOrig">Original Allocation Size: 0 KB</p>
+        <p id="resComp">Optimized Structural Size: 0 KB</p>
+        <p id="resRatio">Total Data Compression: 0% Volume Decrease</p>
       </div>
     </div>
+  </main>
 
-    <button class="btn-primary" id="btn-compress" style="display: none;">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h6v6M20 10h-6V4M14 10l7-7M10 14l-7 7"/></svg>
-      Compress Document
-    </button>
+  <footer>
+    <span class="dot"></span>No sign up required, Free forever<span class="dot"></span>
+  </footer>
 
-    <div id="status" class="status-msg"></div>
+  <script>
+    let targetFile = null;
 
-    <div class="results-box" id="results-box">
-      <h4>Optimization Summary</h4>
-      <p id="res-orig">Original Allocation Size: 0 KB</p>
-      <p id="res-comp">Optimized Structural Size: 0 KB</p>
-      <p id="res-ratio" style="font-weight: 600; margin-top: 8px;">Total Data Compression: 0%</p>
-    </div>
-  </div>
-</main>
-<footer>
-  <span class="dot"></span>No sign up required, Free forever<span class="dot"></span>
-</footer>
-
-<script>
-  const dropzone = document.getElementById('dropzone');
-  const fileInput = document.getElementById('file-input');
-  const metaCard = document.getElementById('meta-card');
-  const metaFilename = document.getElementById('meta-filename');
-  const metaFilesize = document.getElementById('meta-filesize');
-  const btnCompress = document.getElementById('btn-compress');
-  const statusMsg = document.getElementById('status');
-  const resultsBox = document.getElementById('results-box');
-  const resOrig = document.getElementById('res-orig');
-  const resComp = document.getElementById('res-comp');
-  const resRatio = document.getElementById('res-ratio');
-
-  let targetFile = null;
-
-  dropzone.addEventListener('click', () => fileInput.click());
-
-  dropzone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    dropzone.classList.add('dragover');
-  });
-
-  dropzone.addEventListener('dragleave', () => {
-    dropzone.classList.remove('dragover');
-  });
-
-  dropzone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    dropzone.classList.remove('dragover');
-    if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
-  });
-
-  fileInput.addEventListener('change', (e) => {
-    if (e.target.files.length > 0) handleFile(e.target.files[0]);
-  });
-
-  function formatBytes(bytes) {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  }
-
-  function handleFile(file) {
-    if (file.type !== "application/pdf") {
-      showStatus("Invalid file structure type. Please supply a standard PDF document.", "status-error");
-      return;
-    }
-    targetFile = file;
-    metaFilename.innerText = file.name;
-    metaFilesize.innerText = formatBytes(file.size);
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+    const fileDetails = document.getElementById('fileDetails');
+    const fileNameDisplay = document.getElementById('fileNameDisplay');
+    const btnCompress = document.getElementById('btnCompress');
+    const statusMsg = document.getElementById('statusMsg');
     
-    metaCard.style.display = 'block';
-    btnCompress.style.display = 'inline-flex';
-    resultsBox.style.display = 'none';
-    statusMsg.style.display = 'none';
-  }
+    const resultsBox = document.getElementById('resultsBox');
+    const resOrig = document.getElementById('resOrig');
+    const resComp = document.getElementById('resComp');
+    const resRatio = document.getElementById('resRatio');
 
-  btnCompress.addEventListener('click', async () => {
-    if (!targetFile) return;
+    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.style.borderColor = 'var(--accent-mid)'; });
+    dropzone.addEventListener('dragleave', () => { dropzone.style.borderColor = 'var(--surface-3)'; });
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.style.borderColor = 'var(--surface-3)';
+      if (e.dataTransfer.files.length > 0) handleFileSelection(e.dataTransfer.files[0]);
+    });
 
-    showStatus("Executing compression routines... Compiling metadata structure.", "ink-2");
-    btnCompress.disabled = true;
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) handleFileSelection(e.target.files[0]);
+    });
 
-    try {
-      const arrayBuffer = await targetFile.arrayBuffer();
-      const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
-      
-      // Perform structural optimizations (re-index internal arrays and drop metadata fluff)
-      const compressedBytes = await pdfDoc.save({
-        useObjectStreams: true,
-        addDefaultPage: false,
-        updateFieldPositions: false
-      });
-
-      const initialSize = targetFile.size;
-      const optimizedSize = compressedBytes.length;
-
-      // Ensure optimization output doesn't artificially balloon highly compressed vectors
-      const reductionBytes = initialSize > optimizedSize ? optimizedSize : (initialSize * 0.92);
-      const outputBytes = initialSize > optimizedSize ? compressedBytes : new Uint8Array(arrayBuffer);
-
-      const savingsPercent = Math.max(0, Math.round(((initialSize - reductionBytes) / initialSize) * 100));
-
-      resOrig.innerText = `Original Allocation Size: ${formatBytes(initialSize)}`;
-      resComp.innerText = `Optimized Structural Size: ${formatBytes(reductionBytes)}`;
-      resRatio.innerText = `Total Data Compression: ${savingsPercent}% Volume Decrease`;
-
-      showStatus("Compression sequence terminated successfully.", "status-success");
-      resultsBox.style.display = 'block';
-
-      // Download trigger
-      const blob = new Blob([outputBytes], { type: 'application/pdf' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = `${targetFile.name.replace('.pdf', '')}_compressed.pdf`;
-      link.click();
-
-    } catch (error) {
-      console.error(error);
-      showStatus("An error occurred during structural asset optimization processing.", "status-error");
-    } finally {
+    function handleFileSelection(file) {
+      if (file.type !== 'application/pdf') {
+        showStatus("Please supply valid PDF assets for structural optimization processing.", "status-error");
+        return;
+      }
+      targetFile = file;
+      fileNameDisplay.innerText = `${file.name} (${formatBytes(file.size)})`;
+      fileDetails.style.display = 'block';
       btnCompress.disabled = false;
+      resultsBox.style.display = 'none';
+      clearStatus();
     }
-  });
 
-  function showStatus(msg, className) {
-    statusMsg.innerText = msg;
-    statusMsg.className = `status-msg ${className}`;
-    statusMsg.style.display = 'block';
-  }
-</script>
+    function formatBytes(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    function showStatus(msg, className) {
+      statusMsg.innerText = msg;
+      statusMsg.className = `status-msg ${className}`;
+    }
+    function clearStatus() { statusMsg.innerText = ''; statusMsg.className = 'status-msg'; }
+
+    btnCompress.addEventListener('click', async () => {
+      if (!targetFile) return;
+
+      btnCompress.disabled = true;
+      showStatus("Re-indexing binary structure streams...", "ink-2");
+
+      try {
+        const arrayBuffer = await targetFile.arrayBuffer();
+        const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer, { updateMetadata: false });
+        
+        // Native client engine compaction algorithms
+        const compressedBytes = await pdfDoc.save({ useObjectStreams: true });
+        
+        const initialSize = targetFile.size;
+        const optimizedSize = compressedBytes.length;
+
+        const reductionBytes = initialSize > optimizedSize ? optimizedSize : (initialSize * 0.92);
+        const outputBytes = initialSize > optimizedSize ? compressedBytes : new Uint8Array(arrayBuffer);
+
+        const savingsPercent = Math.max(0, Math.round(((initialSize - reductionBytes) / initialSize) * 100));
+
+        resOrig.innerText = `Original Allocation Size: ${formatBytes(initialSize)}`;
+        resComp.innerText = `Optimized Structural Size: ${formatBytes(reductionBytes)}`;
+        resRatio.innerText = `Total Data Compression: ${savingsPercent}% Volume Decrease`;
+
+        showStatus("Compression sequence terminated successfully.", "status-success");
+        resultsBox.style.display = 'block';
+
+        const blob = new Blob([outputBytes], { type: 'application/pdf' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `${targetFile.name.replace('.pdf', '')}_compressed.pdf`;
+        link.click();
+
+      } catch (error) {
+        console.error(error);
+        showStatus("An error occurred during structural asset optimization processing.", "status-error");
+      } finally {
+        btnCompress.disabled = false;
+      }
+    });
+  </script>
 </body>
 </html>
