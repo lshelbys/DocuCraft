@@ -16,6 +16,7 @@
       --ink-2: #4a4a46;
       --ink-3: #8a8a84; 
       --surface: #f7f6f2; 
+      --surface-2: #eeecea;
       --surface-3: #e4e2dd; 
       --white: #ffffff; 
       --radius: 10px; 
@@ -23,6 +24,7 @@
       --transition: all 0.2s ease;
       --accent: #2d5a3d;
       --accent-light: #e8f0ea;
+      --accent-mid: #4a7c5c;
     }
     body {
       font-family: 'DM Sans', sans-serif;
@@ -33,71 +35,72 @@
       flex-direction: column;
     }
     header {
-      padding: 24px 40px;
+      background: var(--ink);
+      padding: 16px 32px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid var(--surface-3);
-      background-color: var(--surface);
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
     }
-    .logo-container {
+    .header-logo {
       display: flex;
       align-items: center;
       gap: 12px;
       text-decoration: none;
-      color: var(--ink);
     }
-    .logo-text {
+    header svg { color: #7ec898; flex-shrink: 0; }
+    .header-text h1 {
       font-family: 'Instrument Serif', serif;
       font-size: 24px;
-      font-weight: 400;
+      color: #fff;
+      letter-spacing: -0.01em;
     }
     .nav-back {
       text-decoration: none;
-      color: var(--ink-2);
-      font-size: 14px;
+      color: var(--surface-2);
+      font-size: 13px;
       font-weight: 500;
       display: flex;
       align-items: center;
       gap: 6px;
       transition: var(--transition);
     }
-    .nav-back:hover { color: var(--ink); }
+    .nav-back:hover { color: #fff; }
     main {
       flex: 1;
       max-width: 800px;
       width: 100%;
       margin: 0 auto;
-      padding: 60px 24px;
+      padding: 40px 24px 60px;
     }
     .hero {
       text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 32px;
     }
-    h1 {
+    .hero h2 {
       font-family: 'Instrument Serif', serif;
-      font-size: 48px;
+      font-size: 42px;
       font-weight: 400;
       line-height: 1.1;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
     .hero p {
       color: var(--ink-2);
-      font-size: 16px;
-      max-width: 500px;
-      margin: 0 auto;
+      font-size: 15px;
     }
     .workspace-card {
       background: var(--white);
       border: 1px solid var(--surface-3);
       border-radius: var(--radius-lg);
-      padding: 32px;
+      padding: 24px;
     }
     .mode-selector {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
     .mode-btn {
       padding: 12px;
@@ -125,7 +128,7 @@
       background: var(--white);
     }
     .dropzone:hover {
-      border-color: var(--ink-3);
+      border-color: var(--accent-mid);
       background: var(--surface);
     }
     .dropzone svg {
@@ -138,7 +141,7 @@
     }
     .dropzone input { display: none; }
     .file-details {
-      margin-top: 24px;
+      margin-top: 20px;
       display: none;
     }
     .file-row {
@@ -162,7 +165,7 @@
     }
     .btn-convert {
       width: 100%;
-      margin-top: 24px;
+      margin-top: 20px;
       padding: 14px;
       background: var(--ink);
       color: var(--white);
@@ -170,7 +173,7 @@
       border-radius: var(--radius);
       font-family: 'DM Sans', sans-serif;
       font-weight: 500;
-      font-size: 15px;
+      font-size: 14px;
       cursor: pointer;
       transition: var(--transition);
     }
@@ -181,65 +184,91 @@
       cursor: not-allowed;
     }
     .status-msg {
-      margin-top: 16px;
-      font-size: 14px;
+      margin-top: 14px;
+      font-size: 13px;
       text-align: center;
     }
     .status-success { color: var(--accent); font-weight: 500; }
     .status-error { color: #a33b3b; font-weight: 500; }
+    
+    footer { 
+      text-align: center; 
+      padding: 20px 24px; 
+      font-size: 12px; 
+      color: var(--ink-3); 
+      border-top: 1px solid var(--surface-3); 
+      background: var(--white); 
+      margin-top: auto;
+    }
+    footer .dot { 
+      width: 4px; 
+      height: 4px; 
+      border-radius: 50%; 
+      background: var(--accent); 
+      display: inline-block; 
+      margin: 0 6px; 
+      vertical-align: middle; 
+    }
   </style>
 </head>
 <body>
 
   <header>
-    <a href="index.html" class="logo-container">
-      <object data="icon.svg" type="image/svg+xml" width="24" height="24" style="pointer-events: none;"></object>
-      <span class="logo-text">DocuCraft</span>
+    <a href="index.html" class="header-logo">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>
+        <line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/>
+      </svg>
+      <div class="header-text"><h1>DocuCraft</h1></div>
     </a>
     <a href="index.html" class="nav-back">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
       Back to hub
     </a>
   </header>
 
   <main>
     <div class="hero">
-      <h1>PDF Converter</h1>
-      <p>Seamlessly change image arrangements to clean PDF bundles or transform PDF layout structures into standalone high-res images and clear text extraction logs.</p>
+      <h2>PDF Converter</h2>
+      <p>Transform format structural elements instantly entirely inside your client dashboard.</p>
     </div>
 
     <div class="workspace-card">
       <div class="mode-selector">
         <button id="modeToPdf" class="mode-btn active">Images to PDF</button>
-        <button id="modeFromPdf" class="mode-btn">PDF to Layout Elements (Images/Text)</button>
+        <button id="modeFromPdf" class="mode-btn">PDF to Layout Elements</button>
       </div>
 
       <div class="dropzone" id="dropzone">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
         </svg>
-        <p id="dropzoneText">Drag and drop file elements here or click to browse</p>
+        <p id="dropzoneText">Drag and drop image components or click to browse</p>
         <input type="file" id="fileInput" />
       </div>
 
       <div class="file-details" id="fileDetails">
         <div class="file-row">
           <div class="file-info">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
             <span class="file-name" id="fileNameDisplay">filename.ext</span>
           </div>
         </div>
       </div>
 
-      <button id="btnConvert" class="btn-convert" disabled>Execute Conversion Pipeline</button>
+      <button id="btnConvert" class="btn-convert" disabled>Execute Conversion Routine</button>
       <div id="statusMsg" class="status-msg"></div>
     </div>
   </main>
 
+  <footer>
+    <span class="dot"></span>No sign up required, Free forever<span class="dot"></span>
+  </footer>
+
   <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
 
-    let currentMode = 'toPdf'; // 'toPdf' or 'fromPdf'
+    let currentMode = 'toPdf';
     let targetFile = null;
 
     const modeToPdf = document.getElementById('modeToPdf');
@@ -265,51 +294,38 @@
       if (mode === 'toPdf') {
         modeToPdf.classList.add('active');
         modeFromPdf.classList.remove('active');
-        dropzoneText.innerText = 'Drag and drop images (PNG, JPG) here or click to browse';
+        dropzoneText.innerText = 'Drag and drop image components (PNG, JPG) or click to browse';
         fileInput.accept = 'image/png, image/jpeg';
       } else {
         modeFromPdf.classList.add('active');
         modeToPdf.classList.remove('active');
-        dropzoneText.innerText = 'Drag and drop your PDF here or click to browse';
+        dropzoneText.innerText = 'Drag and drop layout PDFs or click to browse';
         fileInput.accept = 'application/pdf';
       }
     }
 
     dropzone.addEventListener('click', () => fileInput.click());
-    
-    dropzone.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      dropzone.style.borderColor = 'var(--ink)';
-    });
-
-    dropzone.addEventListener('dragleave', () => {
-      dropzone.style.borderColor = 'var(--surface-3)';
-    });
-
+    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.style.borderColor = 'var(--accent-mid)'; });
+    dropzone.addEventListener('dragleave', () => { dropzone.style.borderColor = 'var(--surface-3)'; });
     dropzone.addEventListener('drop', (e) => {
       e.preventDefault();
       dropzone.style.borderColor = 'var(--surface-3)';
-      if (e.dataTransfer.files.length > 0) {
-        handleFileSelection(e.dataTransfer.files[0]);
-      }
+      if (e.dataTransfer.files.length > 0) handleFileSelection(e.dataTransfer.files[0]);
     });
 
     fileInput.addEventListener('change', (e) => {
-      if (e.target.files.length > 0) {
-        handleFileSelection(e.target.files[0]);
-      }
+      if (e.target.files.length > 0) handleFileSelection(e.target.files[0]);
     });
 
     function handleFileSelection(file) {
       if (currentMode === 'toPdf' && !file.type.startsWith('image/')) {
-        showStatus('Please upload an image file for this conversion mode.', 'status-error');
+        showStatus('Please process image files inside this layout stream.', 'status-error');
         return;
       }
       if (currentMode === 'fromPdf' && file.type !== 'application/pdf') {
-        showStatus('Please upload a valid PDF document path structure.', 'status-error');
+        showStatus('Please upload valid PDF files for layer data compilation.', 'status-error');
         return;
       }
-
       targetFile = file;
       fileNameDisplay.innerText = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
       fileDetails.style.display = 'block';
@@ -320,7 +336,7 @@
     btnConvert.addEventListener('click', async () => {
       if (!targetFile) return;
       btnConvert.disabled = true;
-      showStatus('Processing structure elements...', 'ink-2');
+      showStatus('Compiling layout objects...', 'ink-2');
 
       try {
         if (currentMode === 'toPdf') {
@@ -329,9 +345,8 @@
           await convertPdfToElements(targetFile);
         }
       } catch (err) {
-        console.error(err);
-        showStatus('An structural error occurred during conversion parsing.', 'status-error');
-      } finally {
+        showStatus('Error resolving document structure compilation.', 'status-error');
+      } {
         btnConvert.disabled = false;
       }
     });
@@ -339,77 +354,46 @@
     async function convertImageToPdf(file) {
       const pdfDoc = await PDFLib.PDFDocument.create();
       const arrayBuffer = await file.arrayBuffer();
-      
-      let image;
-      if (file.type === 'image/jpeg' || file.type === 'image/jpg') {
-        image = await pdfDoc.embedJpg(arrayBuffer);
-      } else if (file.type === 'image/png') {
-        image = await pdfDoc.embedPng(arrayBuffer);
-      } else {
-        throw new Error('Unsupported format');
-      }
-
+      let image = file.type === 'image/png' ? await pdfDoc.embedPng(arrayBuffer) : await pdfDoc.embedJpg(arrayBuffer);
       const page = pdfDoc.addPage([image.width, image.height]);
       page.drawImage(image, { x: 0, y: 0, width: image.width, height: image.height });
-
       const pdfBytes = await pdfDoc.save();
       downloadBlob(pdfBytes, `${file.name.split('.')[0]}_converted.pdf`, 'application/pdf');
-      showStatus('Image compiled into PDF workspace layout successfully!', 'status-success');
+      showStatus('Compiled assets successfully.', 'status-success');
     }
 
     async function convertPdfToElements(file) {
       const arrayBuffer = await file.arrayBuffer();
       const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-      
-      // 1. Extract structural text elements safely
-      let structuredText = '';
+      let textLog = '';
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
-        const textContent = await page.getTextContent();
-        const pageText = textContent.items.map(item => item.str).join(' ');
-        structuredText += `--- Page ${i} ---\n${pageText}\n\n`;
+        const txt = await page.getTextContent();
+        textLog += `--- Page ${i} ---\n` + txt.items.map(item => item.str).join(' ') + '\n\n';
       }
+      downloadBlob(new TextEncoder().encode(textLog), `${file.name.split('.')[0]}_extracted.txt`, 'text/plain');
       
-      // Download text log summary
-      const textBytes = new TextEncoder().encode(structuredText);
-      downloadBlob(textBytes, `${file.name.split('.')[0]}_extracted_text.txt`, 'text/plain');
-
-      // 2. Render first page to viewport image for localized capture confirmation
       const page = await pdf.getPage(1);
       const viewport = page.getViewport({ scale: 1.5 });
       const canvas = document.createElement('canvas');
-      const context = canvas.getContext('2d');
+      const ctx = canvas.getContext('2d');
       canvas.height = viewport.height;
       canvas.width = viewport.width;
-
-      await page.render({ canvasContext: context, viewport: viewport }).promise;
-      canvas.toBlob((blob) => {
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `${file.name.split('.')[0]}_page_1.png`;
-        link.click();
-      }, 'image/png');
-
-      showStatus('Extracted localized layer assets and text layouts successfully!', 'status-success');
+      await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+      canvas.toBlob((b) => downloadBlob(b, `${file.name.split('.')[0]}_preview.png`, 'image/png'), 'image/png');
+      showStatus('Extracted workspace matrix assets successfully.', 'status-success');
     }
 
-    function downloadBlob(bytes, filename, contentType) {
-      const blob = new Blob([bytes], { type: contentType });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = filename;
-      link.click();
+    function downloadBlob(b, n, c) {
+      const blob = b instanceof Blob ? b : new Blob([b], { type: c });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = n;
+      a.click();
     }
 
-    function showStatus(msg, className) {
-      statusMsg.innerText = msg;
-      statusMsg.className = `status-msg ${className}`;
-    }
-
-    function clearStatus() {
-      statusMsg.innerText = '';
-      statusMsg.className = 'status-msg';
-    }
+    function showStatus(msg, cls) { statusMsg.innerText = msg; statusMsg.className = `status-msg ${cls}`; }
+    function clearStatus() { statusMsg.innerText = ''; statusMsg.className = 'status-msg'; }
   </script>
 </body>
 </html>
