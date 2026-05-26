@@ -24,6 +24,27 @@
       --radius: 10px;
       --radius-lg: 16px;
       --transition: all 0.2s ease;
+      
+      /* Header Colors - Light Mode Defaults */
+      --header-bg: #1a1a18;
+      --header-text: #ffffff;
+      --header-hover: #7ec898; 
+    }
+
+    /* Target theme tokens directly when dark mode is active */
+    html[data-theme="dark"] {
+      --ink: #f7f6f2;
+      --ink-2: #c4c2be;
+      --ink-3: #8a8a84;
+      --surface: #121211;
+      --surface-2: #1c1c1a;
+      --surface-3: #2a2a27;
+      --white: #1a1a18;
+      
+      /* Make sticky header match dark mode background */
+      --header-bg: #1c1c1a;
+      --header-text: #f7f6f2;
+      --header-hover: #8a8a84; /* Deep dark/muted state for action buttons */
     }
 
     body {
@@ -33,11 +54,11 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      position: relative; /* Setup coordinate system for bottom-right badge */
+      position: relative;
     }
 
     header {
-      background: var(--ink);
+      background: var(--header-bg);
       padding: 16px 32px;
       display: flex;
       align-items: center;
@@ -45,6 +66,8 @@
       position: sticky;
       top: 0;
       z-index: 50;
+      border-bottom: 1px solid var(--surface-3);
+      transition: background var(--transition), border-color var(--transition);
     }
     .header-logo {
       display: flex;
@@ -56,25 +79,65 @@
     .header-text h1 {
       font-family: 'Instrument Serif', serif;
       font-size: 24px;
-      color: #fff;
+      color: #ffffff;
       letter-spacing: -0.01em;
     }
 
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* Theme Toggle Button */
+    .theme-toggle {
+      background: none;
+      border: none;
+      color: var(--header-text);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: var(--transition);
+    }
+    .theme-toggle:hover {
+      color: var(--header-hover);
+      transform: scale(1.05);
+    }
+    
+    /* Explicitly force internal SVG graphics to inherit the correct color tokens */
+    .theme-toggle svg, .github-link svg {
+      color: inherit;
+      fill: none;
+      stroke: currentColor;
+    }
+    
+    html[data-theme="dark"] .theme-toggle .moon-path { display: none; }
+    html:not([data-theme="dark"]) .theme-toggle .sun-path { display: none; }
+
+    /* GitHub Repository Link */
     .github-link {
-      color: #fff;
+      color: var(--header-text);
       display: flex;
       align-items: center;
       justify-content: center;
       text-decoration: none;
       position: relative;
       transition: var(--transition);
-      opacity: 0.85;
     }
     .github-link:hover {
-      opacity: 1;
+      color: var(--header-hover);
       transform: scale(1.05);
     }
-    .github-link svg { color: #fff; }
+    
+    /* Explicitly lock down vector paths inside dark mode hover environments */
+    html[data-theme="dark"] .theme-toggle:hover svg,
+    html[data-theme="dark"] .github-link:hover svg {
+      color: var(--header-hover) !important;
+      stroke: var(--header-hover) !important;
+    }
+
     .github-link::after {
       content: "Repo";
       position: absolute;
@@ -271,7 +334,6 @@
       vertical-align: middle;
     }
 
-    /* Isolated System Status Style (Bottom Right Corner) */
     .system-status {
       position: absolute;
       bottom: 18px;
@@ -282,7 +344,7 @@
       align-items: center;
       gap: 6px;
       font-weight: 500;
-      pointer-events: none; /* Keeps it purely visual */
+      pointer-events: none;
       z-index: 10;
     }
     .status-dot { 
@@ -294,7 +356,6 @@
       display: inline-block; 
     }
 
-    /* Responsive adjustment so it doesn't overlap centered footer on narrow mobile viewports */
     @media (max-width: 600px) {
       .system-status {
         position: static;
@@ -316,11 +377,26 @@
     <div class="header-text"><h1>DocuCraft</h1></div>
   </a>
 
-  <a href="https://github.com/lshelbys/DocuCraft" target="_blank" rel="noopener noreferrer" class="github-link" aria-label="GitHub Repository">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
-    </svg>
-  </a>
+  <div class="header-actions">
+    <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode">
+      <svg width="22" height="22" viewBox="0 0 24 24">
+        <g class="moon-path"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></g>
+        <g class="sun-path">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </g>
+      </svg>
+    </button>
+
+    <a href="https://github.com/lshelbys/DocuCraft" target="_blank" rel="noopener noreferrer" class="github-link" aria-label="GitHub Repository">
+      <svg width="24" height="24" viewBox="0 0 24 24">
+        <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+      </svg>
+    </a>
+  </div>
 </header>
 
 <main>
@@ -447,6 +523,23 @@
     const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname.replace(/\/index\.html$/, '/');
     window.history.replaceState(null, '', cleanUrl);
   }
+
+  const activeTheme = localStorage.getItem('theme') || 'light';
+  if (activeTheme === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
+
+  const toggleBtn = document.getElementById('themeToggle');
+  toggleBtn.addEventListener('click', () => {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    if (isDark) {
+      document.documentElement.removeAttribute('data-theme');
+      localStorage.setItem('theme', 'light');
+    } else {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      localStorage.setItem('theme', 'dark');
+    }
+  });
 </script>
 
 </body>
