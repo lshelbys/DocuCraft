@@ -19,6 +19,8 @@
       --surface-3: #e4e2dd;
       --white: #ffffff;
       --accent: #2d5a3d;
+      --accent-light: #e8f0ea;
+      --accent-mid: #4a7c5c;
       --radius: 10px;
       --radius-lg: 16px;
       --transition: all 0.2s ease;
@@ -26,7 +28,7 @@
 
     body {
       font-family: 'DM Sans', sans-serif;
-      background-color: var(--surface);
+      background: var(--surface);
       color: var(--ink);
       min-height: 100vh;
       display: flex;
@@ -34,62 +36,57 @@
     }
 
     header {
-      padding: 32px 40px;
+      background: var(--ink);
+      padding: 16px 32px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      max-width: 1200px;
-      width: 100%;
-      margin: 0 auto;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
     }
-
-    .logo-container {
+    .header-logo {
       display: flex;
       align-items: center;
       gap: 12px;
       text-decoration: none;
-      color: var(--ink);
     }
-
-    .logo-text {
+    header svg { color: #7ec898; flex-shrink: 0; }
+    .header-text h1 {
       font-family: 'Instrument Serif', serif;
-      font-size: 28px;
-      font-weight: 400;
+      font-size: 24px;
+      color: #fff;
       letter-spacing: -0.01em;
     }
 
-    .main-container {
+    main {
       flex: 1;
-      max-width: 1200px;
+      max-width: 1000px;
       width: 100%;
       margin: 0 auto;
-      padding: 40px 40px 80px 40px;
+      padding: 40px 24px 60px;
     }
 
-    .hero-section {
-      margin-bottom: 64px;
+    .hub-hero {
+      text-align: center;
+      margin-bottom: 40px;
     }
-
-    .hero-title {
+    .hub-hero h2 {
       font-family: 'Instrument Serif', serif;
-      font-size: 64px;
+      font-size: 42px;
       font-weight: 400;
-      line-height: 1.05;
-      letter-spacing: -0.02em;
-      margin-bottom: 20px;
+      line-height: 1.1;
+      margin-bottom: 8px;
     }
-
-    .hero-subtitle {
-      font-size: 18px;
+    .hub-hero p {
       color: var(--ink-2);
-      max-width: 540px;
-      line-height: 1.45;
+      font-size: 16px;
     }
 
     .tools-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 24px;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
     }
 
     .tool-link {
@@ -99,170 +96,174 @@
     }
 
     .tool-card {
-      background-color: var(--white);
+      background: var(--white);
       border: 1px solid var(--surface-3);
       border-radius: var(--radius-lg);
-      padding: 32px;
-      height: 100%;
+      padding: 24px;
+      cursor: pointer;
       display: flex;
       flex-direction: column;
-      position: relative;
+      gap: 14px;
       transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      height: 100%;
     }
-
-    .tool-link:hover .tool-card {
-      transform: translateY(-2px);
-      border-color: var(--ink-3);
-      box-shadow: 0 12px 24px -10px rgba(26,26,24,0.04);
+    .tool-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent-mid);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.03);
     }
-
-    .tool-badge {
-      position: absolute;
-      top: 24px;
-      right: 24px;
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      padding: 4px 8px;
-      border-radius: 20px;
-      background-color: var(--surface-2);
-      color: var(--ink-2);
-    }
-
     .tool-icon {
       width: 44px;
       height: 44px;
       border-radius: var(--radius);
-      background-color: var(--surface);
+      background: var(--surface);
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 32px;
-      color: var(--ink);
+      color: var(--accent);
       transition: var(--transition);
     }
-
-    .tool-link:hover .tool-icon {
-      background-color: var(--ink);
-      color: var(--white);
+    .tool-card:hover .tool-icon {
+      background: var(--accent-light);
     }
-
     .tool-info h3 {
-      font-size: 18px;
-      font-weight: 500;
-      margin-bottom: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
     }
-
     .tool-info p {
-      font-size: 14px;
-      color: var(--ink-2);
-      line-height: 1.5;
-    }
-
-    footer {
-      padding: 40px;
-      border-top: 1px solid var(--surface-3);
-      max-width: 1200px;
-      width: 100%;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .footer-text {
       font-size: 13px;
       color: var(--ink-3);
+      line-height: 1.4;
+    }
+    .tool-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 20px;
+      background: var(--surface-2);
+      color: var(--ink-2);
+    }
+    .tool-badge.ready {
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+
+    footer { 
+      text-align: center; 
+      padding: 20px 24px; 
+      font-size: 12px; 
+      color: var(--ink-3); 
+      border-top: 1px solid var(--surface-3); 
+      background: var(--white); 
+      margin-top: auto;
+    }
+    footer .dot { 
+      width: 4px; 
+      height: 4px; 
+      border-radius: 50%; 
+      background: var(--accent); 
+      display: inline-block; 
+      margin: 0 6px; 
+      vertical-align: middle; 
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <a href="index.html" class="logo-container">
-      <object data="icon.svg" type="image/svg+xml" width="28" height="28" style="pointer-events: none;"></object>
-      <span class="logo-text">DocuCraft</span>
+<header>
+  <a href="index.html" class="header-logo">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>
+      <line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/>
+    </svg>
+    <div class="header-text"><h1>DocuCraft</h1></div>
+  </a>
+</header>
+
+<main>
+  <section class="hub-hero">
+    <h2>The all-in-one platform for your document workflow</h2>
+    <p>No sign up    •    No ads    •    100% Free</p>
+  </section>
+
+  <div class="tools-grid">
+    <a href="image-to-pdf.html" class="tool-link">
+      <div class="tool-card">
+        <span class="tool-badge ready">Ready</span>
+        <div class="tool-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        </div>
+        <div class="tool-info">
+          <h3>Image to PDF</h3>
+          <p>Convert collections of PNG, JPG, WebP images seamlessly into clean presentation PDFs.</p>
+        </div>
+      </div>
     </a>
-  </header>
 
-  <div class="main-container">
-    <div class="hero-section">
-      <h1 class="hero-title">Refined utility<br>for document workflows.</h1>
-      <p class="hero-subtitle">An intentional workspace providing swift processing without telemetry leaks. Client-side tools designed for clarity and efficiency.</p>
-    </div>
-
-    <div class="tools-grid">
-      <a href="merge-pdf.html" class="tool-link">
-        <div class="tool-card">
-          <span class="tool-badge">Tool</span>
-          <div class="tool-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-          </div>
-          <div class="tool-info">
-            <h3>Merge PDF</h3>
-            <p>Combine multiple PDF files into a single structured document in any selected page order.</p>
-          </div>
+    <a href="merge-pdf.html" class="tool-link">
+      <div class="tool-card">
+        <span class="tool-badge">Soon</span>
+        <div class="tool-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
         </div>
-      </a>
-
-      <a href="split-pdf.html" class="tool-link">
-        <div class="tool-card">
-          <span class="tool-badge">Soon</span>
-          <div class="tool-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><path d="M12 3v6M12 15v6"/></svg>
-          </div>
-          <div class="tool-info">
-            <h3>Split PDF</h3>
-            <p>Extract specific page ranges or split each separate page into isolated individual files.</p>
-          </div>
+        <div class="tool-info">
+          <h3>Merge PDF</h3>
+          <p>Combine multiple PDF files into a single structured document in any selected page order.</p>
         </div>
-      </a>
+      </div>
+    </a>
 
-      <a href="compress-pdf.html" class="tool-link">
-        <div class="tool-card">
-          <span class="tool-badge">Soon</span>
-          <div class="tool-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 14h16M4 10h16M12 4v6M12 14v6"/></svg>
-          </div>
-          <div class="tool-info">
-            <h3>Compress PDF</h3>
-            <p>Reduce the localized storage signature of documents while conserving layout parameters.</p>
-          </div>
+    <a href="split-pdf.html" class="tool-link">
+      <div class="tool-card">
+        <span class="tool-badge">Soon</span>
+        <div class="tool-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><path d="M12 3v6M12 15v6"/></svg>
         </div>
-      </a>
+        <div class="tool-info">
+          <h3>Split PDF</h3>
+          <p>Extract specific page ranges or split each separate page into isolated individual files.</p>
+        </div>
+      </div>
+    </a>
 
-      <a href="image-to-pdf.html" class="tool-link">
-        <div class="tool-card">
-          <span class="tool-badge">Soon</span>
-          <div class="tool-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-          </div>
-          <div class="tool-info">
-            <h3>Image to PDF</h3>
-            <p>Convert distinct image layouts into cleanly structured portable file sequences.</p>
-          </div>
+    <a href="compress-pdf.html" class="tool-link">
+      <div class="tool-card">
+        <span class="tool-badge">Soon</span>
+        <div class="tool-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 14h16M4 10h16M12 4v6M12 14v6"/></svg>
         </div>
-      </a>
+        <div class="tool-info">
+          <h3>Compress PDF</h3>
+          <p>Optimize resource footprints and shrink down overall file sizes while keeping structural resolution high.</p>
+        </div>
+      </div>
+    </a>
 
-      <a href="pdf-converter.html" class="tool-link">
-        <div class="tool-card">
-          <span class="tool-badge">Soon</span>
-          <div class="tool-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7 21l-4 1 1-4L17 3z"/></svg>
-          </div>
-          <div class="tool-info">
-            <h3>PDF Converter</h3>
-            <p>Transform any file into a high-quality PDF or convert PDFs to Word, Excel, PowerPoint, images, and other formats.</p>
-          </div>
+    <a href="pdf-converter.html" class="tool-link">
+      <div class="tool-card">
+        <span class="tool-badge ready">Ready</span>
+        <div class="tool-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7 21l-4 1 1-4L17 3z"/></svg>
         </div>
-      </a>
-    </div>
+        <div class="tool-info">
+          <h3>PDF Converter</h3>
+          <p>Transform files into high-quality PDFs or pull high-res image layers and text elements right out of them.</p>
+        </div>
+      </div>
+    </a>
   </div>
+</main>
 
-  <footer>
-    <div class="footer-text">&copy; 2026 DocuCraft. Serverless optimization layer.</div>
-  </footer>
+<footer>
+  <span class="dot"></span>No sign up required, Free forever<span class="dot"></span>
+</footer>
 
 </body>
 </html>
