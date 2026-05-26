@@ -176,14 +176,6 @@
     .list-view .preview-card .preview-card-footer { flex: 1; padding: 0; border-top: none; }
     .list-view .preview-card .page-num { font-size: 12px; }
 
-    .img-adjust-panel { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(20,20,18,.88); padding: 6px 8px; display: none; flex-direction: column; gap: 4px; }
-    .preview-card:hover .img-adjust-panel { display: flex; }
-    .list-view .preview-card .img-adjust-panel { display: none !important; }
-
-    .adj-row { display: flex; align-items: center; gap: 6px; }
-    .adj-row span { font-size: 9px; color: #aaa; width: 22px; flex-shrink: 0; }
-    .adj-row input[type="range"] { flex: 1; accent-color: #7ec898; height: 3px; cursor: pointer; }
-
     .rotate-overlay { position: absolute; top: 6px; left: 6px; display: flex; gap: 4px; opacity: 0; transition: opacity .2s; }
     .preview-card:hover .rotate-overlay { opacity: 1; }
     .rotate-btn { width: 24px; height: 24px; border-radius: 50%; border: none; background: rgba(0,0,0,.6); color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; transition: background .15s; }
@@ -212,7 +204,6 @@
     .convert-btn { flex: 1; background: var(--ink); color: var(--white); border: none; border-radius: var(--radius); padding: 14px 24px; font-size: 15px; font-family: 'DM Sans', sans-serif; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background .15s, opacity .15s; }
     .convert-btn:hover:not(:disabled) { background: #2d2d2a; }
     .convert-btn:disabled { opacity: .4; cursor: not-allowed; }
-    .convert-btn.success { background: var(--accent); }
 
     .split-btn { background: var(--white); color: var(--ink); border: 1.5px solid var(--surface-3); border-radius: var(--radius); padding: 14px 18px; font-size: 14px; font-family: 'DM Sans', sans-serif; font-weight: 600; cursor: pointer; display: flex; transition: border-color .15s, background .15s; white-space: nowrap; text-decoration: none; align-items: center; gap: 7px;}
     .split-btn:hover:not(:disabled) { border-color: var(--accent-mid); background: var(--accent-light); }
@@ -257,64 +248,64 @@
           <polyline points="21 15 16 10 5 21"/>
         </svg>
       </div>
-      <h2>Drag & drop your compilation sequence assets here</h2>
-      <p>Supports JPEG, PNG, and WebP layers. Or <span class="browse-link">browse structural system drives</span></p>
+      <h2>Drag & drop images here</h2>
+      <p>Supports JPEG, PNG, and WebP. Or <span class="browse-link">browse files</span></p>
     </div>
 
     <div class="panel" id="workspacePanel" style="display: none;">
-      <div class="panel-title">Asset Compiler Configurations</div>
+      <div class="panel-title">Page Configurations</div>
       <div class="settings-grid">
         <div class="field">
-          <label for="pageSize">Page Dimensions Protocol</label>
+          <label for="pageSize">Page Size</label>
           <select id="pageSize">
-            <option value="a4">A4 Standard Architecture (210 × 297 mm)</option>
-            <option value="letter">US Letter Framework (8.5 × 11.0 in)</option>
-            <option value="fit">Adaptive Structural Fit (Match Source Aspect)</option>
+            <option value="a4">A4 (210 × 297 mm)</option>
+            <option value="letter">US Letter (8.5 × 11 in)</option>
+            <option value="fit">Fit Image (Match Source Aspect)</option>
           </select>
         </div>
         <div class="field">
-          <label for="orientation">Layout Alignment Logic</label>
+          <label for="orientation">Orientation</label>
           <select id="orientation">
-            <option value="portrait">Vertical Orientation (Portrait)</option>
-            <option value="landscape">Horizontal Vector Line (Landscape)</option>
+            <option value="portrait">Portrait</option>
+            <option value="landscape">Landscape</option>
           </select>
         </div>
         <div class="field">
-          <label for="margin">Boundary Margin Offset</label>
+          <label for="margin">Margin</label>
           <select id="margin">
-            <option value="none">Zero Boundary Clearance (0mm)</option>
-            <option value="small">Compact Framework Cushion (5mm)</option>
-            <option value="large">Standard Safe Separation (12mm)</option>
+            <option value="none">No Margin (0mm)</option>
+            <option value="small">Small (5mm)</option>
+            <option value="large">Large (12mm)</option>
           </select>
         </div>
         <div class="field">
-          <label>Structural Resolution Compaction</label>
+          <label>Image Quality</label>
           <div class="slider-row">
-            <input type="range" id="quality" min="10" max="100" value="82" />
-            <span class="slider-val" id="qualityVal">82%</span>
+            <input type="range" id="quality" min="10" max="100" value="85" />
+            <span class="slider-val" id="qualityVal">85%</span>
           </div>
         </div>
         <div class="field">
-          <label for="metaTitle">Document Title Header</label>
-          <input type="text" id="metaTitle" placeholder="Optional system classification summary..." />
+          <label for="metaTitle">Document Title</label>
+          <input type="text" id="metaTitle" placeholder="Optional..." />
         </div>
         <div class="field">
-          <label for="metaAuthor">Assigned System Operator</label>
-          <input type="text" id="metaAuthor" placeholder="Operator initials or department tag..." />
+          <label for="metaAuthor">Author</label>
+          <input type="text" id="metaAuthor" placeholder="Optional..." />
         </div>
       </div>
     </div>
 
     <div class="preview-section" id="previewSection" style="display: none;">
       <div class="preview-header">
-        <h3 id="assetCounter">Loaded Structural Targets (0)</h3>
+        <h3 id="assetCounter">Selected Images (0)</h3>
         <div class="preview-header-right">
-          <button class="clear-all-btn" id="clearAllBtn">Flush Buffer</button>
+          <button class="clear-all-btn" id="clearAllBtn">Clear All</button>
           <div class="view-toggle">
-            <button class="vt-btn active" id="viewGrid" title="Matrix Grid View">
+            <button class="vt-btn active" id="viewGrid" title="Grid View">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
             </button>
-            <button class="vt-btn" id="viewList" title="Linear List View">
+            <button class="vt-btn" id="viewList" title="List View">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
             </button>
           </div>
@@ -336,14 +327,14 @@
             <line x1="12" y1="18" x2="12" y2="12"/>
             <polyline points="9 15 12 12 15 15"/>
           </svg>
-          Compile Master PDF
+          Convert to PDF
         </button>
         <button class="split-btn" id="splitBtn">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
             <line x1="12" y1="3" x2="12" y2="21"/>
           </svg>
-          Export Split Archive (.ZIP)
+          Export as ZIP
         </button>
       </div>
       <div class="status-msg" id="statusMsg"></div>
@@ -381,11 +372,7 @@
     const orientationSelect = document.getElementById('orientation');
 
     pageSizeSelect.addEventListener('change', () => {
-      if(pageSizeSelect.value === 'fit') {
-        orientationSelect.disabled = true;
-      } else {
-        orientationSelect.disabled = false;
-      }
+      orientationSelect.disabled = (pageSizeSelect.value === 'fit');
     });
 
     quality.addEventListener('input', () => {
@@ -429,8 +416,6 @@
             file: file,
             src: e.target.result,
             rotation: 0,
-            brightness: 100,
-            contrast: 100,
             excluded: false
           });
           updateUI();
@@ -451,7 +436,7 @@
       workspacePanel.style.display = 'block';
       previewSection.style.display = 'block';
       actionPanel.style.display = 'block';
-      assetCounter.textContent = `Loaded Structural Targets (${loadedItems.length})`;
+      assetCounter.textContent = `Selected Images (${loadedItems.length})`;
 
       previewGrid.innerHTML = '';
       loadedItems.forEach((item, index) => {
@@ -462,41 +447,30 @@
 
         card.innerHTML = `
           <input type="checkbox" class="card-select" ${!item.excluded ? 'checked' : ''} />
-          <div class="drag-hint">Order Index: ${index + 1}</div>
+          <div class="drag-hint">Page ${index + 1}</div>
           <div class="rotate-overlay">
             <button class="rotate-btn ccw" title="Rotate Left">↺</button>
             <button class="rotate-btn cw" title="Rotate Right">↻</button>
           </div>
           <div class="img-wrap">
-            <img src="${item.src}" style="transform: rotate(${item.rotation}deg) scale(${item.rotation % 180 !== 0 ? 0.7 : 1}); filter: brightness(${item.brightness}%) contrast(${item.contrast}%);" />
-            <div class="img-adjust-panel">
-              <div class="adj-row">
-                <span>BRT</span>
-                <input type="range" class="adj-brt" min="50" max="150" value="${item.brightness}" />
-              </div>
-              <div class="adj-row">
-                <span>CON</span>
-                <input type="range" class="adj-con" min="50" max="150" value="${item.contrast}" />
-              </div>
-            </div>
+            <img src="${item.src}" style="transform: rotate(${item.rotation}deg) scale(${item.rotation % 180 !== 0 ? 0.7 : 1});" />
           </div>
           <div class="preview-card-footer">
             <span class="page-num">#${String(index + 1).padStart(2, '0')}</span>
             <div class="card-controls">
-              <button class="icon-btn up-btn" ${index === 0 ? 'disabled' : ''} title="Move Layer Backward">
+              <button class="icon-btn up-btn" ${index === 0 ? 'disabled' : ''} title="Move Up">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
               </button>
-              <button class="icon-btn down-btn" ${index === loadedItems.length - 1 ? 'disabled' : ''} title="Move Layer Forward">
+              <button class="icon-btn down-btn" ${index === loadedItems.length - 1 ? 'disabled' : ''} title="Move Down">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
               </button>
-              <button class="icon-btn delete-btn" title="Purge Asset Target">
+              <button class="icon-btn delete-btn" title="Remove File">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
               </button>
             </div>
           </div>
         `;
 
-        // Listeners
         card.querySelector('.card-select').addEventListener('change', (e) => {
           item.excluded = !e.target.checked;
           card.classList.toggle('excluded', item.excluded);
@@ -505,25 +479,10 @@
         card.querySelector('.cw').addEventListener('click', (e) => { e.stopPropagation(); item.rotation = (item.rotation + 90) % 360; updateUI(); });
         card.querySelector('.ccw').addEventListener('click', (e) => { e.stopPropagation(); item.rotation = (item.rotation - 90 + 360) % 360; updateUI(); });
 
-        const brtSlider = card.querySelector('.adj-brt');
-        brtSlider.addEventListener('input', (e) => {
-          item.brightness = e.target.value;
-          card.querySelector('img').style.filter = `brightness(${item.brightness}%) contrast(${item.contrast}%)`;
-        });
-        brtSlider.addEventListener('click', e => e.stopPropagation());
-
-        const conSlider = card.querySelector('.adj-con');
-        conSlider.addEventListener('input', (e) => {
-          item.contrast = e.target.value;
-          card.querySelector('img').style.filter = `brightness(${item.brightness}%) contrast(${item.contrast}%)`;
-        });
-        conSlider.addEventListener('click', e => e.stopPropagation());
-
         card.querySelector('.up-btn').addEventListener('click', (e) => { e.stopPropagation(); swapItems(index, index - 1); });
         card.querySelector('.down-btn').addEventListener('click', (e) => { e.stopPropagation(); swapItems(index, index + 1); });
         card.querySelector('.delete-btn').addEventListener('click', (e) => { e.stopPropagation(); loadedItems.splice(index, 1); updateUI(); });
 
-        // HTML5 Drag and Drop Implementation
         card.addEventListener('dragstart', () => { draggedItemIndex = index; card.classList.add('dragging-card'); });
         card.addEventListener('dragend', () => { card.classList.remove('dragging-card'); removeDragOverClasses(); });
         card.addEventListener('dragover', (e) => { e.preventDefault(); card.classList.add('drag-over'); });
@@ -593,7 +552,7 @@
 
       convertBtn.disabled = true;
       splitBtn.disabled = true;
-      statusMsg.textContent = 'Compiling system master vector stack...';
+      statusMsg.textContent = 'Generating PDF...';
       statusMsg.className = 'status-msg';
       setProgress(5);
 
@@ -603,8 +562,8 @@
         const marginSelect = document.getElementById('margin').value;
 
         let marginPoints = 0;
-        if (marginSelect === 'small') marginPoints = 14.17; // 5mm
-        if (marginSelect === 'large') marginPoints = 34.01; // 12mm
+        if (marginSelect === 'small') marginPoints = 14.17;
+        if (marginSelect === 'large') marginPoints = 34.01;
 
         let pdf = null;
 
@@ -615,7 +574,7 @@
           let orientation = pOri;
 
           if (pSize === 'fit') {
-            format = [processed.width * 0.75, processed.height * 0.75]; // px to pt approach
+            format = [processed.width * 0.75, processed.height * 0.75];
             orientation = processed.width > processed.height ? 'l' : 'p';
           }
 
@@ -651,14 +610,14 @@
         if (title || author) pdf.setProperties({ title: title || undefined, author: author || undefined });
 
         setProgress(95);
-        pdf.save('DocuCraft_Compiled.pdf');
+        pdf.save('DocuCraft_Images.pdf');
         setProgress(100);
 
-        statusMsg.textContent = '✓ Document pipeline build written successfully.';
+        statusMsg.textContent = '✓ PDF downloaded successfully.';
         statusMsg.className = 'status-msg success-text';
       } catch (err) {
         console.error(err);
-        statusMsg.textContent = '⚠ Pipeline build target failure. View diagnostic tools.';
+        statusMsg.textContent = '⚠ Conversion failed. Try smaller or fewer images.';
         statusMsg.className = 'status-msg error-text';
       }
 
@@ -673,7 +632,7 @@
 
       convertBtn.disabled = true;
       splitBtn.disabled = true;
-      statusMsg.textContent = 'Generating distinct atomic target nodes...';
+      statusMsg.textContent = 'Generating distinct PDF components...';
       statusMsg.className = 'status-msg';
       setProgress(5);
 
@@ -737,11 +696,11 @@
         a.click();
         URL.revokeObjectURL(a.href);
 
-        statusMsg.textContent = `✓ images-split.zip written successfully (${activeItems.length} atomic elements).`;
+        statusMsg.textContent = `✓ images-split.zip downloaded (${activeItems.length} PDFs)`;
         statusMsg.className = 'status-msg success-text';
       } catch (err) {
         console.error(err);
-        statusMsg.textContent = '⚠ Component packaging archive operation failure.';
+        statusMsg.textContent = '⚠ ZIP generation failed. Check console constraints.';
         statusMsg.className = 'status-msg error-text';
       }
 
