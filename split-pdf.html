@@ -15,340 +15,296 @@
       --ink-2: #4a4a46;
       --ink-3: #8a8a84; 
       --surface: #f7f6f2; 
-      --surface-2: #eeecea;
       --surface-3: #e4e2dd; 
       --white: #ffffff; 
       --radius: 10px; 
       --radius-lg: 16px; 
       --transition: all 0.2s ease;
       --accent: #2d5a3d;
-      --accent-light: #e8f0ea;
-      --accent-mid: #4a7c5c;
+      --accent-hover: #22442e;
+      --danger: #ba2525;
     }
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background-color: var(--surface);
-      color: var(--ink);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-    header {
-      background: var(--ink);
-      padding: 16px 32px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 50;
-    }
-    .header-logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      text-decoration: none;
-    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--surface); color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; }
+    header { background: var(--ink); padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+    .header-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
     header svg { color: #7ec898; flex-shrink: 0; }
-    .header-text h1 {
-      font-family: 'Instrument Serif', serif;
-      font-size: 24px;
+    .header-text h1 { font-family: 'Instrument Serif', serif; font-size: 24px; color: #fff; letter-spacing: -0.01em; }
+    
+    .back-to-hub {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.2);
       color: #fff;
-      letter-spacing: -0.01em;
-    }
-    .nav-back {
-      text-decoration: none;
-      color: var(--surface-2);
+      padding: 8px 16px;
+      border-radius: var(--radius);
       font-size: 13px;
       font-weight: 500;
-      display: flex;
+      cursor: pointer;
+      display: inline-flex;
       align-items: center;
       gap: 6px;
+      text-decoration: none;
       transition: var(--transition);
     }
-    .nav-back:hover { color: #fff; }
+    .back-to-hub:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: #7ec898;
+    }
 
-    main {
-      flex: 1;
-      max-width: 800px;
-      width: 100%;
-      margin: 0 auto;
-      padding: 40px 24px 60px;
-    }
-    .hero {
-      text-align: center;
-      margin-bottom: 32px;
-    }
-    .hero h2 {
-      font-family: 'Instrument Serif', serif;
-      font-size: 42px;
-      font-weight: 400;
-      line-height: 1.1;
-      margin-bottom: 8px;
-    }
-    .hero p {
-      color: var(--ink-2);
-      font-size: 15px;
-    }
-    .workspace-card {
-      background: var(--white);
-      border: 1px solid var(--surface-3);
-      border-radius: var(--radius-lg);
-      padding: 24px;
-    }
+    main { flex: 1; max-width: 1000px; width: 100%; margin: 0 auto; padding: 40px 24px 60px; }
+    .panel { background: var(--white); border-radius: var(--radius-lg); border: 1px solid var(--surface-3); padding: 40px 30px; text-align: center; }
+    .panel h2 { font-family: 'Instrument Serif', serif; font-size: 32px; font-weight: 400; margin-bottom: 8px; }
+    .panel p { color: var(--ink-3); font-size: 14px; margin-bottom: 30px; }
+    
     .dropzone {
       border: 2px dashed var(--surface-3);
-      border-radius: var(--radius);
       padding: 40px 20px;
-      text-align: center;
+      border-radius: var(--radius);
       cursor: pointer;
+      background: #fafaf9;
       transition: var(--transition);
-      background: var(--white);
+      margin-bottom: 30px;
     }
-    .dropzone:hover {
-      border-color: var(--accent-mid);
-      background: var(--surface);
+    .dropzone:hover, .dropzone.dragover {
+      border-color: var(--accent);
+      background: #f1f5f2;
     }
-    .dropzone svg {
-      color: var(--ink-3);
-      margin-bottom: 12px;
-    }
-    .dropzone p {
-      font-size: 14px;
-      color: var(--ink-2);
-    }
-    .dropzone input { display: none; }
-    
-    .file-details {
-      margin-top: 20px;
-      display: none;
-    }
-    .file-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px;
-      background: var(--surface);
-      border-radius: var(--radius);
-      border: 1px solid var(--surface-3);
-    }
-    .file-info {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .file-name {
-      font-size: 14px;
-      font-weight: 500;
-    }
-    .split-config {
-      margin-top: 24px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-    .config-box {
-      border: 1px solid var(--surface-3);
-      border-radius: var(--radius);
-      padding: 16px;
-      background: var(--surface);
-    }
-    .config-box h4 {
-      font-size: 14px;
-      margin-bottom: 10px;
-      font-weight: 600;
-    }
-    .inputs-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .inputs-row input {
-      width: 70px;
-      padding: 6px;
-      border-radius: 4px;
-      border: 1px solid var(--surface-3);
-      outline: none;
-    }
-    .inputs-row label {
-      font-size: 13px;
-      color: var(--ink-2);
-    }
-    .btn-split {
-      width: 100%;
-      margin-top: 24px;
-      padding: 14px;
-      background: var(--ink);
-      color: var(--white);
-      border: none;
-      border-radius: var(--radius);
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 500;
-      font-size: 14px;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-    .btn-split:hover:not(:disabled) { background: #333330; }
-    .btn-split:disabled {
-      background: var(--surface-2);
-      color: var(--ink-3);
-      cursor: not-allowed;
-      border: 1px solid var(--surface-3);
-    }
-    .status-msg {
-      margin-top: 14px;
-      font-size: 13px;
-      text-align: center;
-    }
-    .status-success { color: var(--accent); font-weight: 500; }
-    .status-error { color: #a33b3b; font-weight: 500; }
+    .dropzone svg { color: var(--ink-3); margin-bottom: 12px; }
+    .dropzone p { margin-bottom: 0; font-weight: 500; color: var(--ink-2); }
+    #file-input { display: none; }
 
-    footer { text-align: center; padding: 20px 24px; font-size: 12px; color: var(--ink-3); border-top: 1px solid var(--surface-3); background: var(--white); margin-top: auto; }
+    .config-box { display: none; text-align: left; background: #fafaf9; border: 1px solid var(--surface-3); padding: 24px; border-radius: var(--radius); margin-bottom: 30px; }
+    .meta-info { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; font-size: 14px; font-weight: 500; border-bottom: 1px solid var(--surface-3); padding-bottom: 12px;}
+    .meta-info span { color: var(--accent); font-weight: 600; }
+
+    .split-options { display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; }
+    .option-group { display: flex; align-items: flex-start; gap: 10px; }
+    .option-group input[type="radio"] { margin-top: 4px; accent-color: var(--accent); }
+    .option-group label { font-size: 14px; font-weight: 500; cursor: pointer; }
+    .option-group p { font-size: 12px; color: var(--ink-3); margin-bottom: 0; margin-top: 2px; }
+
+    .range-inputs { margin-top: 10px; display: flex; align-items: center; gap: 8px; }
+    .range-inputs input { width: 80px; padding: 6px 10px; border: 1px solid var(--surface-3); border-radius: 6px; font-size: 14px; outline: none; }
+    .range-inputs input:focus { border-color: var(--accent); }
+    .range-inputs span { font-size: 13px; color: var(--ink-2); }
+
+    .btn-primary { background: var(--accent); color: #fff; border: none; padding: 14px 28px; border-radius: var(--radius); font-size: 15px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: var(--transition); }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-primary:disabled { background: var(--surface-3); color: var(--ink-3); cursor: not-allowed; }
+
+    .status-msg { margin-top: 16px; font-size: 14px; font-weight: 500; display: none; text-align: center; }
+    .status-success { color: var(--accent); }
+    .status-error { color: var(--danger); }
+
+    footer { text-align: center; padding: 20px 24px; font-size: 12px; color: var(--ink-3); border-top: 1px solid var(--surface-3); background: var(--white); margin-top: auto;}
     footer .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); display: inline-block; margin: 0 6px; vertical-align: middle; }
   </style>
 </head>
 <body>
 
   <header>
-    <a href="./" class="header-logo">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>
-        <line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/>
+    <a href="index.html" class="header-logo">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="16" y1="13" x2="8" y2="13"></line>
+        <line x1="16" y1="17" x2="8" y2="17"></line>
+        <polyline points="10 9 9 9 8 9"></polyline>
       </svg>
-      <div class="header-text"><h1>DocuCraft</h1></div>
+      <div class="header-text">
+        <h1>DocuCraft</h1>
+      </div>
     </a>
-    <a href="./" class="nav-back">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-      Back to hub
+    <a href="index.html" class="back-to-hub">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+      Workspace Hub
     </a>
   </header>
 
   <main>
-    <div class="hero">
-      <h2>Split PDF Workspace</h2>
-      <p>Isolate structural segments or extract customized ranges completely client-side.</p>
-    </div>
+    <div class="panel">
+      <h2>Split PDF Framework</h2>
+      <p>Isolate structural page ranges or slice document streams down to separate single-page arrays.</p>
 
-    <div class="workspace-card">
       <div class="dropzone" id="dropzone">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
         </svg>
-        <p>Drag and drop matrix PDFs or click to explore directories</p>
-        <input type="file" id="fileInput" accept="application/pdf" />
+        <p>Drop your source document profile here or click to choose from directory path</p>
+        <input type="file" id="file-input" accept="application/pdf">
       </div>
 
-      <div class="file-details" id="fileDetails">
-        <div class="file-row">
-          <div class="file-info">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            <span class="file-name" id="fileNameDisplay">filename.pdf</span>
-          </div>
+      <div class="config-box" id="config-box">
+        <div class="meta-info">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span id="file-name">document.pdf</span> &nbsp;|&nbsp; Structural Allocation: <span id="page-count">0</span> Pages detected
         </div>
 
-        <div class="split-config">
-          <div class="config-box">
-            <h4><input type="radio" name="splitMode" id="modeRange" checked style="margin-right:8px;">Custom Range Extraction</h4>
-            <div class="inputs-row" style="margin-top:12px;">
-              <label>From:</label>
-              <input type="number" id="pageStart" value="1" min="1">
-              <label>To:</label>
-              <input type="number" id="pageEnd" value="1" min="1">
+        <div class="split-options">
+          <div class="option-group">
+            <input type="radio" id="mode-all" name="split-mode" value="all" checked>
+            <div>
+              <label for="mode-all">Atomic Decomposition Protocol</label>
+              <p>Extract every single page matrix into standalone isolated file entities.</p>
             </div>
           </div>
-          <div class="config-box" style="opacity: 0.6; cursor: not-allowed;">
-            <h4><input type="radio" name="splitMode" id="modeAll" disabled style="margin-right:8px;">Burst Every Page</h4>
-            <p style="font-size:12px; color:var(--ink-3); margin-top:6px;">Extract each individual layer structure safely into isolated arrays (Under Optimization Routine).</p>
+          <div class="option-group">
+            <input type="radio" id="mode-range" name="split-mode" value="range">
+            <div>
+              <label for="mode-range">Isolate Target Boundaries</label>
+              <p>Extract specified custom sequence loop boundaries into one distinct file.</p>
+              <div class="range-inputs" id="range-inputs" style="opacity: 0.5; pointer-events: none;">
+                <span>From page:</span>
+                <input type="number" id="start-page" min="1" value="1">
+                <span>to page:</span>
+                <input type="number" id="end-page" min="1" value="1">
+              </div>
+            </div>
           </div>
         </div>
+
+        <button class="btn-primary" id="btn-split">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><path d="M12 3v6M12 15v6"/></svg>
+          Execute Split Sequence
+        </button>
       </div>
 
-      <button id="btnSplit" class="btn-split" disabled>Execute Structural Partitioning</button>
-      <div id="statusMsg" class="status-msg"></div>
+      <div class="status-msg" id="status-msg"></div>
     </div>
   </main>
 
   <footer>
-    <span class="dot"></span>No sign up required, Free forever<span class="dot"></span>
+    DocuCraft Workflow Engine v1.4.0 <span class="dot"></span> Client-Side Execution Node
   </footer>
 
   <script>
     let activeFile = null;
+    let totalPages = 0;
+    let arrayBuffer = null;
 
     const dropzone = document.getElementById('dropzone');
-    const fileInput = document.getElementById('fileInput');
-    const fileDetails = document.getElementById('fileDetails');
-    const fileNameDisplay = document.getElementById('fileNameDisplay');
-    const btnSplit = document.getElementById('btnSplit');
-    const statusMsg = document.getElementById('statusMsg');
+    const fileInput = document.getElementById('file-input');
+    const configBox = document.getElementById('config-box');
+    const btnSplit = document.getElementById('btn-split');
+    const statusMsg = document.getElementById('status-msg');
+    const fileNameText = document.getElementById('file-name');
+    const pageCountText = document.getElementById('page-count');
     
-    const pageStart = document.getElementById('pageStart');
-    const pageEnd = document.getElementById('pageEnd');
+    const modeAll = document.getElementById('mode-all');
+    const modeRange = document.getElementById('mode-range');
+    const rangeInputs = document.getElementById('range-inputs');
+    const startPage = document.getElementById('start-page');
+    const endPage = document.getElementById('end-page');
 
     dropzone.addEventListener('click', () => fileInput.click());
-    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.style.borderColor = 'var(--accent-mid)'; });
-    dropzone.addEventListener('dragleave', () => { dropzone.style.borderColor = 'var(--surface-3)'; });
+    fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+
+    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
     dropzone.addEventListener('drop', (e) => {
       e.preventDefault();
-      dropzone.style.borderColor = 'var(--surface-3)';
-      if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
+      dropzone.classList.remove('dragover');
+      handleFile(e.dataTransfer.files[0]);
     });
 
-    fileInput.addEventListener('change', (e) => {
-      if (e.target.files.length > 0) handleFile(e.target.files[0]);
-    });
+    modeAll.addEventListener('change', toggleModes);
+    modeRange.addEventListener('change', toggleModes);
 
-    function handleFile(file) {
-      if (file.type !== 'application/pdf') {
-        showStatus("Please deploy only standard document files (.pdf)", "status-error");
+    function toggleModes() {
+      if (modeRange.checked) {
+        rangeInputs.style.opacity = "1";
+        rangeInputs.style.pointerEvents = "auto";
+      } else {
+        rangeInputs.style.opacity = "0.5";
+        rangeInputs.style.pointerEvents = "none";
+      }
+    }
+
+    async function handleFile(file) {
+      if (!file || file.type !== "application/pdf") {
+        showStatus("Invalid file structure type. Load a valid PDF file target.", "status-error");
         return;
       }
       activeFile = file;
-      fileNameDisplay.innerText = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
-      fileDetails.style.display = 'block';
-      btnSplit.disabled = false;
-      clearStatus();
+      showStatus("Analyzing structural geometry parameters...", "ink-2");
+      
+      try {
+        arrayBuffer = await file.arrayBuffer();
+        const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer, { updateMetadata: false });
+        totalPages = pdfDoc.getPageCount();
+
+        fileNameText.textContent = file.name;
+        pageCountText.textContent = totalPages;
+        
+        startPage.value = 1;
+        startPage.max = totalPages;
+        endPage.value = totalPages;
+        endPage.max = totalPages;
+
+        configBox.style.display = "block";
+        statusMsg.style.display = "none";
+      } catch (e) {
+        console.error(e);
+        showStatus("An error occurred reading document structural data elements.", "status-error");
+      }
     }
 
     btnSplit.addEventListener('click', async () => {
-      if (!activeFile) return;
-      
+      if (!arrayBuffer) return;
       btnSplit.disabled = true;
-      showStatus("Parsing document array structure...", "ink-2");
+      showStatus("Executing sequence optimization layer...", "ink-2");
 
       try {
-        const arrayBuffer = await activeFile.arrayBuffer();
-        const start = parseInt(pageStart.value);
-        const end = parseInt(pageEnd.value);
+        if (modeAll.checked) {
+          // Atomic processing: single zip download logic structure
+          showStatus("Decomposing file arrays into components...", "ink-2");
+          const srcPdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+          
+          // Lazy load JSZip for performance architecture
+          if (!window.JSZip) {
+            await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js");
+          }
+          
+          const zip = new JSZip();
+          const baseName = activeFile.name.replace('.pdf', '');
 
-        if (isNaN(start) || isNaN(end) || start < 1 || end < start) {
-          showStatus("Invalid sequence perimeter parameters. Verify page boundaries.", "status-error");
-          btnSplit.disabled = false;
-          return;
+          for (let i = 0; i < totalPages; i++) {
+            const singlePdf = await PDFLib.PDFDocument.create();
+            const [copiedPage] = await singlePdf.copyPages(srcPdfDoc, [i]);
+            singlePdf.addPage(copiedPage);
+            const bytes = await singlePdf.save();
+            zip.file(`${baseName}_Page_${i + 1}.pdf`, bytes);
+          }
+
+          const zipBlob = await zip.generateAsync({ type: "blob" });
+          downloadBlob(zipBlob, `${baseName}_atomic_split.zip`, "application/zip");
+          showStatus("Structural matrix decomposed and written completely.", "status-success");
+        } else {
+          // Range isolate logic pipeline
+          const start = parseInt(startPage.value);
+          const end = parseInt(endPage.value);
+
+          if (isNaN(start) || isNaN(end) || start < 1 || end > totalPages || start > end) {
+            showStatus("Invalid sequence loop parameters. Verify page boundaries.", "status-error");
+            btnSplit.disabled = false;
+            return;
+          }
+
+          showStatus("Extracting selected segments...", "ink-2");
+          const srcPdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+          const rangedPdf = await PDFLib.PDFDocument.create();
+          
+          const pageIndices = [];
+          for (let i = start - 1; i < end; i++) {
+            pageIndices.push(i);
+          }
+
+          const copiedPages = await rangedPdf.copyPages(srcPdfDoc, pageIndices);
+          copiedPages.forEach(page => rangedPdf.addPage(page));
+
+          const pdfBytes = await rangedPdf.save();
+          downloadBlob(pdfBytes, `${activeFile.name.replace('.pdf', '')}_Extracted_${start}-${end}.pdf`, "application/pdf");
+          showStatus("Range isolated and downloaded successfully!", "status-success");
         }
-
-        showStatus("Extracting selected segments...", "ink-2");
-        const srcPdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
-        const rangedPdf = await PDFLib.PDFDocument.create();
-        
-        const totalPages = srcPdfDoc.getPageCount();
-        if (end > totalPages) {
-          showStatus(`Boundary limit violation. Target file only contains ${totalPages} pages.`, "status-error");
-          btnSplit.disabled = false;
-          return;
-        }
-
-        const pageIndices = [];
-        for (let i = start - 1; i < end; i++) {
-          pageIndices.push(i);
-        }
-
-        const copiedPages = await rangedPdf.copyPages(srcPdfDoc, pageIndices);
-        copiedPages.forEach(page => rangedPdf.addPage(page));
-
-        const pdfBytes = await rangedPdf.save();
-        downloadBlob(pdfBytes, `${activeFile.name.replace('.pdf', '')}_Extracted_${start}-${end}.pdf`);
-        showStatus("Range isolated and downloaded successfully!", "status-success");
       } catch (e) {
         console.error(e);
         showStatus("Processing failure encountered during execution pipeline.", "status-error");
@@ -357,8 +313,8 @@
       }
     });
 
-    function downloadBlob(bytes, filename) {
-      const blob = new Blob([bytes], { type: 'application/pdf' });
+    function downloadBlob(bytesOrBlob, filename, type) {
+      const blob = bytesOrBlob instanceof Blob ? bytesOrBlob : new Blob([bytesOrBlob], { type: type });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
       link.download = filename;
@@ -368,8 +324,18 @@
     function showStatus(msg, className) {
       statusMsg.innerText = msg;
       statusMsg.className = `status-msg ${className}`;
+      statusMsg.style.display = "block";
     }
-    function clearStatus() { statusMsg.innerText = ''; statusMsg.className = 'status-msg'; }
+
+    function loadScript(src) {
+      return new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = src;
+        s.onload = resolve;
+        s.onerror = reject;
+        document.head.appendChild(s);
+      });
+    }
   </script>
 </body>
 </html>
