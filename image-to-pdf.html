@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DocuCraft - Image to PDF Converter</title>
-  <link rel="icon" type="image/svg+xml" href="icon.svg" />
+  <link class="icon" type="image/svg+xml" href="icon.svg" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -176,6 +176,14 @@
     .list-view .preview-card .preview-card-footer { flex: 1; padding: 0; border-top: none; }
     .list-view .preview-card .page-num { font-size: 12px; }
 
+    .img-adjust-panel { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(20,20,18,.88); padding: 6px 8px; display: none; flex-direction: column; gap: 4px; }
+    .preview-card:hover .img-adjust-panel { display: flex; }
+    .list-view .preview-card .img-adjust-panel { display: none !important; }
+
+    .adj-row { display: flex; align-items: center; gap: 6px; }
+    .adj-row span { font-size: 9px; color: #aaa; width: 22px; flex-shrink: 0; }
+    .adj-row input[type="range"] { flex: 1; accent-color: #7ec898; height: 3px; cursor: pointer; }
+
     .rotate-overlay { position: absolute; top: 6px; left: 6px; display: flex; gap: 4px; opacity: 0; transition: opacity .2s; }
     .preview-card:hover .rotate-overlay { opacity: 1; }
     .rotate-btn { width: 24px; height: 24px; border-radius: 50%; border: none; background: rgba(0,0,0,.6); color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; transition: background .15s; }
@@ -204,8 +212,9 @@
     .convert-btn { flex: 1; background: var(--ink); color: var(--white); border: none; border-radius: var(--radius); padding: 14px 24px; font-size: 15px; font-family: 'DM Sans', sans-serif; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background .15s, opacity .15s; }
     .convert-btn:hover:not(:disabled) { background: #2d2d2a; }
     .convert-btn:disabled { opacity: .4; cursor: not-allowed; }
+    .convert-btn.success { background: var(--accent); }
 
-    .split-btn { background: var(--white); color: var(--ink); border: 1.5px solid var(--surface-3); border-radius: var(--radius); padding: 14px 18px; font-size: 14px; font-family: 'DM Sans', sans-serif; font-weight: 600; cursor: pointer; display: flex; transition: border-color .15s, background .15s; white-space: nowrap; text-decoration: none; align-items: center; gap: 7px;}
+    .split-btn { background: var(--white); color: var(--ink); border: 1.5px solid var(--surface-3); border-radius: var(--radius); padding: 14px 18px; font-size: 14px; font-family: 'DM Sans', sans-serif; font-weight: 600; cursor: pointer; display: flex; align-items: gap: 7px; transition: border-color .15s, background .15s; white-space: nowrap; text-decoration: none; align-items: center;}
     .split-btn:hover:not(:disabled) { border-color: var(--accent-mid); background: var(--accent-light); }
     .split-btn:disabled { opacity: .4; cursor: not-allowed; }
 
@@ -219,495 +228,530 @@
 </head>
 <body>
 
-  <header>
-    <a href="index.html" class="header-logo">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-        <polyline points="14 2 14 8 20 8"></polyline>
-        <line x1="16" y1="13" x2="8" y2="13"></line>
-        <line x1="16" y1="17" x2="8" y2="17"></line>
-        <polyline points="10 9 9 9 8 9"></polyline>
+<header>
+  <a href="index.html" class="header-logo">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>
+      <line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/>
+    </svg>
+    <div class="header-text"><h1>DocuCraft</h1></div>
+  </a>
+  <a href="index.html" class="back-to-hub">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    Back to Tools Hub
+  </a>
+</header>
+
+<main>
+  <div class="drop-zone" id="dropZone">
+    <input type="file" id="fileInput" accept="image/*" multiple />
+    <div class="drop-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/>
+        <path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/>
       </svg>
-      <div class="header-text">
-        <h1>DocuCraft</h1>
-      </div>
-    </a>
-    <a href="index.html" class="back-to-hub">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-      Workspace Hub
-    </a>
-  </header>
-
-  <main>
-    <div class="drop-zone" id="dropZone">
-      <input type="file" id="fileInput" multiple accept="image/jpeg,image/png,image/webp" />
-      <div class="drop-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-          <circle cx="8.5" cy="8.5" r="1.5"/>
-          <polyline points="21 15 16 10 5 21"/>
-        </svg>
-      </div>
-      <h2>Drag & drop images here</h2>
-      <p>Supports JPEG, PNG, and WebP. Or <span class="browse-link">browse files</span></p>
     </div>
+    <h2>Drop images here</h2>
+    <p><span class="browse-link">Browse files</span> or drag and drop · PNG, JPG, WebP, GIF</p>
+  </div>
 
-    <div class="panel" id="workspacePanel" style="display: none;">
-      <div class="panel-title">Page Configurations</div>
-      <div class="settings-grid">
-        <div class="field">
-          <label for="pageSize">Page Size</label>
-          <select id="pageSize">
-            <option value="a4">A4 (210 × 297 mm)</option>
-            <option value="letter">US Letter (8.5 × 11 in)</option>
-            <option value="fit">Fit Image (Match Source Aspect)</option>
-          </select>
+  <div class="panel">
+    <div class="panel-title">PDF Settings</div>
+    <div class="settings-grid">
+      <div class="field">
+        <label for="pageSize">Page size</label>
+        <select id="pageSize">
+          <option value="a4">A4 (210 × 297 mm)</option>
+          <option value="letter">Letter (8.5 × 11 in)</option>
+          <option value="a3">A3 (297 × 420 mm)</option>
+          <option value="legal">Legal (8.5 × 14 in)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="orientation">Orientation</label>
+        <select id="orientation">
+          <option value="auto">Auto (match image)</option>
+          <option value="p">Portrait</option>
+          <option value="l">Landscape</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="imageFit">Image fit</label>
+        <select id="imageFit">
+          <option value="contain">Fit page (keep aspect ratio)</option>
+          <option value="stretch">Fill page (stretch)</option>
+          <option value="original">Original size (centered)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="margins">Margins</label>
+        <select id="margins">
+          <option value="0">None (0 mm)</option>
+          <option value="10" selected>Small (10 mm)</option>
+          <option value="20">Large (20 mm)</option>
+        </select>
+      </div>
+      <div class="field span2">
+        <label>JPEG quality <small style="font-weight:400;color:var(--ink-3)">(affects file size)</small></label>
+        <div class="slider-row">
+          <input type="range" id="jpegQuality" min="0.3" max="1" step="0.05" value="0.92" />
+          <span class="slider-val" id="qualityVal">92%</span>
         </div>
-        <div class="field">
-          <label for="orientation">Orientation</label>
-          <select id="orientation">
-            <option value="portrait">Portrait</option>
-            <option value="landscape">Landscape</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="margin">Margin</label>
-          <select id="margin">
-            <option value="none">No Margin (0mm)</option>
-            <option value="small">Small (5mm)</option>
-            <option value="large">Large (12mm)</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Image Quality</label>
-          <div class="slider-row">
-            <input type="range" id="quality" min="10" max="100" value="85" />
-            <span class="slider-val" id="qualityVal">85%</span>
-          </div>
-        </div>
-        <div class="field">
-          <label for="metaTitle">Document Title</label>
-          <input type="text" id="metaTitle" placeholder="Optional..." />
-        </div>
-        <div class="field">
-          <label for="metaAuthor">Author</label>
-          <input type="text" id="metaAuthor" placeholder="Optional..." />
-        </div>
+      </div>
+      <div class="field span2">
+        <label for="pdfFilename">Output filename</label>
+        <input type="text" id="pdfFilename" placeholder="Leave blank to auto-name" autocomplete="off" />
       </div>
     </div>
+  </div>
 
-    <div class="preview-section" id="previewSection" style="display: none;">
-      <div class="preview-header">
-        <h3 id="assetCounter">Selected Images (0)</h3>
-        <div class="preview-header-right">
-          <button class="clear-all-btn" id="clearAllBtn">Clear All</button>
-          <div class="view-toggle">
-            <button class="vt-btn active" id="viewGrid" title="Grid View">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-            </button>
-            <button class="vt-btn" id="viewList" title="List View">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-            </button>
-          </div>
+  <div class="panel">
+    <div class="panel-title">Document Metadata</div>
+    <div class="settings-grid">
+      <div class="field">
+        <label for="metaTitle">Title</label>
+        <input type="text" id="metaTitle" placeholder="Document title" />
+      </div>
+      <div class="field">
+        <label for="metaAuthor">Author</label>
+        <input type="text" id="metaAuthor" placeholder="Author name" />
+      </div>
+    </div>
+  </div>
+
+  <section class="preview-section" id="previewSection" style="display:none;">
+    <div class="preview-header">
+      <h3 id="imageCount">Uploaded Images (0)</h3>
+      <div class="preview-header-right">
+        <button class="clear-all-btn" id="clearAllBtn">Clear all</button>
+        <div class="view-toggle">
+          <button class="vt-btn active" id="viewGrid" title="Grid View">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          </button>
+          <button class="vt-btn" id="viewList" title="List View">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          </button>
         </div>
       </div>
-
-      <div class="preview-grid" id="previewGrid"></div>
     </div>
 
-    <div class="actions" id="actionPanel" style="display: none;">
+    <div class="preview-grid" id="previewGrid"></div>
+
+    <div class="actions">
       <div class="progress-bar-wrap" id="progressWrap">
         <div class="progress-bar-fill" id="progressFill"></div>
       </div>
       <div class="btn-row">
         <button class="convert-btn" id="convertBtn">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <polyline points="14 2 14 8 20 8"/>
-            <line x1="12" y1="18" x2="12" y2="12"/>
-            <polyline points="9 15 12 12 15 15"/>
-          </svg>
-          Convert to PDF
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Convert & Download PDF
         </button>
-        <button class="split-btn" id="splitBtn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-            <line x1="12" y1="3" x2="12" y2="21"/>
-          </svg>
-          Export as ZIP
+        <button class="split-btn" id="splitBtn" title="Convert each individual image into separate single-page PDFs and download together inside a ZIP archive.">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
+          Save as Separate PDFs (.zip)
         </button>
       </div>
       <div class="status-msg" id="statusMsg"></div>
     </div>
-  </main>
+  </section>
+</main>
 
-  <footer>
-    DocuCraft Workflow Engine v1.4.0 <span class="dot"></span> Client-Side Execution Node
-  </footer>
+<footer>
+  <span class="dot"></span>No sign up required, Free forever<span class="dot"></span>
+</footer>
 
-  <script>
-    const { jsPDF } = window.jspdf;
+<script>
+const { jsPDF } = window.jspdf;
+let items = [];
+let dragSourceElement = null;
 
-    let loadedItems = [];
-    let draggedItemIndex = null;
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const previewSection = document.getElementById('previewSection');
+const previewGrid = document.getElementById('previewGrid');
+const imageCount = document.getElementById('imageCount');
+const clearAllBtn = document.getElementById('clearAllBtn');
+const viewGrid = document.getElementById('viewGrid');
+const viewList = document.getElementById('viewList');
+const jpegQuality = document.getElementById('jpegQuality');
+const qualityVal = document.getElementById('qualityVal');
+const convertBtn = document.getElementById('convertBtn');
+const splitBtn = document.getElementById('splitBtn');
+const progressWrap = document.getElementById('progressWrap');
+const progressFill = document.getElementById('progressFill');
+const statusMsg = document.getElementById('statusMsg');
 
-    const dropZone = document.getElementById('dropZone');
-    const fileInput = document.getElementById('fileInput');
-    const workspacePanel = document.getElementById('workspacePanel');
-    const previewSection = document.getElementById('previewSection');
-    const previewGrid = document.getElementById('previewGrid');
-    const actionPanel = document.getElementById('actionPanel');
-    const assetCounter = document.getElementById('assetCounter');
-    const clearAllBtn = document.getElementById('clearAllBtn');
-    const viewGrid = document.getElementById('viewGrid');
-    const viewList = document.getElementById('viewList');
-    const quality = document.getElementById('quality');
-    const qualityVal = document.getElementById('qualityVal');
-    const progressWrap = document.getElementById('progressWrap');
-    const progressFill = document.getElementById('progressFill');
-    const convertBtn = document.getElementById('convertBtn');
-    const splitBtn = document.getElementById('splitBtn');
-    const statusMsg = document.getElementById('statusMsg');
-    const pageSizeSelect = document.getElementById('pageSize');
-    const orientationSelect = document.getElementById('orientation');
+jpegQuality.addEventListener('input', (e) => {
+  qualityVal.textContent = Math.round(e.target.value * 100) + '%';
+});
 
-    pageSizeSelect.addEventListener('change', () => {
-      orientationSelect.disabled = (pageSizeSelect.value === 'fit');
-    });
+['dragenter', 'dragover'].forEach(eventName => {
+  dropZone.addEventListener(eventName, (e) => { e.preventDefault(); dropZone.classList.add('dragging'); }, false);
+});
+['dragleave', 'drop'].forEach(eventName => {
+  dropZone.addEventListener(eventName, (e) => { e.preventDefault(); dropZone.classList.remove('dragging'); }, false);
+});
+dropZone.addEventListener('drop', (e) => {
+  if (e.dataTransfer.files ? e.dataTransfer.files.length : 0) handleFiles(e.dataTransfer.files);
+});
+fileInput.addEventListener('change', (e) => {
+  if (e.target.files ? e.target.files.length : 0) handleFiles(e.target.files);
+});
 
-    quality.addEventListener('input', () => {
-      qualityVal.textContent = `${quality.value}%`;
-    });
+function handleFiles(fileList) {
+  const incoming = Array.from(fileList).filter(f => f.type.startsWith('image/'));
+  if (!incoming.length) return;
 
-    viewGrid.addEventListener('click', () => {
-      viewGrid.classList.add('active');
-      viewList.classList.remove('active');
-      previewGrid.classList.remove('list-view');
-    });
-
-    viewList.addEventListener('click', () => {
-      viewList.classList.add('active');
-      viewGrid.classList.remove('active');
-      previewGrid.classList.add('list-view');
-    });
-
-    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragging'); });
-    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragging'));
-    dropZone.addEventListener('drop', (e) => {
-      e.preventDefault();
-      dropZone.classList.remove('dragging');
-      handleFiles(e.dataTransfer.files);
-    });
-    fileInput.addEventListener('change', () => handleFiles(fileInput.files));
-
-    clearAllBtn.addEventListener('click', () => {
-      loadedItems = [];
-      updateUI();
-    });
-
-    function handleFiles(files) {
-      const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
-      Array.from(files).forEach(file => {
-        if (!validTypes.includes(file.type)) return;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          loadedItems.push({
-            id: crypto.randomUUID(),
-            file: file,
-            src: e.target.result,
-            rotation: 0,
-            excluded: false
-          });
-          updateUI();
-        };
-        reader.readAsDataURL(file);
-      });
-    }
-
-    function updateUI() {
-      if (loadedItems.length === 0) {
-        workspacePanel.style.display = 'none';
-        previewSection.style.display = 'none';
-        actionPanel.style.display = 'none';
-        previewGrid.innerHTML = '';
-        return;
-      }
-
-      workspacePanel.style.display = 'block';
-      previewSection.style.display = 'block';
-      actionPanel.style.display = 'block';
-      assetCounter.textContent = `Selected Images (${loadedItems.length})`;
-
-      previewGrid.innerHTML = '';
-      loadedItems.forEach((item, index) => {
-        const card = document.createElement('div');
-        card.className = `preview-card ${item.excluded ? 'excluded' : ''}`;
-        card.draggable = true;
-        card.dataset.index = index;
-
-        card.innerHTML = `
-          <input type="checkbox" class="card-select" ${!item.excluded ? 'checked' : ''} />
-          <div class="drag-hint">Page ${index + 1}</div>
-          <div class="rotate-overlay">
-            <button class="rotate-btn ccw" title="Rotate Left">↺</button>
-            <button class="rotate-btn cw" title="Rotate Right">↻</button>
-          </div>
-          <div class="img-wrap">
-            <img src="${item.src}" style="transform: rotate(${item.rotation}deg) scale(${item.rotation % 180 !== 0 ? 0.7 : 1});" />
-          </div>
-          <div class="preview-card-footer">
-            <span class="page-num">#${String(index + 1).padStart(2, '0')}</span>
-            <div class="card-controls">
-              <button class="icon-btn up-btn" ${index === 0 ? 'disabled' : ''} title="Move Up">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
-              </button>
-              <button class="icon-btn down-btn" ${index === loadedItems.length - 1 ? 'disabled' : ''} title="Move Down">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-              </button>
-              <button class="icon-btn delete-btn" title="Remove File">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-              </button>
-            </div>
-          </div>
-        `;
-
-        card.querySelector('.card-select').addEventListener('change', (e) => {
-          item.excluded = !e.target.checked;
-          card.classList.toggle('excluded', item.excluded);
+  incoming.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        items.push({
+          id: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2),
+          file: file,
+          src: e.target.result,
+          width: img.naturalWidth,
+          height: img.naturalHeight,
+          rotation: 0,
+          brightness: 100,
+          contrast: 100,
+          excluded: false
         });
+        renderCards();
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
 
-        card.querySelector('.cw').addEventListener('click', (e) => { e.stopPropagation(); item.rotation = (item.rotation + 90) % 360; updateUI(); });
-        card.querySelector('.ccw').addEventListener('click', (e) => { e.stopPropagation(); item.rotation = (item.rotation - 90 + 360) % 360; updateUI(); });
+function renderCards() {
+  if (!items.length) {
+    previewSection.style.display = 'none';
+    return;
+  }
+  previewSection.style.display = 'block';
+  imageCount.textContent = `Uploaded Images (${items.length})`;
+  previewGrid.innerHTML = '';
 
-        card.querySelector('.up-btn').addEventListener('click', (e) => { e.stopPropagation(); swapItems(index, index - 1); });
-        card.querySelector('.down-btn').addEventListener('click', (e) => { e.stopPropagation(); swapItems(index, index + 1); });
-        card.querySelector('.delete-btn').addEventListener('click', (e) => { e.stopPropagation(); loadedItems.splice(index, 1); updateUI(); });
+  items.forEach((item, index) => {
+    const card = document.createElement('div');
+    card.className = `preview-card ${item.excluded ? 'excluded' : ''}`;
+    card.setAttribute('draggable', 'true');
+    card.setAttribute('data-id', item.id);
 
-        card.addEventListener('dragstart', () => { draggedItemIndex = index; card.classList.add('dragging-card'); });
-        card.addEventListener('dragend', () => { card.classList.remove('dragging-card'); removeDragOverClasses(); });
-        card.addEventListener('dragover', (e) => { e.preventDefault(); card.classList.add('drag-over'); });
-        card.addEventListener('dragleave', () => card.classList.remove('drag-over'));
-        card.addEventListener('drop', () => {
-          if (draggedItemIndex !== null && draggedItemIndex !== index) {
-            const movedElement = loadedItems.splice(draggedItemIndex, 1)[0];
-            loadedItems.splice(index, 0, movedElement);
-            updateUI();
-          }
-        });
+    card.innerHTML = `
+      <input type="checkbox" class="card-select" ${!item.excluded ? 'checked' : ''} title="Include page in PDF" />
+      <div class="drag-hint">Drag to reorder</div>
+      <div class="rotate-overlay">
+        <button class="rotate-btn left" title="Rotate Counter-Clockwise">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2.5 2v6h6M2.66 15.57a10 10 0 1 0-.57-8.38l5.67-2.5"/></svg>
+        </button>
+        <button class="rotate-btn right" title="Rotate Clockwise">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1 .57-8.38l-5.67-2.5"/></svg>
+        </button>
+      </div>
+      <div class="img-wrap">
+        <img src="${item.src}" style="transform: rotate(${item.rotation}deg) scale(${item.rotation % 180 !== 0 ? 0.7 : 1}); filter: brightness(${item.brightness}%) contrast(${item.contrast}%);" />
+        <div class="img-adjust-panel">
+          <div class="adj-row">
+            <span>Bri</span>
+            <input type="range" class="bri-slider" min="50" max="150" value="${item.brightness}" />
+          </div>
+          <div class="adj-row">
+            <span>Con</span>
+            <input type="range" class="con-slider" min="50" max="150" value="${item.contrast}" />
+          </div>
+        </div>
+      </div>
+      <div class="preview-card-footer">
+        <span class="page-num">Page ${index + 1}</span>
+        <div class="card-controls">
+          <button class="icon-btn up-btn" ${index === 0 ? 'disabled' : ''} title="Move Up">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+          </button>
+          <button class="icon-btn down-btn" ${index === items.length - 1 ? 'disabled' : ''} title="Move Down">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <button class="icon-btn delete-btn" title="Remove image">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          </button>
+        </div>
+      </div>
+    `;
 
-        previewGrid.appendChild(card);
-      });
+    card.querySelector('.card-select').addEventListener('change', (e) => {
+      item.excluded = !e.target.checked;
+      card.classList.toggle('excluded', item.excluded);
+    });
+    card.querySelector('.rotate-btn.left').addEventListener('click', () => { item.rotation = (item.rotation - 90) % 360; renderCards(); });
+    card.querySelector('.rotate-btn.right').addEventListener('click', () => { item.rotation = (item.rotation + 90) % 360; renderCards(); });
+    
+    const bri = card.querySelector('.bri-slider');
+    bri.addEventListener('input', (e) => { item.brightness = e.target.value; card.querySelector('img').style.filter = `brightness(${item.brightness}%) contrast(${item.contrast}%)`; });
+    bri.addEventListener('change', () => renderCards());
+
+    const con = card.querySelector('.con-slider');
+    con.addEventListener('input', (e) => { item.contrast = e.target.value; card.querySelector('img').style.filter = `brightness(${item.brightness}%) contrast(${item.contrast}%)`; });
+    con.addEventListener('change', () => renderCards());
+
+    card.querySelector('.up-btn').addEventListener('click', () => { if(index > 0) { [items[index], items[index-1]] = [items[index-1], items[index]]; renderCards(); } });
+    card.querySelector('.down-btn').addEventListener('click', () => { if(index < items.length-1) { [items[index], items[index+1]] = [items[index+1], items[index]]; renderCards(); } });
+    card.querySelector('.delete-btn').addEventListener('click', () => { items.splice(index, 1); renderCards(); });
+
+    setupDragAndDrop(card);
+    previewGrid.appendChild(card);
+  });
+}
+
+function setupDragAndDrop(card) {
+  card.addEventListener('dragstart', (e) => { dragSourceElement = card; card.classList.add('dragging-card'); e.dataTransfer.effectAllowed = 'move'; }, false);
+  card.addEventListener('dragover', (e) => { if (e.preventDefault) e.preventDefault(); card.classList.add('drag-over'); return false; }, false);
+  card.addEventListener('dragleave', () => card.classList.remove('drag-over'), false);
+  card.addEventListener('drop', (e) => {
+    e.stopPropagation(); e.preventDefault();
+    if (dragSourceElement !== card) {
+      const srcId = dragSourceElement.getAttribute('data-id');
+      const targetId = card.getAttribute('data-id');
+      const srcIndex = items.findIndex(i => i.id === srcId);
+      const targetIndex = items.findIndex(i => i.id === targetId);
+      const [moved] = items.splice(srcIndex, 1);
+      items.splice(targetIndex, 0, moved);
+      renderCards();
     }
+    return false;
+  }, false);
+  card.addEventListener('dragend', () => { card.classList.remove('dragging-card'); Array.from(previewGrid.children).forEach(c => c.classList.remove('drag-over')); }, false);
+}
 
-    function removeDragOverClasses() {
-      document.querySelectorAll('.preview-card').forEach(c => c.classList.remove('drag-over'));
+clearAllBtn.addEventListener('click', () => { items = []; renderCards(); statusMsg.textContent = ''; });
+viewGrid.addEventListener('click', () => { viewGrid.classList.add('active'); viewList.classList.remove('active'); previewGrid.classList.remove('list-view'); });
+viewList.addEventListener('click', () => { viewList.classList.add('active'); viewGrid.classList.remove('active'); previewGrid.classList.add('list-view'); });
+
+function processAndApplyFilters(item) {
+  return new Promise((resolve) => {
+    if (item.brightness == 100 && item.contrast == 100 && item.rotation == 0) {
+      resolve(item.src);
+      return;
     }
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.onload = () => {
+      const angle = (item.rotation * Math.PI) / 180;
+      const is90 = Math.abs(item.rotation) % 180 !== 0;
+      canvas.width = is90 ? img.naturalHeight : img.naturalWidth;
+      canvas.height = is90 ? img.naturalWidth : img.naturalHeight;
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.rotate(angle);
+      ctx.filter = `brightness(${item.brightness}%) contrast(${item.contrast}%)`;
+      ctx.drawImage(img, -img.naturalWidth / 2, -img.naturalHeight / 2);
+      resolve(canvas.toDataURL('image/jpeg', 0.95));
+    };
+    img.src = item.src;
+  });
+}
 
-    function swapItems(a, b) {
-      const temp = loadedItems[a];
-      loadedItems[a] = loadedItems[b];
-      loadedItems[b] = temp;
-      updateUI();
-    }
+function getPageDimensions(sizeStr, orientStr, imgW, imgH) {
+  const map = { a4: [210, 297], letter: [215.9, 279.4], a3: [297, 420], legal: [215.9, 355.6] };
+  let dims = map[sizeStr] || map.a4;
+  let pW = dims[0];
+  let pH = dims[1];
+  if (orientStr === 'auto') {
+    if (imgW > imgH) { pW = dims[1]; pH = dims[0]; }
+  } else if (orientStr === 'l') {
+    pW = dims[1]; pH = dims[0];
+  }
+  return { pW, pH };
+}
 
-    function setProgress(val, hide = false) {
-      progressWrap.style.display = hide ? 'none' : 'block';
-      progressFill.style.width = `${val}%`;
-    }
+convertBtn.addEventListener('click', async () => {
+  const activeItems = items.filter(i => !i.excluded);
+  if (!activeItems.length) { alert('All cards are currently unchecked or removed.'); return; }
 
-    async function processImage(item) {
-      return new Promise((resolve) => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          let w = img.naturalWidth;
-          let h = img.naturalHeight;
+  convertBtn.disabled = true;
+  splitBtn.disabled = true;
+  statusMsg.textContent = 'Generating PDF file layers...';
+  statusMsg.className = 'status-msg';
+  setProgress(5);
 
-          if (item.rotation % 180 !== 0) {
-            canvas.width = h;
-            canvas.height = w;
-          } else {
-            canvas.width = w;
-            canvas.height = h;
-          }
+  try {
+    const sizeOpt = document.getElementById('pageSize').value;
+    const orientOpt = document.getElementById('orientation').value;
+    const fitOpt = document.getElementById('imageFit').value;
+    const marginOpt = parseFloat(document.getElementById('margins').value);
+    const qOpt = parseFloat(jpegQuality.value);
 
-          const ctx = canvas.getContext('2d');
-          ctx.fillStyle = "#ffffff";
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
+    let pdf = null;
 
-          ctx.translate(canvas.width / 2, canvas.height / 2);
-          ctx.rotate((item.rotation * Math.PI) / 180);
-          ctx.drawImage(img, -w / 2, -h / 2);
+    for (let i = 0; i < activeItems.length; i++) {
+      const item = activeItems[i];
+      const processedSrc = await processAndApplyFilters(item);
+      const { pW, pH } = getPageDimensions(sizeOpt, orientOpt, item.width, item.height);
 
-          const base64 = canvas.toDataURL('image/jpeg', parseInt(quality.value) / 100);
-          resolve({ data: base64, width: canvas.width, height: canvas.height });
-        };
-        img.src = item.src;
-      });
-    }
-
-    convertBtn.addEventListener('click', async () => {
-      const activeItems = loadedItems.filter(i => !i.excluded);
-      if (!activeItems.length) return;
-
-      convertBtn.disabled = true;
-      splitBtn.disabled = true;
-      statusMsg.textContent = 'Generating PDF...';
-      statusMsg.className = 'status-msg';
-      setProgress(5);
-
-      try {
-        const pSize = pageSizeSelect.value;
-        const pOri = orientationSelect.value;
-        const marginSelect = document.getElementById('margin').value;
-
-        let marginPoints = 0;
-        if (marginSelect === 'small') marginPoints = 14.17;
-        if (marginSelect === 'large') marginPoints = 34.01;
-
-        let pdf = null;
-
-        for (let i = 0; i < activeItems.length; i++) {
-          const processed = await processImage(activeItems[i]);
-          
-          let format = pSize;
-          let orientation = pOri;
-
-          if (pSize === 'fit') {
-            format = [processed.width * 0.75, processed.height * 0.75];
-            orientation = processed.width > processed.height ? 'l' : 'p';
-          }
-
-          if (i === 0) {
-            pdf = new jsPDF({ orientation: orientation, unit: 'pt', format: format, compress: true });
-          } else {
-            pdf.addPage(format, orientation);
-          }
-
-          const pWidth = pdf.internal.pageSize.getWidth();
-          const pHeight = pdf.internal.pageSize.getHeight();
-
-          const availW = pWidth - (marginPoints * 2);
-          const availH = pHeight - (marginPoints * 2);
-
-          let targetW = availW;
-          let targetH = (processed.height * availW) / processed.width;
-
-          if (targetH > availH) {
-            targetH = availH;
-            targetW = (processed.width * availH) / processed.height;
-          }
-
-          const xOff = marginPoints + (availW - targetW) / 2;
-          const yOff = marginPoints + (availH - targetH) / 2;
-
-          pdf.addImage(processed.data, 'JPEG', xOff, yOff, targetW, targetH, undefined, 'FAST');
-          setProgress(5 + Math.round((i / activeItems.length) * 85));
-        }
-
-        const title = document.getElementById('metaTitle').value.trim();
-        const author = document.getElementById('metaAuthor').value.trim();
-        if (title || author) pdf.setProperties({ title: title || undefined, author: author || undefined });
-
-        setProgress(95);
-        pdf.save('DocuCraft_Images.pdf');
-        setProgress(100);
-
-        statusMsg.textContent = '✓ PDF downloaded successfully.';
-        statusMsg.className = 'status-msg success-text';
-      } catch (err) {
-        console.error(err);
-        statusMsg.textContent = '⚠ Conversion failed. Try smaller or fewer images.';
-        statusMsg.className = 'status-msg error-text';
+      if (i === 0) {
+        pdf = new jsPDF({ orientation: pW > pH ? 'l' : 'p', unit: 'mm', format: [pW, pH] });
+      } else {
+        pdf.addPage([pW, pH], pW > pH ? 'l' : 'p');
       }
 
-      convertBtn.disabled = false;
-      splitBtn.disabled = false;
-      setTimeout(() => setProgress(0, true), 1200);
-    });
+      let dW = pW - (marginOpt * 2);
+      let dH = pH - (marginOpt * 2);
+      let dX = marginOpt;
+      let dY = marginOpt;
 
-    splitBtn.addEventListener('click', async () => {
-      const activeItems = loadedItems.filter(i => !i.excluded);
-      if (!activeItems.length) return;
+      const is90 = Math.abs(item.rotation) % 180 !== 0;
+      const currentW = is90 ? item.height : item.width;
+      const currentH = is90 ? item.width : item.height;
 
-      convertBtn.disabled = true;
-      splitBtn.disabled = true;
-      statusMsg.textContent = 'Generating distinct PDF components...';
-      statusMsg.className = 'status-msg';
-      setProgress(5);
-
-      try {
-        const zip = new JSZip();
-        const pSize = pageSizeSelect.value;
-        const pOri = orientationSelect.value;
-        const marginSelect = document.getElementById('margin').value;
-
-        let marginPoints = 0;
-        if (marginSelect === 'small') marginPoints = 14.17;
-        if (marginSelect === 'large') marginPoints = 34.01;
-
-        for (let i = 0; i < activeItems.length; i++) {
-          const processed = await processImage(activeItems[i]);
-          let format = pSize;
-          let orientation = pOri;
-
-          if (pSize === 'fit') {
-            format = [processed.width * 0.75, processed.height * 0.75];
-            orientation = processed.width > processed.height ? 'l' : 'p';
-          }
-
-          const pdf = new jsPDF({ orientation: orientation, unit: 'pt', format: format, compress: true });
-          
-          const pWidth = pdf.internal.pageSize.getWidth();
-          const pHeight = pdf.internal.pageSize.getHeight();
-          const availW = pWidth - (marginPoints * 2);
-          const availH = pHeight - (marginPoints * 2);
-
-          let targetW = availW;
-          let targetH = (processed.height * availW) / processed.width;
-
-          if (targetH > availH) {
-            targetH = availH;
-            targetW = (processed.width * availH) / processed.height;
-          }
-
-          const xOff = marginPoints + (availW - targetW) / 2;
-          const yOff = marginPoints + (availH - targetH) / 2;
-
-          pdf.addImage(processed.data, 'JPEG', xOff, yOff, targetW, targetH, undefined, 'FAST');
-
-          const title = document.getElementById('metaTitle').value.trim();
-          const author = document.getElementById('metaAuthor').value.trim();
-          if (title || author) pdf.setProperties({ title: title || undefined, author: author || undefined });
-
-          const base = activeItems[i].file.name.replace(/\.[^/.]+$/, '');
-          const fname = `${String(i + 1).padStart(3, '0')}_${base}.pdf`;
-          zip.file(fname, pdf.output('blob'));
-          setProgress(5 + Math.round((i / activeItems.length) * 85));
-        }
-
-        setProgress(95);
-        const blob = await zip.generateAsync({ type: 'blob' });
-        setProgress(100);
-
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'images-split.zip';
-        a.click();
-        URL.revokeObjectURL(a.href);
-
-        statusMsg.textContent = `✓ images-split.zip downloaded (${activeItems.length} PDFs)`;
-        statusMsg.className = 'status-msg success-text';
-      } catch (err) {
-        console.error(err);
-        statusMsg.textContent = '⚠ ZIP generation failed. Check console constraints.';
-        statusMsg.className = 'status-msg error-text';
+      if (fitOpt === 'contain') {
+        const ratio = Math.min(dW / currentW, dH / currentH);
+        const finalW = currentW * ratio;
+        const finalH = currentH * ratio;
+        dX = marginOpt + (dW - finalW) / 2;
+        dY = marginOpt + (dH - finalH) / 2;
+        dW = finalW;
+        dH = finalH;
+      } else if (fitOpt === 'original') {
+        const mmW = currentW * 0.264583;
+        const mmH = currentH * 0.264583;
+        dX = marginOpt + (dW - mmW) / 2;
+        dY = marginOpt + (dH - mmH) / 2;
+        dW = mmW;
+        dH = mmH;
       }
 
-      splitBtn.disabled = false;
-      convertBtn.disabled = false;
-      setTimeout(() => setProgress(0, true), 1200);
-    });
-  </script>
+      pdf.addImage(processedSrc, 'JPEG', dX, dY, dW, dH, undefined, 'FAST');
+      setProgress(5 + Math.round((i / activeItems.length) * 80));
+    }
+
+    const title = document.getElementById('metaTitle').value.trim();
+    const author = document.getElementById('metaAuthor').value.trim();
+    if (title || author) pdf.setProperties({ title: title || undefined, author: author || undefined });
+
+    setProgress(90);
+    let outName = document.getElementById('pdfFilename').value.trim();
+    if (!outName) {
+      if (activeItems.length === 1) {
+        outName = activeItems[0].file.name.replace(/\.[^/.]+$/, "") + ".pdf";
+      } else {
+        outName = "docucraft_archive.pdf";
+      }
+    } else {
+      if (!outName.toLowerCase().endsWith('.pdf')) outName += '.pdf';
+    }
+
+    pdf.save(outName);
+    setProgress(100);
+    statusMsg.textContent = `✓ Generated "${outName}" successfully.`;
+    statusMsg.className = 'status-msg success-text';
+  } catch (err) {
+    console.error(err);
+    statusMsg.textContent = '⚠ Document processing generation failed.';
+    statusMsg.className = 'status-msg error-text';
+  }
+
+  convertBtn.disabled = false;
+  splitBtn.disabled = false;
+  setTimeout(() => setProgress(0, true), 1200);
+});
+
+splitBtn.addEventListener('click', async () => {
+  const activeItems = items.filter(i => !i.excluded);
+  if (!activeItems.length) { alert('Please check or upload files to extract.'); return; }
+
+  splitBtn.disabled = true;
+  convertBtn.disabled = true;
+  statusMsg.textContent = 'Compressing image splits into ZIP layers...';
+  statusMsg.className = 'status-msg';
+  setProgress(5);
+
+  try {
+    const zip = new JSZip();
+    const sizeOpt = document.getElementById('pageSize').value;
+    const orientOpt = document.getElementById('orientation').value;
+    const fitOpt = document.getElementById('imageFit').value;
+    const marginOpt = parseFloat(document.getElementById('margins').value);
+
+    for (let i = 0; i < activeItems.length; i++) {
+      const item = activeItems[i];
+      const processedSrc = await processAndApplyFilters(item);
+      const { pW, pH } = getPageDimensions(sizeOpt, orientOpt, item.width, item.height);
+
+      const pdf = new jsPDF({ orientation: pW > pH ? 'l' : 'p', unit: 'mm', format: [pW, pH] });
+
+      let dW = pW - (marginOpt * 2);
+      let dH = pH - (marginOpt * 2);
+      let dX = marginOpt;
+      let dY = marginOpt;
+
+      const is90 = Math.abs(item.rotation) % 180 !== 0;
+      const currentW = is90 ? item.height : item.width;
+      const currentH = is90 ? item.width : item.height;
+
+      if (fitOpt === 'contain') {
+        const ratio = Math.min(dW / currentW, dH / currentH);
+        const finalW = currentW * ratio;
+        const finalH = currentH * ratio;
+        dX = marginOpt + (dW - finalW) / 2;
+        dY = marginOpt + (dH - finalH) / 2;
+        dW = finalW;
+        dH = finalH;
+      } else if (fitOpt === 'original') {
+        const mmW = currentW * 0.264583;
+        const mmH = currentH * 0.264583;
+        dX = marginOpt + (dW - mmW) / 2;
+        dY = marginOpt + (dH - mmH) / 2;
+        dW = mmW;
+        dH = mmH;
+      }
+
+      pdf.addImage(processedSrc, 'JPEG', dX, dY, dW, dH, undefined, 'FAST');
+
+      const title = document.getElementById('metaTitle').value.trim();
+      const author = document.getElementById('metaAuthor').value.trim();
+      if (title || author) pdf.setProperties({ title: title || undefined, author: author || undefined });
+
+      const base = item.file.name.replace(/\.[^/.]+$/, '');
+      const fname = `${String(i + 1).padStart(3, '0')}_${base}.pdf`;
+      zip.file(fname, pdf.output('blob'));
+      setProgress(5 + Math.round((i / activeItems.length) * 85));
+    }
+
+    setProgress(95);
+    const blob = await zip.generateAsync({ type: 'blob' });
+    setProgress(100);
+
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'images-split.zip';
+    a.click();
+    URL.revokeObjectURL(a.href);
+
+    statusMsg.textContent = `✓ images-split.zip downloaded (${activeItems.length} PDFs)`;
+    statusMsg.className = 'status-msg success-text';
+  } catch (err) {
+    console.error(err);
+    statusMsg.textContent = '⚠ ZIP generation failed. Check console constraints.';
+    statusMsg.className = 'status-msg error-text';
+  }
+
+  splitBtn.disabled = false;
+  convertBtn.disabled = false;
+  setTimeout(() => setProgress(0, true), 1200);
+});
+
+function setProgress(pct, hide = false) {
+  if (hide) {
+    progressWrap.style.display = 'none';
+    progressFill.style.width = '0%';
+  } else {
+    progressWrap.style.display = 'block';
+    progressFill.style.width = `${pct}%`;
+  }
+}
+</script>
+
 </body>
 </html>
