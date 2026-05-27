@@ -23,7 +23,7 @@
       --accent-mid: #4a7c5c;
       --radius: 10px;
       --radius-lg: 16px;
-      --transition: all 0.2s ease;
+      --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       
       /* Header Colors - Light Mode Defaults */
       --header-bg: #1a1a18;
@@ -294,7 +294,7 @@
     .tool-wrapper {
       position: relative;
       display: block;
-      transition: transform 0.2s ease;
+      transition: var(--transition);
     }
     .tool-wrapper:hover {
       transform: translateY(-4px);
@@ -874,22 +874,25 @@
     }
 
     let pinnedCount = 0;
-    starredIds.forEach(id => {
-      const coreSourceCard = document.querySelector(`#toolsGrid .tool-wrapper[data-id="${id}"]`);
-      if (coreSourceCard) {
-        // Clone original module element cleanly down into the pinned view layer
+    
+    // Explicitly loop through main grid to clone them to map correct visual layout state
+    document.querySelectorAll('#toolsGrid .tool-wrapper').forEach(coreSourceCard => {
+      const toolId = coreSourceCard.getAttribute('data-id');
+      
+      if (starredIds.includes(toolId)) {
         const clone = coreSourceCard.cloneNode(true);
-        
-        // Re-wire cloned button mechanics securely back to their parent functions
         const cloneBtn = clone.querySelector('.favorite-toggle-btn');
+        
+        // Standalone clean click mapping interface logic
         cloneBtn.addEventListener('click', (e) => {
           e.preventDefault();
           e.stopPropagation();
-          // Programmatically click the primary button to update database state smoothly
-          coreSourceCard.querySelector('.favorite-toggle-btn').click();
+          
+          const primaryBtn = coreSourceCard.querySelector('.favorite-toggle-btn');
+          if (primaryBtn) primaryBtn.click();
         });
 
-        // Ensure pinned module copies match current interactive search query configurations
+        // Sync with active filter states dynamically
         if (coreSourceCard.style.display === 'none') {
           clone.style.display = 'none';
         } else {
@@ -900,7 +903,6 @@
       }
     });
 
-    // Display container deck contextually based on query matching metrics
     favoritesSection.style.display = pinnedCount > 0 ? 'block' : 'none';
   }
 
@@ -908,29 +910,31 @@
      Live Search Engine Logic
      ========================================================================== */
   function initializeSearchSystem() {
-    // 1. Listen for global keyboard shortcuts to focus search bar
+    // Listen for shortcuts globally
     window.addEventListener('keydown', (e) => {
       if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
+        if (e.key === 'Escape') {
+          document.activeElement.blur();
+        }
         return;
       }
       
       if (e.key === '/') {
-        e.preventDefault();
+        e.preventDefault(); // Clean execution block to prevent trailing slashes inside input stream
         searchInput.focus();
+        setTimeout(() => { searchInput.select(); }, 0);
       }
     });
 
-    // 2. Clear text button handler
+    // Clear string configurations wrapper mechanics
     searchClearBtn.addEventListener('click', () => {
       searchInput.value = '';
-      searchInput.focus();
       triggerSearchFilter('');
+      searchInput.focus();
     });
 
-    // 3. Search query character parsing input stream listener
     searchInput.addEventListener('input', (e) => {
-      const query = e.target.value;
-      triggerSearchFilter(query);
+      triggerSearchFilter(e.target.value);
     });
   }
 
@@ -965,7 +969,7 @@
       noResultsMessage.style.display = 'none';
     }
 
-    // Refresh pinned row cards status asynchronously matching global search values
+    // Safely update favorite grid cards to mirror global layout search queries
     renderFavoritesDeck();
   }
 
