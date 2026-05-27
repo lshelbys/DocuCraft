@@ -193,7 +193,7 @@
     }
     .search-input {
       width: 100%;
-      padding: 14px 16px 14px 44px;
+      padding: 14px 48px 14px 44px;
       font-family: 'DM Sans', sans-serif;
       font-size: 14px;
       color: var(--ink);
@@ -223,12 +223,62 @@
       color: var(--accent-mid);
     }
 
+    /* Keyboard Shortcut Hint */
+    .search-shortcut {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: var(--surface-2);
+      border: 1px solid var(--surface-3);
+      color: var(--ink-3);
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      pointer-events: none;
+      transition: var(--transition);
+    }
+    .search-wrapper:focus-within .search-shortcut {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    /* Reset Search Inline Button Button Style */
+    .clear-search-btn {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--ink-3);
+      font-size: 14px;
+      cursor: pointer;
+      display: none; /* Controlled via script logic updates */
+      padding: 4px;
+      line-height: 1;
+      transition: var(--transition);
+    }
+    .clear-search-btn:hover {
+      color: var(--ink);
+    }
+
+    /* Empty Search Results Notice Layout */
+    .no-results {
+      text-align: center;
+      color: var(--ink-3);
+      font-size: 15px;
+      padding: 48px 0;
+      display: none;
+      transition: var(--transition);
+    }
+
     .tools-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 20px;
       margin-bottom: 60px;
-      transition: opacity var(--transition);
     }
 
     .tool-link {
@@ -450,6 +500,8 @@
       <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
     </svg>
     <input type="text" id="toolSearch" class="search-input" placeholder="Search document utilities..." aria-label="Search tools">
+    <span class="search-shortcut" id="searchShortcut">/</span>
+    <button id="clearSearch" class="clear-search-btn" aria-label="Clear search queries" type="button">✕</button>
   </div>
 
   <div class="tools-grid" id="toolsGrid">
@@ -512,6 +564,10 @@
         </div>
       </div>
     </a>
+  </div>
+
+  <div id="noResults" class="no-results">
+    No document utilities found matching those search terms.
   </div>
 
   <section class="features-row">
@@ -588,12 +644,58 @@
     }
   });
 
-  // Client-side real-time filter logic
+  // Search, shortcuts, and clearing filters operational variables
   const searchInput = document.getElementById('toolSearch');
   const toolCards = document.querySelectorAll('.tool-link');
+  const noResultsNotice = document.getElementById('noResults');
+  const toolsGrid = document.getElementById('toolsGrid');
+  const clearSearchBtn = document.getElementById('clearSearch');
+  const searchShortcut = document.getElementById('searchShortcut');
+
+  // Focus search box automatically when forward slash is hit, blur/clear on Escape
+  window.addEventListener('keydown', (e) => {
+    if (e.key === '/' && document.activeElement !== searchInput) {
+      e.preventDefault(); 
+      searchInput.focus();
+    }
+    if (e.key === 'Escape' && document.activeElement === searchInput) {
+      resetSearchFilter();
+    }
+  });
+
+  // Action button mouse click trigger
+  clearSearchBtn.addEventListener('click', resetSearchFilter);
+
+  // Central search manager function to instantly clear query filters
+  function resetSearchFilter() {
+    searchInput.value = '';
+    clearSearchBtn.style.display = 'none';
+    
+    // Restore layout hints if input loses active tracking state
+    if (document.activeElement !== searchInput) {
+      searchShortcut.style.display = 'block';
+    }
+    
+    toolCards.forEach(card => {
+      card.style.display = 'block';
+      card.style.opacity = '1';
+    });
+    noResultsNotice.style.display = 'none';
+    toolsGrid.style.marginBottom = '60px';
+    searchInput.blur();
+  }
 
   searchInput.addEventListener('input', (e) => {
     const query = e.target.value.toLowerCase().trim();
+    let hasMatches = false;
+
+    // Dynamically toggle action button display tokens based on input contents
+    if (query.length > 0) {
+      clearSearchBtn.style.display = 'block';
+      searchShortcut.style.display = 'none';
+    } else {
+      clearSearchBtn.style.display = 'none';
+    }
     
     toolCards.forEach(card => {
       const h3Text = card.querySelector('h3').textContent.toLowerCase();
@@ -601,13 +703,22 @@
       
       if (h3Text.includes(query) || pText.includes(query)) {
         card.style.display = 'block';
-        // Delay slight opacity change to feel native
         setTimeout(() => card.style.opacity = '1', 10);
+        hasMatches = true;
       } else {
         card.style.opacity = '0';
         card.style.display = 'none';
       }
     });
+
+    // Handle UI layout states gracefully if search result fails
+    if (!hasMatches && query !== '') {
+      noResultsNotice.style.display = 'block';
+      toolsGrid.style.marginBottom = '20px';
+    } else {
+      noResultsNotice.style.display = 'none';
+      toolsGrid.style.marginBottom = '60px';
+    }
   });
 </script>
 
