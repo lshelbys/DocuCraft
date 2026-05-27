@@ -200,7 +200,7 @@
     }
     .search-bar {
       width: 100%;
-      padding: 14px 44px 14px 44px; /* Room for magnifying glass left, controls right */
+      padding: 14px 44px 14px 44px;
       font-family: 'DM Sans', sans-serif;
       font-size: 14px;
       background: var(--white);
@@ -218,7 +218,6 @@
       color: var(--ink-3);
     }
 
-    /* Search Controls Right Side Positioning Overlay */
     .search-controls {
       position: absolute;
       right: 16px;
@@ -227,7 +226,6 @@
       gap: 6px;
     }
 
-    /* Slash Keyboard Shortcut Hint Badge */
     .search-shortcut-hint {
       background: var(--surface-2);
       color: var(--ink-3);
@@ -241,14 +239,13 @@
       transition: opacity 0.15s ease;
     }
     
-    /* Clear Text Button Component Style */
     .search-clear-btn {
       background: none;
       border: none;
       color: var(--ink-3);
       cursor: pointer;
       padding: 2px;
-      display: none; /* Controlled dynamically via input presence */
+      display: none;
       align-items: center;
       justify-content: center;
       border-radius: 50%;
@@ -257,9 +254,6 @@
     .search-clear-btn:hover {
       background: var(--surface-2);
       color: var(--ink);
-    }
-    .search-clear-btn svg {
-      display: block;
     }
 
     .no-results-message {
@@ -295,16 +289,22 @@
       gap: 20px;
       margin-bottom: 60px;
     }
-    .tools-grid:empty {
-      margin-bottom: 0;
-    }
 
+    /* Structurally Fixed Interactive Card Module */
+    .tool-wrapper {
+      position: relative;
+      display: block;
+      transition: transform 0.2s ease;
+    }
+    .tool-wrapper:hover {
+      transform: translateY(-4px);
+    }
+    
     .tool-link {
       text-decoration: none;
       color: inherit;
       display: block;
-      transition: opacity 0.2s ease, transform 0.2s ease;
-      position: relative;
+      height: 100%;
     }
 
     .tool-card {
@@ -317,15 +317,13 @@
       flex-direction: column;
       gap: 14px;
       transition: var(--transition);
-      position: relative;
-      overflow: hidden;
       height: 100%;
     }
-    .tool-card:hover {
-      transform: translateY(-4px);
+    .tool-wrapper:hover .tool-card {
       border-color: var(--accent-mid);
       box-shadow: 0 6px 20px rgba(0,0,0,0.03);
     }
+    
     .tool-icon {
       width: 44px;
       height: 44px;
@@ -337,7 +335,7 @@
       color: var(--accent);
       transition: var(--transition);
     }
-    .tool-card:hover .tool-icon {
+    .tool-wrapper:hover .tool-icon {
       background: var(--accent-light);
     }
     .tool-info h3 {
@@ -352,7 +350,7 @@
       line-height: 1.4;
     }
 
-    /* Favorite Pinning Icon Button - Visibility Enhanced with Balanced Light Grey */
+    /* Isolated Bookmark Button Layout Styling */
     .favorite-toggle-btn {
       position: absolute;
       top: 24px;
@@ -361,21 +359,26 @@
       border: none;
       cursor: pointer;
       color: #b4b4af; 
-      z-index: 10;
-      padding: 4px;
+      z-index: 20; /* High index to float cleanly on top of link layers */
+      padding: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
       transition: var(--transition);
+      border-radius: 50%;
     }
     html[data-theme="dark"] .favorite-toggle-btn {
       color: #5a5a57; 
     }
-    .tool-card:hover .favorite-toggle-btn {
+    .tool-wrapper:hover .favorite-toggle-btn {
       color: var(--ink-2); 
     }
     .favorite-toggle-btn:hover {
       transform: scale(1.2);
+      background: var(--surface);
+    }
+    html[data-theme="dark"] .favorite-toggle-btn:hover {
+      background: var(--surface-3);
     }
     .favorite-toggle-btn.starred {
       color: #eab308 !important; 
@@ -623,11 +626,11 @@
     <div class="section-label" id="mainGridLabel">All Utilities</div>
     <div class="tools-grid" id="toolsGrid">
       
-      <div class="tool-link" data-id="image-to-pdf">
+      <div class="tool-wrapper" data-id="image-to-pdf">
         <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
           <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </button>
-        <a href="image-to-pdf.html" style="text-decoration:none; color:inherit;">
+        <a href="image-to-pdf.html" class="tool-link">
           <div class="tool-card">
             <div class="tool-icon">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
@@ -640,11 +643,11 @@
         </a>
       </div>
 
-      <div class="tool-link" data-id="merge-pdf">
+      <div class="tool-wrapper" data-id="merge-pdf">
         <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
           <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </button>
-        <a href="merge-pdf.html" style="text-decoration:none; color:inherit;">
+        <a href="merge-pdf.html" class="tool-link">
           <div class="tool-card">
             <div class="tool-icon">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
@@ -657,11 +660,11 @@
         </a>
       </div>
 
-      <div class="tool-link" data-id="split-pdf">
+      <div class="tool-wrapper" data-id="split-pdf">
         <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
           <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </button>
-        <a href="split-pdf.html" style="text-decoration:none; color:inherit;">
+        <a href="split-pdf.html" class="tool-link">
           <div class="tool-card">
             <div class="tool-icon">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><path d="M12 3v6M12 15v6"/></svg>
@@ -674,11 +677,11 @@
         </a>
       </div>
 
-      <div class="tool-link" data-id="compress-pdf">
+      <div class="tool-wrapper" data-id="compress-pdf">
         <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
           <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </button>
-        <a href="compress-pdf.html" style="text-decoration:none; color:inherit;">
+        <a href="compress-pdf.html" class="tool-link">
           <div class="tool-card">
             <div class="tool-icon">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 14h16M4 10h16M12 4v6M12 14v6"/></svg>
@@ -691,11 +694,11 @@
         </a>
       </div>
 
-      <div class="tool-link" data-id="pdf-converter">
+      <div class="tool-wrapper" data-id="pdf-converter">
         <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
           <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </button>
-        <a href="pdf-converter.html" style="text-decoration:none; color:inherit;">
+        <a href="pdf-converter.html" class="tool-link">
           <div class="tool-card">
             <div class="tool-icon">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7 21l-4 1 1-4L17 3z"/></svg>
@@ -825,14 +828,14 @@
   const searchClearBtn = document.getElementById('searchClearBtn');
 
   /* ==========================================================================
-     Smart Favorite Pinning System Engine Logic
+     Bookmarking / Pinned Utilities Engine Logic
      ========================================================================== */
   function initializeFavoritesSystem() {
     let starredIds = JSON.parse(localStorage.getItem('docucraft_pinned')) || [];
     
     document.querySelectorAll('#toolsGrid .favorite-toggle-btn').forEach(btn => {
-      const parentCard = btn.closest('.tool-link');
-      const toolId = parentCard.getAttribute('data-id');
+      const wrapperCard = btn.closest('.tool-wrapper');
+      const toolId = wrapperCard.getAttribute('data-id');
       
       // Sync UI star states with local metadata on init
       if (starredIds.includes(toolId)) {
@@ -841,7 +844,7 @@
 
       btn.addEventListener('click', (e) => {
         e.preventDefault();
-        e.stopPropagation(); // Avoid navigation triggers when clicking target pin overlay buttons
+        e.stopPropagation(); // Stops event bubbling completely out of the link layer
         
         starredIds = JSON.parse(localStorage.getItem('docucraft_pinned')) || [];
         
@@ -872,20 +875,21 @@
 
     let pinnedCount = 0;
     starredIds.forEach(id => {
-      const coreSourceCard = document.querySelector(`#toolsGrid .tool-link[data-id="${id}"]`);
+      const coreSourceCard = document.querySelector(`#toolsGrid .tool-wrapper[data-id="${id}"]`);
       if (coreSourceCard) {
-        // Clone original module element down cleanly into pinned access row
+        // Clone original module element cleanly down into the pinned view layer
         const clone = coreSourceCard.cloneNode(true);
         
-        // Wire cloned button layout events back to parent references securely
+        // Re-wire cloned button mechanics securely back to their parent functions
         const cloneBtn = clone.querySelector('.favorite-toggle-btn');
         cloneBtn.addEventListener('click', (e) => {
           e.preventDefault();
           e.stopPropagation();
+          // Programmatically click the primary button to update database state smoothly
           coreSourceCard.querySelector('.favorite-toggle-btn').click();
         });
 
-        // Ensure pinned tools respect current search criteria filtering
+        // Ensure pinned module copies match current interactive search query configurations
         if (coreSourceCard.style.display === 'none') {
           clone.style.display = 'none';
         } else {
@@ -896,35 +900,34 @@
       }
     });
 
-    // Toggle favorites strip block context based on filtered pinned matches
+    // Display container deck contextually based on query matching metrics
     favoritesSection.style.display = pinnedCount > 0 ? 'block' : 'none';
   }
 
   /* ==========================================================================
-     Live Search Engine Logic (with X clear and / shortcut hints)
+     Live Search Engine Logic
      ========================================================================== */
   function initializeSearchSystem() {
     // 1. Listen for global keyboard shortcuts to focus search bar
     window.addEventListener('keydown', (e) => {
-      // Disregard shortcuts if the user is currently typing inside an input or textarea field
       if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
         return;
       }
       
       if (e.key === '/') {
-        e.preventDefault(); // Prevent standard slash browser actions
+        e.preventDefault();
         searchInput.focus();
       }
     });
 
-    // 2. Clear button mechanism click listener
+    // 2. Clear text button handler
     searchClearBtn.addEventListener('click', () => {
       searchInput.value = '';
       searchInput.focus();
       triggerSearchFilter('');
     });
 
-    // 3. Search query processing change handler
+    // 3. Search query character parsing input stream listener
     searchInput.addEventListener('input', (e) => {
       const query = e.target.value;
       triggerSearchFilter(query);
@@ -933,10 +936,9 @@
 
   function triggerSearchFilter(rawQuery) {
     const query = rawQuery.toLowerCase().trim();
-    const mainCards = toolsGrid.querySelectorAll('.tool-link');
+    const mainCards = toolsGrid.querySelectorAll('.tool-wrapper');
     let matchesFound = 0;
 
-    // Toggle view layout layers for control indicators contextually
     if (rawQuery.length > 0) {
       searchShortcutHint.style.display = 'none';
       searchClearBtn.style.display = 'flex';
@@ -957,24 +959,22 @@
       }
     });
 
-    // Show/Hide "No Results" messaging panel cleanly
     if (matchesFound === 0 && query !== '') {
       noResultsMessage.style.display = 'block';
     } else {
       noResultsMessage.style.display = 'none';
     }
 
-    // Sync filter view configurations instantly across the pinned deck layout layer
+    // Refresh pinned row cards status asynchronously matching global search values
     renderFavoritesDeck();
   }
 
   function updatePrivacyInspectorStatistics() {
-    // Dynamic tracking baseline mapping logic for files converted locally
     const dynamicActionsCount = localStorage.getItem('docucraft_actions_total_count') || 0;
     statsFileCounter.textContent = dynamicActionsCount;
   }
 
-  // Initial sequence initialization execution flows
+  // Engine boot up sequence execution maps
   initializeFavoritesSystem();
   initializeSearchSystem();
   updatePrivacyInspectorStatistics();
