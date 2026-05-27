@@ -252,7 +252,7 @@
       font-size: 16px;
       font-weight: 600;
       margin-bottom: 4px;
-      padding-right: 24px; 
+      padding-right: 28px; 
     }
     .tool-info p {
       font-size: 13px;
@@ -260,7 +260,7 @@
       line-height: 1.4;
     }
 
-    /* Favorite Interaction Icon Button Overlay */
+    /* Favorite Pinning Icon Button - Visibility Enhanced with Balanced Light Grey */
     .favorite-toggle-btn {
       position: absolute;
       top: 24px;
@@ -268,7 +268,7 @@
       background: none;
       border: none;
       cursor: pointer;
-      color: var(--surface-3);
+      color: #b4b4af; /* Clear, legible light grey instead of blending into the canvas background */
       z-index: 10;
       padding: 4px;
       display: flex;
@@ -276,11 +276,14 @@
       justify-content: center;
       transition: var(--transition);
     }
+    html[data-theme="dark"] .favorite-toggle-btn {
+      color: #5a5a57; /* Structured deep grey alternative for dark background layouts */
+    }
     .tool-card:hover .favorite-toggle-btn {
-      color: var(--ink-3);
+      color: var(--ink-2); /* Elevates contrast cleanly when hovering over target cards */
     }
     .favorite-toggle-btn:hover {
-      transform: scale(1.15);
+      transform: scale(1.2);
     }
     .favorite-toggle-btn.starred {
       color: #eab308 !important; 
@@ -288,6 +291,7 @@
     .favorite-toggle-btn svg {
       fill: transparent;
       stroke: currentColor;
+      stroke-width: 2;
     }
     .favorite-toggle-btn.starred svg {
       fill: currentColor;
