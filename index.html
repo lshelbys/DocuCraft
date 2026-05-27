@@ -167,7 +167,7 @@
 
     .hub-hero {
       text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 32px;
     }
     .hub-hero h2 {
       font-family: 'Instrument Serif', serif;
@@ -179,6 +179,95 @@
     .hub-hero p {
       color: var(--ink-2);
       font-size: 16px;
+    }
+
+    /* Enhanced Search Container with X and / Badges */
+    .search-container {
+      max-width: 500px;
+      margin: 0 auto 40px;
+      position: relative;
+    }
+    .search-input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .search-input-wrapper .search-icon {
+      position: absolute;
+      left: 16px;
+      color: var(--ink-3);
+      pointer-events: none;
+    }
+    .search-bar {
+      width: 100%;
+      padding: 14px 44px 14px 44px; /* Room for magnifying glass left, controls right */
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      background: var(--white);
+      color: var(--ink);
+      border: 1px solid var(--surface-3);
+      border-radius: var(--radius-lg);
+      outline: none;
+      transition: var(--transition);
+    }
+    .search-bar:focus {
+      border-color: var(--accent-mid);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+    }
+    .search-bar::placeholder {
+      color: var(--ink-3);
+    }
+
+    /* Search Controls Right Side Positioning Overlay */
+    .search-controls {
+      position: absolute;
+      right: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Slash Keyboard Shortcut Hint Badge */
+    .search-shortcut-hint {
+      background: var(--surface-2);
+      color: var(--ink-3);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--surface-3);
+      pointer-events: none;
+      user-select: none;
+      transition: opacity 0.15s ease;
+    }
+    
+    /* Clear Text Button Component Style */
+    .search-clear-btn {
+      background: none;
+      border: none;
+      color: var(--ink-3);
+      cursor: pointer;
+      padding: 2px;
+      display: none; /* Controlled dynamically via input presence */
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: var(--transition);
+    }
+    .search-clear-btn:hover {
+      background: var(--surface-2);
+      color: var(--ink);
+    }
+    .search-clear-btn svg {
+      display: block;
+    }
+
+    .no-results-message {
+      text-align: center;
+      padding: 30px 0;
+      color: var(--ink-3);
+      font-size: 14px;
+      display: none;
     }
 
     /* Section Subheaders */
@@ -205,6 +294,9 @@
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 20px;
       margin-bottom: 60px;
+    }
+    .tools-grid:empty {
+      margin-bottom: 0;
     }
 
     .tool-link {
@@ -268,7 +360,7 @@
       background: none;
       border: none;
       cursor: pointer;
-      color: #b4b4af; /* Clear, legible light grey instead of blending into the canvas background */
+      color: #b4b4af; 
       z-index: 10;
       padding: 4px;
       display: flex;
@@ -277,10 +369,10 @@
       transition: var(--transition);
     }
     html[data-theme="dark"] .favorite-toggle-btn {
-      color: #5a5a57; /* Structured deep grey alternative for dark background layouts */
+      color: #5a5a57; 
     }
     .tool-card:hover .favorite-toggle-btn {
-      color: var(--ink-2); /* Elevates contrast cleanly when hovering over target cards */
+      color: var(--ink-2); 
     }
     .favorite-toggle-btn:hover {
       transform: scale(1.2);
@@ -297,7 +389,7 @@
       fill: currentColor;
     }
 
-    /* Privacy Dashboard Styling - Text Sizes Equalized to Features Row Below */
+    /* Privacy Dashboard Styling */
     .privacy-dashboard {
       background: var(--white);
       border: 1px solid var(--surface-3);
@@ -453,20 +545,12 @@
       z-index: 10;
     }
     .status-dot { 
-      width: 6px; 
-      height: 6px; 
-      border-radius: 50%; 
-      background: #22c55e;
-      box-shadow: 0 0 8px #22c55e;
-      display: inline-block; 
+      width: 6px; height: 6px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 8px #22c55e; display: inline-block; 
     }
 
     @media (max-width: 600px) {
       .system-status {
-        position: static;
-        justify-content: center;
-        padding-bottom: 16px;
-        background: var(--white);
+        position: static; justify-content: center; padding-bottom: 16px; background: var(--white);
       }
     }
   </style>
@@ -509,6 +593,23 @@
     <h2>The all in one platform for your document workflow</h2>
     <p>No sign up    •    No ads    •    100% Free</p>
   </section>
+
+  <div class="search-container">
+    <div class="search-input-wrapper">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input type="text" id="toolSearchInput" class="search-bar" placeholder="Search utilities (e.g., merge, convert, split)..." aria-label="Search tools" />
+      <div class="search-controls">
+        <span id="searchShortcutHint" class="search-shortcut-hint">/</span>
+        <button type="button" id="searchClearBtn" class="search-clear-btn" aria-label="Clear search input">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <section id="favoritesSection" class="favorites-section">
     <div class="section-label">
@@ -607,6 +708,8 @@
         </a>
       </div>
     </div>
+    
+    <div id="noResultsMessage" class="no-results-message">No matching utilities found.</div>
   </section>
 
   <section class="privacy-dashboard">
@@ -715,6 +818,11 @@
   const favoritesSection = document.getElementById('favoritesSection');
   const favoritesGrid = document.getElementById('favoritesGrid');
   const statsFileCounter = document.getElementById('statsFileCounter');
+  const searchInput = document.getElementById('toolSearchInput');
+  const toolsGrid = document.getElementById('toolsGrid');
+  const noResultsMessage = document.getElementById('noResultsMessage');
+  const searchShortcutHint = document.getElementById('searchShortcutHint');
+  const searchClearBtn = document.getElementById('searchClearBtn');
 
   /* ==========================================================================
      Smart Favorite Pinning System Engine Logic
@@ -722,7 +830,7 @@
   function initializeFavoritesSystem() {
     let starredIds = JSON.parse(localStorage.getItem('docucraft_pinned')) || [];
     
-    document.querySelectorAll('.favorite-toggle-btn').forEach(btn => {
+    document.querySelectorAll('#toolsGrid .favorite-toggle-btn').forEach(btn => {
       const parentCard = btn.closest('.tool-link');
       const toolId = parentCard.getAttribute('data-id');
       
@@ -762,8 +870,9 @@
       return;
     }
 
+    let pinnedCount = 0;
     starredIds.forEach(id => {
-      const coreSourceCard = document.querySelector(`.tool-link[data-id="${id}"]`);
+      const coreSourceCard = document.querySelector(`#toolsGrid .tool-link[data-id="${id}"]`);
       if (coreSourceCard) {
         // Clone original module element down cleanly into pinned access row
         const clone = coreSourceCard.cloneNode(true);
@@ -776,11 +885,87 @@
           coreSourceCard.querySelector('.favorite-toggle-btn').click();
         });
 
+        // Ensure pinned tools respect current search criteria filtering
+        if (coreSourceCard.style.display === 'none') {
+          clone.style.display = 'none';
+        } else {
+          pinnedCount++;
+        }
+
         favoritesGrid.appendChild(clone);
       }
     });
 
-    favoritesSection.style.display = 'block';
+    // Toggle favorites strip block context based on filtered pinned matches
+    favoritesSection.style.display = pinnedCount > 0 ? 'block' : 'none';
+  }
+
+  /* ==========================================================================
+     Live Search Engine Logic (with X clear and / shortcut hints)
+     ========================================================================== */
+  function initializeSearchSystem() {
+    // 1. Listen for global keyboard shortcuts to focus search bar
+    window.addEventListener('keydown', (e) => {
+      // Disregard shortcuts if the user is currently typing inside an input or textarea field
+      if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
+        return;
+      }
+      
+      if (e.key === '/') {
+        e.preventDefault(); // Prevent standard slash browser actions
+        searchInput.focus();
+      }
+    });
+
+    // 2. Clear button mechanism click listener
+    searchClearBtn.addEventListener('click', () => {
+      searchInput.value = '';
+      searchInput.focus();
+      triggerSearchFilter('');
+    });
+
+    // 3. Search query processing change handler
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value;
+      triggerSearchFilter(query);
+    });
+  }
+
+  function triggerSearchFilter(rawQuery) {
+    const query = rawQuery.toLowerCase().trim();
+    const mainCards = toolsGrid.querySelectorAll('.tool-link');
+    let matchesFound = 0;
+
+    // Toggle view layout layers for control indicators contextually
+    if (rawQuery.length > 0) {
+      searchShortcutHint.style.display = 'none';
+      searchClearBtn.style.display = 'flex';
+    } else {
+      searchShortcutHint.style.display = 'inline-block';
+      searchClearBtn.style.display = 'none';
+    }
+
+    mainCards.forEach(card => {
+      const title = card.querySelector('h3').textContent.toLowerCase();
+      const description = card.querySelector('p').textContent.toLowerCase();
+
+      if (title.includes(query) || description.includes(query)) {
+        card.style.display = 'block';
+        matchesFound++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    // Show/Hide "No Results" messaging panel cleanly
+    if (matchesFound === 0 && query !== '') {
+      noResultsMessage.style.display = 'block';
+    } else {
+      noResultsMessage.style.display = 'none';
+    }
+
+    // Sync filter view configurations instantly across the pinned deck layout layer
+    renderFavoritesDeck();
   }
 
   function updatePrivacyInspectorStatistics() {
@@ -791,6 +976,7 @@
 
   // Initial sequence initialization execution flows
   initializeFavoritesSystem();
+  initializeSearchSystem();
   updatePrivacyInspectorStatistics();
 </script>
 
