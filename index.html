@@ -29,7 +29,7 @@
       --header-bg: #1a1a18;
       --header-text: #ffffff;
       --header-hover: #7ec898; 
-      --header-icon-color: #8a8a84; /* Uniform gray for header items */
+      --header-icon-color: #8a8a84; 
     }
 
     html[data-theme="dark"] {
@@ -44,7 +44,7 @@
       --header-bg: #1c1c1a;
       --header-text: #f7f6f2;
       --header-hover: #8a8a84; 
-      --header-icon-color: #8a8a84; /* Maintains parity across shifts */
+      --header-icon-color: #8a8a84;
     }
 
     body {
@@ -84,13 +84,11 @@
       letter-spacing: -0.01em;
       display: flex;
       user-select: none;
-      
-      /* Smoothly grow the whole text block over 0.6 seconds */
       transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
       transform-origin: left center;
     }
 
-    /* Scale the text slightly upwards on hover */
+    /* Scale the logo text slightly upwards on hover */
     .header-logo:hover .header-text h1 {
       transform: scale(1.1);
     }
@@ -112,7 +110,6 @@
       gap: 16px;
     }
 
-    /* Common Icon Button Base Style */
     .header-btn {
       background: none;
       border: none;
@@ -139,7 +136,6 @@
     html[data-theme="dark"] .theme-toggle .moon-path { display: none; }
     html:not([data-theme="dark"]) .theme-toggle .sun-path { display: none; }
 
-    /* Bookmark System Dynamic Tooltip Layout */
     .bookmark-wrapper {
       position: relative;
       display: flex;
@@ -257,25 +253,40 @@
       font-size: 16px;
     }
 
+    /* ==========================================================================
+       Search Container with Growing and Static Pine Green Glow Properties
+       ========================================================================== */
     .search-container {
       max-width: 500px;
       margin: 0 auto 40px;
       position: relative;
     }
+    
     .search-input-wrapper {
       position: relative;
       display: flex;
       align-items: center;
+      
+      /* Smoothly scale up the bar container layout over 0.6 seconds on mouse hover */
+      transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+      transform-origin: center center;
     }
+    
+    .search-input-wrapper:hover {
+      transform: scale(1.04);
+    }
+
     .search-input-wrapper .search-icon {
       position: absolute;
       left: 16px;
       color: var(--ink-3);
       pointer-events: none;
+      z-index: 5;
     }
+
     .search-bar {
       width: 100%;
-      padding: 14px 44px 14px 44px;
+      padding: 14px 44px;
       font-family: 'DM Sans', sans-serif;
       font-size: 14px;
       background: var(--white);
@@ -283,14 +294,29 @@
       border: 1px solid var(--surface-3);
       border-radius: var(--radius-lg);
       outline: none;
-      transition: var(--transition);
+      position: relative;
+      
+      /* Set a smooth transition timing map to allow the static pine green highlights 
+         and neon glow backdrops to blend in cleanly over 0.8 seconds. */
+      transition: border-color 0.8s cubic-bezier(0.25, 1, 0.5, 1), 
+                  box-shadow 0.8s cubic-bezier(0.25, 1, 0.5, 1);
     }
-    .search-bar:focus {
-      border-color: var(--accent-mid);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
-    }
+    
     .search-bar::placeholder {
       color: var(--ink-3);
+    }
+
+    /* Smoothly render the static brand-accurate Pine Green glow filter on hover */
+    .search-input-wrapper:hover .search-bar {
+      border-color: var(--accent-mid);
+      /* Combines a soft 16px atmospheric aura with a subtle 4px crisp vector glow */
+      box-shadow: 0 0 16px rgba(45, 90, 61, 0.3), 0 0 4px rgba(74, 124, 92, 0.2);
+    }
+
+    /* Keep the focused input style uniform and balanced when active/typing */
+    .search-bar:focus {
+      border-color: var(--accent-mid) !important;
+      box-shadow: 0 0 0 3px var(--accent-light), 0 4px 12px rgba(0, 0, 0, 0.02) !important;
     }
 
     .search-controls {
@@ -299,6 +325,7 @@
       display: flex;
       align-items: center;
       gap: 6px;
+      z-index: 5;
     }
 
     .search-shortcut-hint {
@@ -689,11 +716,13 @@
   </section>
 
   <div class="search-container">
-    <div class="search-input-wrapper">
+    <div class="search-input-wrapper" id="searchInputWrapper">
       <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
       </svg>
+      
       <input type="text" id="toolSearchInput" class="search-bar" placeholder="Search utilities (e.g., merge, convert, split)..." aria-label="Search tools" />
+      
       <div class="search-controls">
         <span id="searchShortcutHint" class="search-shortcut-hint">/</span>
         <button type="button" id="searchClearBtn" class="search-clear-btn" aria-label="Clear search input">
@@ -906,7 +935,6 @@
       document.documentElement.setAttribute('data-theme', 'dark');
       localStorage.setItem('theme', 'dark');
     }
-    // Instantly reset letters colors to matching defaults if theme flips
     resetLogoLetters();
   });
 
@@ -929,7 +957,6 @@
      Dynamic Bookmark Helper Logic
      ========================================================================== */
   function initializeBookmarkUtility() {
-    // Detect OS to serve tailored advice
     const userAgent = navigator.userAgent.toLowerCase();
     const isMac = userAgent.includes('macintosh') || userAgent.includes('mac os');
     const isMobile = userAgent.includes('iphone') || userAgent.includes('ipad') || userAgent.includes('android');
@@ -942,13 +969,11 @@
       bookmarkShortcut.innerHTML = '<kbd>Ctrl + D</kbd>';
     }
 
-    // Toggle popover tooltip on explicit action
     bookmarkToggle.addEventListener('click', (e) => {
       e.stopPropagation();
       bookmarkWrapper.classList.toggle('show-tip');
     });
 
-    // Close bookmark utility tip cleanly if clicking outside anywhere
     document.addEventListener('click', () => {
       bookmarkWrapper.classList.remove('show-tip');
     });
@@ -1104,7 +1129,6 @@
   let activeStaggerTimeouts = [];
 
   function resetLogoLetters() {
-    // Clear any color timeouts currently scheduled
     activeStaggerTimeouts.forEach(clearTimeout);
     activeStaggerTimeouts = [];
 
@@ -1120,17 +1144,14 @@
     const letters = document.querySelectorAll('.logo-letter');
 
     logoLink.addEventListener('mouseenter', () => {
-      // Clear any pending cleanups or competing state
       activeStaggerTimeouts.forEach(clearTimeout);
       activeStaggerTimeouts = [];
 
-      // Loop through characters with a sequential cascade delay 
       letters.forEach((letter, index) => {
         const timeoutId = setTimeout(() => {
-          // Generate an individual, random, bright-pastel color coordinate using HSL
           const randomHue = Math.floor(Math.random() * 360);
           letter.style.color = `hsl(${randomHue}, 85%, 75%)`;
-        }, index * 120); // Spacing tightened from 250ms to 120ms for a snappier flow
+        }, index * 120);
 
         activeStaggerTimeouts.push(timeoutId);
       });
