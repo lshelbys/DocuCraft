@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -76,11 +76,34 @@
       text-decoration: none;
     }
     header svg { color: #7ec898; flex-shrink: 0; }
+    
+    /* Logo Typography Container Setup */
     .header-text h1 {
       font-family: 'Instrument Serif', serif;
       font-size: 24px;
-      color: #ffffff;
       letter-spacing: -0.01em;
+      display: flex;
+      user-select: none;
+      
+      /* Smoothly grow the whole text block over 0.6 seconds */
+      transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+      transform-origin: left center;
+    }
+
+    /* Scale the text slightly upwards on hover */
+    .header-logo:hover .header-text h1 {
+      transform: scale(1.1);
+    }
+    
+    /* Create beautiful slow-fading properties unique to each text token */
+    .header-text h1 .logo-letter {
+      color: #ffffff;
+      transition: color 0.8s ease-in-out;
+      display: inline-block;
+    }
+    
+    html[data-theme="dark"] .header-text h1 .logo-letter {
+      color: #f7f6f2;
     }
 
     .header-actions {
@@ -608,12 +631,24 @@
 <body>
 
 <header>
-  <a href="/" class="header-logo">
+  <a href="/" class="header-logo" id="logoLink">
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
       <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>
       <line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/>
     </svg>
-    <div class="header-text"><h1>DocuCraft</h1></div>
+    <div class="header-text">
+      <h1>
+        <span class="logo-letter">D</span>
+        <span class="logo-letter">o</span>
+        <span class="logo-letter">c</span>
+        <span class="logo-letter">u</span>
+        <span class="logo-letter">C</span>
+        <span class="logo-letter">r</span>
+        <span class="logo-letter">a</span>
+        <span class="logo-letter">f</span>
+        <span class="logo-letter">t</span>
+      </h1>
+    </div>
   </a>
 
   <div class="header-actions">
@@ -871,6 +906,8 @@
       document.documentElement.setAttribute('data-theme', 'dark');
       localStorage.setItem('theme', 'dark');
     }
+    // Instantly reset letters colors to matching defaults if theme flips
+    resetLogoLetters();
   });
 
   // Structural nodes assignments
@@ -1061,11 +1098,55 @@
     statsFileCounter.textContent = dynamicActionsCount;
   }
 
+  /* ==========================================================================
+     Staggered Sequential Logo Staining Engine
+     ========================================================================== */
+  let activeStaggerTimeouts = [];
+
+  function resetLogoLetters() {
+    // Clear any color timeouts currently scheduled
+    activeStaggerTimeouts.forEach(clearTimeout);
+    activeStaggerTimeouts = [];
+
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const letters = document.querySelectorAll('.logo-letter');
+    letters.forEach(letter => {
+      letter.style.color = isDark ? '#f7f6f2' : '#ffffff';
+    });
+  }
+
+  function initializeLogoHoverEngine() {
+    const logoLink = document.getElementById('logoLink');
+    const letters = document.querySelectorAll('.logo-letter');
+
+    logoLink.addEventListener('mouseenter', () => {
+      // Clear any pending cleanups or competing state
+      activeStaggerTimeouts.forEach(clearTimeout);
+      activeStaggerTimeouts = [];
+
+      // Loop through characters with a sequential cascade delay 
+      letters.forEach((letter, index) => {
+        const timeoutId = setTimeout(() => {
+          // Generate an individual, random, bright-pastel color coordinate using HSL
+          const randomHue = Math.floor(Math.random() * 360);
+          letter.style.color = `hsl(${randomHue}, 85%, 75%)`;
+        }, index * 120); // Spacing tightened from 250ms to 120ms for a snappier flow
+
+        activeStaggerTimeouts.push(timeoutId);
+      });
+    });
+
+    logoLink.addEventListener('mouseleave', () => {
+      resetLogoLetters();
+    });
+  }
+
   // Engine boot up sequence execution maps
   initializeBookmarkUtility();
   initializeFavoritesSystem();
   initializeSearchSystem();
   updatePrivacyInspectorStatistics();
+  initializeLogoHoverEngine();
 </script>
 
 </body>
