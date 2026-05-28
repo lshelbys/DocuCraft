@@ -266,8 +266,6 @@
       position: relative;
       display: flex;
       align-items: center;
-      
-      /* Smoothly scale up the bar container layout over 0.6 seconds on mouse hover */
       transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
       transform-origin: center center;
     }
@@ -295,9 +293,6 @@
       border-radius: var(--radius-lg);
       outline: none;
       position: relative;
-      
-      /* Set a smooth transition timing map to allow the static pine green highlights 
-         and neon glow backdrops to blend in cleanly over 0.8 seconds. */
       transition: border-color 0.8s cubic-bezier(0.25, 1, 0.5, 1), 
                   box-shadow 0.8s cubic-bezier(0.25, 1, 0.5, 1);
     }
@@ -306,14 +301,11 @@
       color: var(--ink-3);
     }
 
-    /* Smoothly render the static brand-accurate Pine Green glow filter on hover */
     .search-input-wrapper:hover .search-bar {
       border-color: var(--accent-mid);
-      /* Combines a soft 16px atmospheric aura with a subtle 4px crisp vector glow */
       box-shadow: 0 0 16px rgba(45, 90, 61, 0.3), 0 0 4px rgba(74, 124, 92, 0.2);
     }
 
-    /* Keep the focused input style uniform and balanced when active/typing */
     .search-bar:focus {
       border-color: var(--accent-mid) !important;
       box-shadow: 0 0 0 3px var(--accent-light), 0 4px 12px rgba(0, 0, 0, 0.02) !important;
@@ -416,16 +408,13 @@
       flex-direction: column;
       gap: 14px;
       height: 100%;
-      /* Transition expanded to smoothly animate the brand-accurate border highlight and deep neon box-shadow */
       transition: border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
                   box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
                   background var(--transition);
     }
     
-    /* Apply matching Pine Green outline glow properties to the tool cards on mouseover */
     .tool-wrapper:hover .tool-card {
       border-color: var(--accent-mid);
-      /* Balanced premium 14px atmospheric aura mixed with a subtle crisp shadow definition layer */
       box-shadow: 0 0 14px rgba(45, 90, 61, 0.25), 0 4px 14px rgba(0, 0, 0, 0.02);
     }
     
@@ -590,15 +579,28 @@
       text-align: center;
       margin-bottom: 24px;
     }
+    
+    /* ==========================================================================
+       FAQ Accordions Glow Styling Properties
+       ========================================================================== */
     details {
       background: var(--white);
       border: 1px solid var(--surface-3);
       border-radius: var(--radius);
       margin-bottom: 12px;
       overflow: hidden;
-      transition: var(--transition);
+      transition: border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                  box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    details[open] { border-color: var(--ink-3); }
+    
+    details:hover {
+      border-color: var(--accent-mid);
+      box-shadow: 0 0 14px rgba(45, 90, 61, 0.25), 0 4px 14px rgba(0, 0, 0, 0.02);
+    }
+    
+    details[open] { 
+      border-color: var(--accent-mid); 
+    }
     summary {
       padding: 16px;
       font-size: 14px;
@@ -607,7 +609,8 @@
       user-select: none;
       outline: none;
     }
-    summary:hover { background: var(--surface-2); }
+    /* The light grey background-color transition on hover has been removed from summary rules */
+    
     .faq-content {
       padding: 0 16px 16px 16px;
       font-size: 13px;
