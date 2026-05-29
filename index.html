@@ -25,11 +25,14 @@
       --radius-lg: 16px;
       --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       
-      /* Header Colors - Light Mode Defaults */
-      --header-bg: #1a1a18;
-      --header-text: #ffffff;
-      --header-hover: #7ec898; 
-      --header-icon-color: #8a8a84; 
+      /* Header Colors - Light Mode: Liquid Glass */
+      --header-bg: rgba(247, 246, 242, 0.55);
+      --header-text: #1a1a18;
+      --header-hover: #2d5a3d;
+      --header-icon-color: #4a4a46;
+      --header-border: rgba(255, 255, 255, 0.6);
+      --header-shadow: 0 1px 0 rgba(0,0,0,0.06), 0 8px 32px rgba(0,0,0,0.06);
+      --header-highlight: rgba(255,255,255,0.7);
     }
 
     html[data-theme="dark"] {
@@ -41,10 +44,13 @@
       --surface-3: #2a2a27;
       --white: #1a1a18;
       
-      --header-bg: #1c1c1a;
+      --header-bg: rgba(28, 28, 26, 0.55);
       --header-text: #f7f6f2;
-      --header-hover: #8a8a84; 
+      --header-hover: #7ec898;
       --header-icon-color: #8a8a84;
+      --header-border: rgba(255,255,255,0.07);
+      --header-shadow: 0 1px 0 rgba(0,0,0,0.3), 0 8px 32px rgba(0,0,0,0.25);
+      --header-highlight: rgba(255,255,255,0.04);
     }
 
     body {
@@ -66,8 +72,16 @@
       position: sticky;
       top: 0;
       z-index: 50;
-      border-bottom: 1px solid var(--surface-3);
-      transition: background var(--transition), border-color var(--transition);
+
+      /* Liquid glass / matte frosted effect */
+      backdrop-filter: blur(20px) saturate(160%) brightness(1.04);
+      -webkit-backdrop-filter: blur(20px) saturate(160%) brightness(1.04);
+
+      /* Outer shadow + inner top-edge glass rim highlight */
+      box-shadow: var(--header-shadow), inset 0 1px 0 var(--header-highlight);
+      border-bottom: 1px solid var(--header-border);
+
+      transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
     }
     .header-logo {
       display: flex;
@@ -95,13 +109,9 @@
     
     /* Create beautiful slow-fading properties unique to each text token */
     .header-text h1 .logo-letter {
-      color: #ffffff;
+      color: var(--header-text);
       transition: color 0.8s ease-in-out;
       display: inline-block;
-    }
-    
-    html[data-theme="dark"] .header-text h1 .logo-letter {
-      color: #f7f6f2;
     }
 
     .header-actions {
@@ -1144,7 +1154,7 @@
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
     const letters = document.querySelectorAll('.logo-letter');
     letters.forEach(letter => {
-      letter.style.color = isDark ? '#f7f6f2' : '#ffffff';
+      letter.style.color = isDark ? '#f7f6f2' : '#1a1a18';
     });
   }
 
