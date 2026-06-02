@@ -24,7 +24,27 @@
       --accent: #2d5a3d;
       --accent-light: #e8f0ea;
       --accent-mid: #4a7c5c;
+
+      /* Header Colors - Light Mode: Liquid Glass */
+      --header-bg: rgba(255, 255, 255, 0.35);
+      --header-text: #1a1a18;
+      --header-hover: #2d5a3d;
+      --header-icon-color: #4a4a46;
+      --header-border: rgba(255, 255, 255, 0.4);
+      --header-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+      --header-highlight: rgba(255, 255, 255, 0.9);
     }
+
+    html[data-theme="dark"] {
+      --header-bg: rgba(20, 20, 18, 0.45);
+      --header-text: #f7f6f2;
+      --header-hover: #7ec898;
+      --header-icon-color: #8a8a84;
+      --header-border: rgba(255, 255, 255, 0.08);
+      --header-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+      --header-highlight: rgba(255, 255, 255, 0.06);
+    }
+
     body {
       font-family: 'DM Sans', sans-serif;
       background-color: var(--surface);
@@ -34,7 +54,7 @@
       flex-direction: column;
     }
     header {
-      background: var(--ink);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent 40%), var(--header-bg);
       padding: 16px 32px;
       display: flex;
       align-items: center;
@@ -42,6 +62,15 @@
       position: sticky;
       top: 0;
       z-index: 50;
+
+      backdrop-filter: blur(30px) saturate(200%) brightness(1.1);
+      -webkit-backdrop-filter: blur(30px) saturate(200%) brightness(1.1);
+      box-shadow: 
+        var(--header-shadow), 
+        inset 0 1px 1px var(--header-highlight),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+      border-bottom: 1px solid var(--header-border);
+      transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
     }
     .header-logo {
       display: flex;
@@ -53,12 +82,23 @@
     .header-text h1 {
       font-family: 'Instrument Serif', serif;
       font-size: 24px;
-      color: #fff;
       letter-spacing: -0.01em;
+      display: flex;
+      user-select: none;
+      transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+      transform-origin: left center;
+    }
+    .header-logo:hover .header-text h1 {
+      transform: scale(1.1);
+    }
+    .header-text h1 .logo-letter {
+      color: var(--header-text);
+      transition: color 0.8s ease-in-out;
+      display: inline-block;
     }
     .nav-back {
       text-decoration: none;
-      color: var(--surface-2);
+      color: var(--header-icon-color);
       font-size: 13px;
       font-weight: 500;
       display: flex;
@@ -66,7 +106,7 @@
       gap: 6px;
       transition: var(--transition);
     }
-    .nav-back:hover { color: #fff; }
+    .nav-back:hover { color: var(--header-hover); transform: translateX(-2px); }
 
     main {
       flex: 1;
@@ -201,7 +241,19 @@
         <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>
         <line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/>
       </svg>
-      <div class="header-text"><h1>DocuCraft</h1></div>
+      <div class="header-text">
+        <h1>
+          <span class="logo-letter">D</span>
+          <span class="logo-letter">o</span>
+          <span class="logo-letter">c</span>
+          <span class="logo-letter">u</span>
+          <span class="logo-letter">C</span>
+          <span class="logo-letter">r</span>
+          <span class="logo-letter">a</span>
+          <span class="logo-letter">f</span>
+          <span class="logo-letter">t</span>
+        </h1>
+      </div>
     </a>
     <a href="./" class="nav-back">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
@@ -250,6 +302,43 @@
   </footer>
 
   <script>
+    const activeTheme = localStorage.getItem('theme') || 'light';
+    if (activeTheme === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+
+    function incrementActionStats() {
+      const count = parseInt(localStorage.getItem('docucraft_actions_total_count') || '0');
+      localStorage.setItem('docucraft_actions_total_count', count + 1);
+    }
+
+    let activeStaggerTimeouts = [];
+    function resetLogoLetters() {
+      activeStaggerTimeouts.forEach(clearTimeout);
+      activeStaggerTimeouts = [];
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      document.querySelectorAll('.logo-letter').forEach(l => {
+        l.style.color = isDark ? '#f7f6f2' : '#1a1a18';
+      });
+    }
+
+    function initializeLogoHoverEngine() {
+      const logoLink = document.querySelector('.header-logo');
+      const letters = document.querySelectorAll('.logo-letter');
+      logoLink.addEventListener('mouseenter', () => {
+        activeStaggerTimeouts.forEach(clearTimeout);
+        activeStaggerTimeouts = [];
+        letters.forEach((letter, index) => {
+          const timeoutId = setTimeout(() => {
+            const randomHue = Math.floor(Math.random() * 360);
+            letter.style.color = `hsl(${randomHue}, 85%, 75%)`;
+          }, index * 120);
+          activeStaggerTimeouts.push(timeoutId);
+        });
+      });
+      logoLink.addEventListener('mouseleave', resetLogoLetters);
+    }
+
     let targetFile = null;
 
     const dropzone = document.getElementById('dropzone');
@@ -337,6 +426,7 @@
         link.href = URL.createObjectURL(blob);
         link.download = `${targetFile.name.replace('.pdf', '')}_compressed.pdf`;
         link.click();
+        incrementActionStats();
 
       } catch (error) {
         console.error(error);
@@ -345,6 +435,7 @@
         btnCompress.disabled = false;
       }
     });
+    initializeLogoHoverEngine();
   </script>
 </body>
 </html>
