@@ -26,13 +26,13 @@
       --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       
       /* Header Colors - Light Mode: Liquid Glass */
-      --header-bg: rgba(247, 246, 242, 0.55);
+      --header-bg: rgba(255, 255, 255, 0.35);
       --header-text: #1a1a18;
       --header-hover: #2d5a3d;
       --header-icon-color: #4a4a46;
-      --header-border: rgba(255, 255, 255, 0.6);
-      --header-shadow: 0 1px 0 rgba(0,0,0,0.06), 0 8px 32px rgba(0,0,0,0.06);
-      --header-highlight: rgba(255,255,255,0.7);
+      --header-border: rgba(255, 255, 255, 0.4);
+      --header-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+      --header-highlight: rgba(255, 255, 255, 0.9);
     }
 
     html[data-theme="dark"] {
@@ -44,13 +44,13 @@
       --surface-3: #2a2a27;
       --white: #1a1a18;
       
-      --header-bg: rgba(28, 28, 26, 0.55);
+      --header-bg: rgba(20, 20, 18, 0.45);
       --header-text: #f7f6f2;
       --header-hover: #7ec898;
       --header-icon-color: #8a8a84;
-      --header-border: rgba(255,255,255,0.07);
-      --header-shadow: 0 1px 0 rgba(0,0,0,0.3), 0 8px 32px rgba(0,0,0,0.25);
-      --header-highlight: rgba(255,255,255,0.04);
+      --header-border: rgba(255, 255, 255, 0.08);
+      --header-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+      --header-highlight: rgba(255, 255, 255, 0.06);
     }
 
     body {
@@ -64,7 +64,7 @@
     }
 
     header {
-      background: var(--header-bg);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent 40%), var(--header-bg);
       padding: 16px 32px;
       display: flex;
       align-items: center;
@@ -73,12 +73,16 @@
       top: 0;
       z-index: 50;
 
-      /* Liquid glass / matte frosted effect */
-      backdrop-filter: blur(20px) saturate(160%) brightness(1.04);
-      -webkit-backdrop-filter: blur(20px) saturate(160%) brightness(1.04);
+      /* Enhanced liquid glass texture */
+      backdrop-filter: blur(30px) saturate(200%) brightness(1.1);
+      -webkit-backdrop-filter: blur(30px) saturate(200%) brightness(1.1);
 
-      /* Outer shadow + inner top-edge glass rim highlight */
-      box-shadow: var(--header-shadow), inset 0 1px 0 var(--header-highlight);
+      /* Layered shadows and inner highlights for a refractive look */
+      box-shadow: 
+        var(--header-shadow), 
+        inset 0 1px 1px var(--header-highlight),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+
       border-bottom: 1px solid var(--header-border);
 
       transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
