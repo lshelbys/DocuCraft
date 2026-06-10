@@ -201,8 +201,8 @@
       <h2>Split PDF</h2>
       <p>Extract a page range or split every page into separate files.</p>
 
-      <div class="dropzone" id="dropzone">
-        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <div class="dropzone" id="dropzone" role="button" tabindex="0" aria-label="Upload PDF file">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
         </svg>
         <p>Drop your PDF here or click to browse</p>
@@ -212,7 +212,7 @@
       <div class="config-box" id="config-box">
         <div class="meta-info">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          <span id="file-name">document.pdf</span> &nbsp;|&nbsp; Structural Allocation: <span id="page-count">0</span> Pages detected
+          <span id="file-name">document.pdf</span> &nbsp;|&nbsp; Total Pages: <span id="page-count">0</span>
         </div>
 
         <div class="split-options">
@@ -321,6 +321,7 @@
     const endPage = document.getElementById('end-page');
 
     dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); } });
     fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
 
     dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
@@ -346,12 +347,12 @@
 
     async function handleFile(file) {
       if (!file || file.type !== "application/pdf") {
-        showStatus("Invalid file structure type. Load a valid PDF file target.", "status-error");
+        showStatus("Please upload a valid PDF file.", "status-error");
         return;
       }
       activeFile = file;
-      showStatus("Analyzing structural geometry parameters...", "ink-2");
-      
+      showStatus("Reading PDF…", "");
+
       try {
         arrayBuffer = await file.arrayBuffer();
         const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer, { updateMetadata: false });
@@ -359,7 +360,7 @@
 
         fileNameText.textContent = file.name;
         pageCountText.textContent = totalPages;
-        
+
         startPage.value = 1;
         startPage.max = totalPages;
         endPage.value = totalPages;
@@ -369,26 +370,24 @@
         statusMsg.style.display = "none";
       } catch (e) {
         console.error(e);
-        showStatus("An error occurred reading document structural data elements.", "status-error");
+        showStatus("Failed to read PDF. The file may be encrypted or corrupted.", "status-error");
       }
     }
 
     btnSplit.addEventListener('click', async () => {
       if (!arrayBuffer) return;
       btnSplit.disabled = true;
-      showStatus("Executing sequence optimization layer...", "ink-2");
+      showStatus("Splitting PDF…", "");
 
       try {
         if (modeAll.checked) {
-          // Atomic processing: single zip download logic structure
-          showStatus("Decomposing file arrays into components...", "ink-2");
+          showStatus("Splitting into individual pages…", "");
           const srcPdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
-          
-          // Lazy load JSZip for performance architecture
+
           if (!window.JSZip) {
             await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js");
           }
-          
+
           const zip = new JSZip();
           const baseName = activeFile.name.replace('.pdf', '');
 
@@ -401,24 +400,23 @@
           }
 
           const zipBlob = await zip.generateAsync({ type: "blob" });
-          downloadBlob(zipBlob, `${baseName}_atomic_split.zip`, "application/zip");
+          downloadBlob(zipBlob, `${baseName}_split.zip`, "application/zip");
           incrementActionStats();
-          showStatus("Structural matrix decomposed and written completely.", "status-success");
+          showStatus("PDF split and downloaded successfully!", "status-success");
         } else {
-          // Range isolate logic pipeline
           const start = parseInt(startPage.value);
           const end = parseInt(endPage.value);
 
           if (isNaN(start) || isNaN(end) || start < 1 || end > totalPages || start > end) {
-            showStatus("Invalid sequence loop parameters. Verify page boundaries.", "status-error");
+            showStatus("Invalid page range. Please check your start and end page numbers.", "status-error");
             btnSplit.disabled = false;
             return;
           }
 
-          showStatus("Extracting selected segments...", "ink-2");
+          showStatus("Extracting pages…", "");
           const srcPdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
           const rangedPdf = await PDFLib.PDFDocument.create();
-          
+
           const pageIndices = [];
           for (let i = start - 1; i < end; i++) {
             pageIndices.push(i);
@@ -428,13 +426,13 @@
           copiedPages.forEach(page => rangedPdf.addPage(page));
 
           const pdfBytes = await rangedPdf.save();
-          downloadBlob(pdfBytes, `${activeFile.name.replace('.pdf', '')}_Extracted_${start}-${end}.pdf`, "application/pdf");
+          downloadBlob(pdfBytes, `${activeFile.name.replace('.pdf', '')}_pages_${start}-${end}.pdf`, "application/pdf");
           incrementActionStats();
-          showStatus("Range isolated and downloaded successfully!", "status-success");
+          showStatus("Pages extracted and downloaded successfully!", "status-success");
         }
       } catch (e) {
         console.error(e);
-        showStatus("Processing failure encountered during execution pipeline.", "status-error");
+        showStatus("An error occurred while splitting the PDF.", "status-error");
       } finally {
         btnSplit.disabled = false;
       }

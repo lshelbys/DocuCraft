@@ -253,6 +253,8 @@
       color: var(--ink-3);
       cursor: not-allowed;
     }
+    .progress-bar-wrap { height: 4px; background: var(--surface-2); border-radius: 99px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: var(--accent); border-radius: 99px; width: 0%; transition: width 0.3s ease; }
     .status-msg {
       margin-top: 14px;
       font-size: 13px;
@@ -335,23 +337,26 @@
         <button id="modeFromPdf" class="mode-btn">Extract from PDF</button>
       </div>
 
-      <div class="dropzone" id="dropzone">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <div class="dropzone" id="dropzone" role="button" tabindex="0" aria-label="Upload file">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
         </svg>
-        <p id="dropzoneText">Drag and drop image components or click to browse</p>
+        <p id="dropzoneText">Drag and drop an image (PNG, JPG) or click to browse</p>
         <input type="file" id="fileInput" />
       </div>
 
       <div class="file-details" id="fileDetails">
         <div class="file-row">
           <div class="file-info">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
             <span class="file-name" id="fileNameDisplay">filename.ext</span>
           </div>
         </div>
       </div>
 
+      <div class="progress-bar-wrap" id="progressWrap" style="display:none; margin-top:16px;">
+        <div class="progress-bar-fill" id="progressFill"></div>
+      </div>
       <button id="btnConvert" class="btn-convert" disabled>Convert</button>
       <div id="statusMsg" class="status-msg"></div>
     </div>
@@ -441,17 +446,25 @@
       if (mode === 'toPdf') {
         modeToPdf.classList.add('active');
         modeFromPdf.classList.remove('active');
-        dropzoneText.innerText = 'Drag and drop image components (PNG, JPG) or click to browse';
+        dropzoneText.innerText = 'Drag and drop an image (PNG, JPG) or click to browse';
         fileInput.accept = 'image/png, image/jpeg';
       } else {
         modeFromPdf.classList.add('active');
         modeToPdf.classList.remove('active');
-        dropzoneText.innerText = 'Drag and drop layout PDFs or click to browse';
+        dropzoneText.innerText = 'Drag and drop a PDF file or click to browse';
         fileInput.accept = 'application/pdf';
       }
     }
 
+    const progressWrap = document.getElementById('progressWrap');
+    const progressFill = document.getElementById('progressFill');
+    function setProgress(pct, hide = false) {
+      if (hide) { progressWrap.style.display = 'none'; progressFill.style.width = '0%'; }
+      else { progressWrap.style.display = 'block'; progressFill.style.width = `${pct}%`; }
+    }
+
     dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); } });
     dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.style.borderColor = 'var(--accent-mid)'; });
     dropzone.addEventListener('dragleave', () => { dropzone.style.borderColor = 'var(--surface-3)'; });
     dropzone.addEventListener('drop', (e) => {
@@ -466,11 +479,11 @@
 
     function handleFileSelection(file) {
       if (currentMode === 'toPdf' && !file.type.startsWith('image/')) {
-        showStatus('Please process image files inside this layout stream.', 'status-error');
+        showStatus('Please upload an image file (PNG or JPG).', 'status-error');
         return;
       }
       if (currentMode === 'fromPdf' && file.type !== 'application/pdf') {
-        showStatus('Please upload valid PDF files for layer data compilation.', 'status-error');
+        showStatus('Please upload a valid PDF file.', 'status-error');
         return;
       }
       targetFile = file;
@@ -483,7 +496,8 @@
     btnConvert.addEventListener('click', async () => {
       if (!targetFile) return;
       btnConvert.disabled = true;
-      showStatus('Converting...', 'ink-2');
+      showStatus('Converting…', '');
+      setProgress(10);
 
       try {
         if (currentMode === 'toPdf') {
@@ -492,43 +506,54 @@
           await convertPdfToElements(targetFile);
         }
       } catch (err) {
+        console.error(err);
         showStatus('An error occurred while converting the file.', 'status-error');
       } finally {
         btnConvert.disabled = false;
+        setTimeout(() => setProgress(0, true), 1200);
       }
     });
 
     async function convertImageToPdf(file) {
+      setProgress(30);
       const pdfDoc = await PDFLib.PDFDocument.create();
       const arrayBuffer = await file.arrayBuffer();
-      let image = file.type === 'image/png' ? await pdfDoc.embedPng(arrayBuffer) : await pdfDoc.embedJpg(arrayBuffer);
+      setProgress(60);
+      const image = file.type === 'image/png' ? await pdfDoc.embedPng(arrayBuffer) : await pdfDoc.embedJpg(arrayBuffer);
       const page = pdfDoc.addPage([image.width, image.height]);
       page.drawImage(image, { x: 0, y: 0, width: image.width, height: image.height });
-      incrementActionStats();
+      setProgress(85);
       const pdfBytes = await pdfDoc.save();
-      downloadBlob(pdfBytes, `${file.name.split('.')[0]}_converted.pdf`, 'application/pdf');
-      showStatus('Converted successfully.', 'status-success');
+      setProgress(100);
+      downloadBlob(pdfBytes, `${file.name.replace(/\.[^.]+$/, '')}_converted.pdf`, 'application/pdf');
+      incrementActionStats();
+      showStatus('Image converted to PDF successfully.', 'status-success');
     }
 
     async function convertPdfToElements(file) {
       const arrayBuffer = await file.arrayBuffer();
+      setProgress(20);
       const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
       let textLog = '';
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
         const txt = await page.getTextContent();
         textLog += `--- Page ${i} ---\n` + txt.items.map(item => item.str).join(' ') + '\n\n';
+        setProgress(20 + Math.round((i / pdf.numPages) * 50));
       }
-      downloadBlob(new TextEncoder().encode(textLog), `${file.name.split('.')[0]}_extracted.txt`, 'text/plain');
-      
+      downloadBlob(new TextEncoder().encode(textLog), `${file.name.replace(/\.[^.]+$/, '')}_extracted.txt`, 'text/plain');
+      setProgress(80);
       const page = await pdf.getPage(1);
       const viewport = page.getViewport({ scale: 1.5 });
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       canvas.height = viewport.height;
       canvas.width = viewport.width;
-      await page.render({ canvasContext: ctx, viewport: viewport }).promise;
-      canvas.toBlob((b) => downloadBlob(b, `${file.name.split('.')[0]}_preview.png`, 'image/png'), 'image/png');
+      await page.render({ canvasContext: ctx, viewport }).promise;
+      canvas.toBlob((b) => {
+        if (b) downloadBlob(b, `${file.name.replace(/\.[^.]+$/, '')}_preview.png`, 'image/png');
+      }, 'image/png');
+      setProgress(100);
       incrementActionStats();
       showStatus('Text and preview image extracted successfully.', 'status-success');
     }
