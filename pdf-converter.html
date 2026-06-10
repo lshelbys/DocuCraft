@@ -21,7 +21,6 @@
       --white: #ffffff; 
       --radius: 10px; 
       --radius-lg: 16px; 
-      --transition: all 0.2s ease;
       --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       --accent: #2d5a3d;
       --accent-light: #e8f0ea;
@@ -38,6 +37,14 @@
     }
 
     html[data-theme="dark"] {
+      --ink: #f7f6f2;
+      --ink-2: #c4c2be;
+      --ink-3: #8a8a84;
+      --surface: #121211;
+      --surface-2: #1c1c1a;
+      --surface-3: #2a2a27;
+      --white: #1a1a18;
+
       --header-bg: rgba(20, 20, 18, 0.45);
       --header-text: #f7f6f2;
       --header-hover: #7ec898;
@@ -98,6 +105,22 @@
       transition: color 0.8s ease-in-out;
       display: inline-block;
     }
+    .header-actions { display: flex; align-items: center; gap: 16px; }
+    .header-btn {
+      background: none;
+      border: none;
+      color: var(--header-icon-color);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: var(--transition);
+    }
+    .header-btn:hover { color: var(--header-hover); transform: scale(1.05); }
+    .header-btn svg { color: inherit; fill: none; stroke: currentColor; }
+    html[data-theme="dark"] .theme-toggle .moon-path { display: none; }
+    html:not([data-theme="dark"]) .theme-toggle .sun-path { display: none; }
     .nav-back {
       text-decoration: none;
       color: var(--header-icon-color);
@@ -274,22 +297,36 @@
         </h1>
       </div>
     </a>
-    <a href="./" class="nav-back">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-      Back to hub
-    </a>
+    <div class="header-actions">
+      <button id="themeToggle" class="header-btn theme-toggle" aria-label="Toggle dark mode">
+        <svg width="22" height="22" viewBox="0 0 24 24">
+          <g class="moon-path"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></g>
+          <g class="sun-path">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </g>
+        </svg>
+      </button>
+      <a href="./" class="nav-back">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Back to hub
+      </a>
+    </div>
   </header>
 
   <main>
     <div class="hero">
       <h2>PDF Converter</h2>
-      <p>Transform format structural elements instantly entirely inside your client dashboard.</p>
+      <p>Convert images to PDF, or extract text and images from an existing PDF.</p>
     </div>
 
     <div class="workspace-card">
       <div class="mode-selector">
-        <button id="modeToPdf" class="mode-btn active">Images to PDF</button>
-        <button id="modeFromPdf" class="mode-btn">PDF to Layout Elements</button>
+        <button id="modeToPdf" class="mode-btn active">Image to PDF</button>
+        <button id="modeFromPdf" class="mode-btn">Extract from PDF</button>
       </div>
 
       <div class="dropzone" id="dropzone">
@@ -309,7 +346,7 @@
         </div>
       </div>
 
-      <button id="btnConvert" class="btn-convert" disabled>Execute Conversion Routine</button>
+      <button id="btnConvert" class="btn-convert" disabled>Convert</button>
       <div id="statusMsg" class="status-msg"></div>
     </div>
   </main>
@@ -323,6 +360,18 @@
     if (activeTheme === 'dark') {
       document.documentElement.setAttribute('data-theme', 'dark');
     }
+
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (isDark) {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'light');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+      }
+      resetLogoLetters();
+    });
 
     function incrementActionStats() {
       const count = parseInt(localStorage.getItem('docucraft_actions_total_count') || '0');
@@ -426,7 +475,7 @@
     btnConvert.addEventListener('click', async () => {
       if (!targetFile) return;
       btnConvert.disabled = true;
-      showStatus('Compiling layout objects...', 'ink-2');
+      showStatus('Converting...', 'ink-2');
 
       try {
         if (currentMode === 'toPdf') {
@@ -435,8 +484,8 @@
           await convertPdfToElements(targetFile);
         }
       } catch (err) {
-        showStatus('Error resolving document structure compilation.', 'status-error');
-      } {
+        showStatus('An error occurred while converting the file.', 'status-error');
+      } finally {
         btnConvert.disabled = false;
       }
     });
@@ -450,7 +499,7 @@
       incrementActionStats();
       const pdfBytes = await pdfDoc.save();
       downloadBlob(pdfBytes, `${file.name.split('.')[0]}_converted.pdf`, 'application/pdf');
-      showStatus('Compiled assets successfully.', 'status-success');
+      showStatus('Converted successfully.', 'status-success');
     }
 
     async function convertPdfToElements(file) {
@@ -473,7 +522,7 @@
       await page.render({ canvasContext: ctx, viewport: viewport }).promise;
       canvas.toBlob((b) => downloadBlob(b, `${file.name.split('.')[0]}_preview.png`, 'image/png'), 'image/png');
       incrementActionStats();
-      showStatus('Extracted workspace matrix assets successfully.', 'status-success');
+      showStatus('Text and preview image extracted successfully.', 'status-success');
     }
 
     function downloadBlob(b, n, c) {
@@ -487,6 +536,41 @@
     function showStatus(msg, cls) { statusMsg.innerText = msg; statusMsg.className = `status-msg ${cls}`; }
     function clearStatus() { statusMsg.innerText = ''; statusMsg.className = 'status-msg'; }
     initializeLogoHoverEngine();
+  </script>
+
+  <script>
+    (function () {
+      const ease = 0.07;
+      let target = window.scrollY, current = window.scrollY, raf = null;
+
+      function hasScrollParent(el) {
+        while (el && el !== document.documentElement) {
+          const s = getComputedStyle(el);
+          if ((s.overflowY === 'auto' || s.overflowY === 'scroll') && el.scrollHeight > el.clientHeight) return true;
+          el = el.parentElement;
+        }
+        return false;
+      }
+
+      window.addEventListener('wheel', (e) => {
+        if (hasScrollParent(e.target)) return;
+        e.preventDefault();
+        let delta = e.deltaY;
+        if (e.deltaMode === 1) delta *= 40;
+        else if (e.deltaMode === 2) delta *= window.innerHeight;
+        target = Math.max(0, Math.min(target + delta * 0.8, document.documentElement.scrollHeight - window.innerHeight));
+        if (!raf) raf = requestAnimationFrame(tick);
+      }, { passive: false });
+
+      function tick() {
+        current += (target - current) * ease;
+        if (Math.abs(target - current) < 0.5) { current = target; raf = null; window.scrollTo(0, current); return; }
+        window.scrollTo(0, current);
+        raf = requestAnimationFrame(tick);
+      }
+
+      window.addEventListener('scroll', () => { if (!raf) { target = window.scrollY; current = window.scrollY; } }, { passive: true });
+    })();
   </script>
 </body>
 </html>
