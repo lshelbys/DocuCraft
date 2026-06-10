@@ -202,11 +202,36 @@
       background: var(--surface);
       border: 1px solid var(--surface-3);
       border-radius: var(--radius);
+      cursor: grab;
+      transition: var(--transition);
+    }
+    .file-item:active { cursor: grabbing; }
+    .file-item.dragging { opacity: 0.4; }
+    .file-item.drag-over { border-color: var(--accent); background: var(--accent-light); }
+    .drag-handle {
+      color: var(--ink-3);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
     }
     .file-meta {
       display: flex;
       align-items: center;
       gap: 12px;
+      flex: 1;
+      min-width: 0;
+    }
+    .file-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .reorder-hint {
+      font-size: 12px;
+      color: var(--ink-3);
+      margin-top: 16px;
+      margin-bottom: -4px;
+      text-align: center;
     }
     .file-name {
       font-size: 14px;
@@ -325,6 +350,7 @@
         <input type="file" id="fileInput" multiple accept="application/pdf" />
       </div>
 
+      <div class="reorder-hint" id="reorderHint" style="display:none;">Drag files to reorder them, or use the arrow buttons</div>
       <div class="file-list" id="fileList"></div>
 
       <div class="progress-bar-wrap" id="progressWrap">
@@ -434,46 +460,81 @@
       updateUI();
     }
 
+    let dragSrcIndex = null;
+    const reorderHint = document.getElementById('reorderHint');
+
+    function escapeHtml(str) {
+      return str.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
     function updateUI() {
       fileList.innerHTML = '';
-      
+
       selectedFiles.forEach((file, index) => {
         const item = document.createElement('div');
         item.className = 'file-item';
+        item.draggable = true;
+        item.dataset.index = index;
         item.innerHTML = `
           <div class="file-meta">
-            <span class="file-name">${file.name}</span>
+            <span class="drag-handle" aria-hidden="true" title="Drag to reorder">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="9" cy="6" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="18" r="1"/><circle cx="15" cy="6" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="18" r="1"/></svg>
+            </span>
+            <span class="file-name">${escapeHtml(file.name)}</span>
             <span class="file-size">(${(file.size / 1024).toFixed(1)} KB)</span>
           </div>
           <div class="item-controls">
-            <button class="control-btn" onclick="moveUp(${index})" title="Move Up">↑</button>
-            <button class="control-btn" onclick="moveDown(${index})" title="Move Down">↓</button>
-            <button class="control-btn" style="color: #a33b3b;" onclick="removeFile(${index})" title="Remove File">✕</button>
+            <button class="control-btn" data-action="up" title="Move Up" aria-label="Move up">↑</button>
+            <button class="control-btn" data-action="down" title="Move Down" aria-label="Move down">↓</button>
+            <button class="control-btn" data-action="remove" style="color: #a33b3b;" title="Remove File" aria-label="Remove file">✕</button>
           </div>
         `;
+
+        item.querySelector('[data-action="up"]').addEventListener('click', () => moveUp(index));
+        item.querySelector('[data-action="down"]').addEventListener('click', () => moveDown(index));
+        item.querySelector('[data-action="remove"]').addEventListener('click', () => removeFile(index));
+
+        item.addEventListener('dragstart', (e) => {
+          dragSrcIndex = index;
+          item.classList.add('dragging');
+          e.dataTransfer.effectAllowed = 'move';
+        });
+        item.addEventListener('dragend', () => item.classList.remove('dragging'));
+        item.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+          if (dragSrcIndex !== null && dragSrcIndex !== index) item.classList.add('drag-over');
+        });
+        item.addEventListener('dragleave', () => item.classList.remove('drag-over'));
+        item.addEventListener('drop', (e) => {
+          e.preventDefault();
+          item.classList.remove('drag-over');
+          if (dragSrcIndex !== null && dragSrcIndex !== index) {
+            const [moved] = selectedFiles.splice(dragSrcIndex, 1);
+            selectedFiles.splice(index, 0, moved);
+            dragSrcIndex = null;
+            updateUI();
+          }
+        });
+
         fileList.appendChild(item);
       });
 
+      reorderHint.style.display = selectedFiles.length >= 2 ? 'block' : 'none';
       btnMerge.disabled = selectedFiles.length < 2;
     }
 
-    window.moveUp = function(index) {
+    function moveUp(index) {
       if (index === 0) return;
-      const temp = selectedFiles[index];
-      selectedFiles[index] = selectedFiles[index - 1];
-      selectedFiles[index - 1] = temp;
+      [selectedFiles[index - 1], selectedFiles[index]] = [selectedFiles[index], selectedFiles[index - 1]];
       updateUI();
     }
-
-    window.moveDown = function(index) {
+    function moveDown(index) {
       if (index === selectedFiles.length - 1) return;
-      const temp = selectedFiles[index];
-      selectedFiles[index] = selectedFiles[index + 1];
-      selectedFiles[index + 1] = temp;
+      [selectedFiles[index + 1], selectedFiles[index]] = [selectedFiles[index], selectedFiles[index + 1]];
       updateUI();
     }
-
-    window.removeFile = function(index) {
+    function removeFile(index) {
       selectedFiles.splice(index, 1);
       updateUI();
     }
