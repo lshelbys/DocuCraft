@@ -676,6 +676,118 @@
         position: static; justify-content: center; padding-bottom: 16px; background: var(--white);
       }
     }
+
+    /* =====================================================
+       Category Cards
+       ===================================================== */
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+      margin-bottom: 48px;
+    }
+
+    .category-card {
+      background: var(--white);
+      border: 1px solid var(--surface-3);
+      border-radius: var(--radius-lg);
+      padding: 24px 28px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      transition: border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                  box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                  transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .category-card:hover {
+      border-color: var(--accent-mid);
+      box-shadow: 0 0 14px rgba(45, 90, 61, 0.2), 0 4px 14px rgba(0,0,0,0.02);
+      transform: translateY(-3px);
+    }
+    .category-icon-box {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: var(--accent-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      flex-shrink: 0;
+      transition: var(--transition);
+    }
+    .category-card:hover .category-icon-box {
+      background: var(--accent);
+      color: #fff;
+    }
+    .category-info { flex: 1; }
+    .category-info h3 { font-size: 17px; font-weight: 600; margin-bottom: 4px; }
+    .category-info p { font-size: 13px; color: var(--ink-3); line-height: 1.4; margin-bottom: 10px; }
+    .category-count {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent);
+      background: var(--accent-light);
+      padding: 3px 9px;
+      border-radius: 20px;
+    }
+    .category-chevron { color: var(--ink-3); flex-shrink: 0; transition: transform 0.2s ease, color 0.2s ease; }
+    .category-card:hover .category-chevron { transform: translateX(5px); color: var(--accent); }
+
+    /* =====================================================
+       View transitions
+       ===================================================== */
+    #categoriesView, #pdfView {
+      transition: opacity 0.22s ease;
+    }
+    .view-hidden {
+      display: none !important;
+    }
+    .view-enter {
+      animation: viewSlideIn 0.28s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+    @keyframes viewSlideIn {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* =====================================================
+       Breadcrumb / back button
+       ===================================================== */
+    .view-breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 28px;
+      font-size: 13px;
+      color: var(--ink-3);
+    }
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--white);
+      border: 1px solid var(--surface-3);
+      color: var(--ink-2);
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: var(--radius);
+      transition: var(--transition);
+    }
+    .back-btn:hover {
+      border-color: var(--accent-mid);
+      color: var(--accent);
+      background: var(--accent-light);
+    }
+    .breadcrumb-sep { color: var(--surface-3); font-size: 16px; }
+    .breadcrumb-current { font-weight: 600; color: var(--ink); }
   </style>
 </head>
 <body>
@@ -733,200 +845,270 @@
 </header>
 
 <main>
-  <section class="hub-hero">
-    <h2>The all in one platform for your document workflow</h2>
-    <p>No sign up    •    No ads    •    100% Free</p>
-  </section>
 
-  <div class="search-container">
-    <div class="search-input-wrapper" id="searchInputWrapper">
-      <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-      </svg>
-      
-      <input type="text" id="toolSearchInput" class="search-bar" placeholder="Search utilities (e.g., merge, convert, split)..." aria-label="Search tools" />
-      
-      <div class="search-controls">
-        <span id="searchShortcutHint" class="search-shortcut-hint">/</span>
-        <button type="button" id="searchClearBtn" class="search-clear-btn" aria-label="Clear search input">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+  <!-- ============================================================
+       CATEGORIES VIEW  (default)
+       ============================================================ -->
+  <section id="categoriesView">
+    <section class="hub-hero">
+      <h2>The all in one platform for your document workflow</h2>
+      <p>No sign up &nbsp;•&nbsp; No ads &nbsp;•&nbsp; 100% Free</p>
+    </section>
+
+    <div class="section-label" style="margin-bottom:16px;">All Utilities</div>
+
+    <div class="categories-grid">
+      <!-- PDF Utilities category -->
+      <div class="category-card" id="categoryPdf" role="button" tabindex="0" aria-label="Open PDF Utilities">
+        <div class="category-icon-box">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>
+            <line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/>
           </svg>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <section id="favoritesSection" class="favorites-section">
-    <div class="section-label">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="#eab308" stroke="#eab308" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      <span>Pinned Utilities</span>
-    </div>
-    <div class="tools-grid" id="favoritesGrid"></div>
-  </section>
-
-  <section id="mainToolsSection">
-    <div class="section-label" id="mainGridLabel">All Utilities</div>
-    <div class="tools-grid" id="toolsGrid">
-      
-      <div class="tool-wrapper" data-id="image-to-pdf">
-        <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
-          <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        </button>
-        <a href="image-to-pdf.html" class="tool-link">
-          <div class="tool-card">
-            <div class="tool-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            </div>
-            <div class="tool-info">
-              <h3>Image to PDF</h3>
-              <p>Convert collections of PNG, JPG, WebP images seamlessly into clean presentation PDFs.</p>
-            </div>
-          </div>
-        </a>
-      </div>
-
-      <div class="tool-wrapper" data-id="merge-pdf">
-        <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
-          <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        </button>
-        <a href="merge-pdf.html" class="tool-link">
-          <div class="tool-card">
-            <div class="tool-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-            </div>
-            <div class="tool-info">
-              <h3>Merge PDF</h3>
-              <p>Combine multiple PDF files into a single structured document in any selected page order.</p>
-            </div>
-          </div>
-        </a>
-      </div>
-
-      <div class="tool-wrapper" data-id="split-pdf">
-        <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
-          <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        </button>
-        <a href="split-pdf.html" class="tool-link">
-          <div class="tool-card">
-            <div class="tool-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><path d="M12 3v6M12 15v6"/></svg>
-            </div>
-            <div class="tool-info">
-              <h3>Split PDF</h3>
-              <p>Extract specific page ranges or split each separate page into isolated individual files.</p>
-            </div>
-          </div>
-        </a>
-      </div>
-
-      <div class="tool-wrapper" data-id="compress-pdf">
-        <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
-          <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        </button>
-        <a href="compress-pdf.html" class="tool-link">
-          <div class="tool-card">
-            <div class="tool-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 14h16M4 10h16M12 4v6M12 14v6"/></svg>
-            </div>
-            <div class="tool-info">
-              <h3>Compress PDF</h3>
-              <p>Optimize resource footprints and shrink down overall file sizes while keeping structural resolution high.</p>
-            </div>
-          </div>
-        </a>
-      </div>
-
-      <div class="tool-wrapper" data-id="pdf-converter">
-        <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
-          <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        </button>
-        <a href="pdf-converter.html" class="tool-link">
-          <div class="tool-card">
-            <div class="tool-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7 21l-4 1 1-4L17 3z"/></svg>
-            </div>
-            <div class="tool-info">
-              <h3>PDF Converter</h3>
-              <p>Transform files into high-quality PDFs or pull high-res image layers and text elements right out of them.</p>
-            </div>
-          </div>
-        </a>
-      </div>
-    </div>
-    
-    <div id="noResultsMessage" class="no-results-message">No matching utilities found.</div>
-  </section>
-
-  <section class="privacy-dashboard">
-    <div class="section-label" style="margin-bottom:0;">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" style="vertical-align: middle; margin-right: 4px;">
-        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-      </svg>
-      <span style="color: var(--ink); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em;">Privacy Inspector Dashboard</span>
-    </div>
-    <div class="privacy-grid">
-      <div class="privacy-metric">
-        <div class="metric-label">Network Transmission</div>
-        <div class="metric-value">0.00 <span class="unit">KB sent</span></div>
-      </div>
-      <div class="privacy-metric">
-        <div class="metric-label">Local File Actions</div>
-        <div class="metric-value" id="statsFileCounter">0</div>
-      </div>
-      <div class="privacy-metric">
-        <div class="metric-label">Security Shield Status</div>
-        <div class="metric-value" style="margin-top: 4px;">
-          <span class="secure-badge">
-            <span style="width:6px; height:6px; background:#22c55e; border-radius:50%; display:inline-block;"></span>
-            Local Sandbox Active
+        </div>
+        <div class="category-info">
+          <h3>PDF Utilities</h3>
+          <p>Merge, split, compress, rotate, convert, and build PDFs from images</p>
+          <span class="category-count">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            6 tools
           </span>
+        </div>
+        <svg class="category-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </div>
+      <!-- Future categories go here -->
+    </div>
+
+    <section class="privacy-dashboard">
+      <div class="section-label" style="margin-bottom:0;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" style="vertical-align:middle;margin-right:4px;">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+        <span style="color:var(--ink);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;">Privacy Inspector Dashboard</span>
+      </div>
+      <div class="privacy-grid">
+        <div class="privacy-metric">
+          <div class="metric-label">Network Transmission</div>
+          <div class="metric-value">0.00 <span class="unit">KB sent</span></div>
+        </div>
+        <div class="privacy-metric">
+          <div class="metric-label">Local File Actions</div>
+          <div class="metric-value" id="statsFileCounter">0</div>
+        </div>
+        <div class="privacy-metric">
+          <div class="metric-label">Security Shield Status</div>
+          <div class="metric-value" style="margin-top:4px;">
+            <span class="secure-badge">
+              <span style="width:6px;height:6px;background:#22c55e;border-radius:50%;display:inline-block;"></span>
+              Local Sandbox Active
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="features-row">
+      <div class="feature-item">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <div>
+          <h4>Absolute Privacy</h4>
+          <p>Your documents never leave your computer. All rendering and transformations happen inside your client browser environment.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        <div>
+          <h4>Zero Friction</h4>
+          <p>No waiting rooms, no premium upload speed limits, and completely free of distracting advertisement structures.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 9.4 7.55 4.24a1.79 1.79 0 0 0-2.5 1.53v12.46a1.79 1.79 0 0 0 2.5 1.53L16.5 14.6a1.79 1.79 0 0 0 0-3.2z"/></svg>
+        <div>
+          <h4>Open & Scalable</h4>
+          <p>Built with reliable, pure modern web libraries. Completely audited, transparent, and hosted open-source on GitHub.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="faq-section">
+      <h3>Frequently Asked Questions</h3>
+      <details>
+        <summary>Where are my uploaded files stored?</summary>
+        <div class="faq-content">
+          They aren't stored anywhere! DocuCraft processes your images and PDFs completely inside your browser locally using client-side JavaScript APIs. Your file details never interact with external servers.
+        </div>
+      </details>
+      <details>
+        <summary>Is there a file size or limit threshold?</summary>
+        <div class="faq-content">
+          No. Since processing happens natively using your computer's processing power rather than our cloud hardware resources, you can process as many documents as your system's hardware allows.
+        </div>
+      </details>
+    </section>
+  </section>
+
+
+  <!-- ============================================================
+       PDF TOOLS VIEW  (shown after clicking PDF Utilities)
+       ============================================================ -->
+  <section id="pdfView" class="view-hidden">
+
+    <div class="view-breadcrumb">
+      <button class="back-btn" id="backToCategoriesBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+        </svg>
+        All Utilities
+      </button>
+      <span class="breadcrumb-sep">/</span>
+      <span class="breadcrumb-current">PDF Utilities</span>
+    </div>
+
+    <section class="hub-hero" style="margin-bottom:24px;">
+      <h2>PDF Utilities</h2>
+      <p>Merge, split, compress, rotate, convert, and build PDFs from images</p>
+    </section>
+
+    <div class="search-container">
+      <div class="search-input-wrapper" id="searchInputWrapper">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="toolSearchInput" class="search-bar" placeholder="Search tools (e.g., merge, compress, rotate)..." aria-label="Search tools" />
+        <div class="search-controls">
+          <span id="searchShortcutHint" class="search-shortcut-hint">/</span>
+          <button type="button" id="searchClearBtn" class="search-clear-btn" aria-label="Clear search input">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
         </div>
       </div>
     </div>
+
+    <section id="favoritesSection" class="favorites-section">
+      <div class="section-label">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="#eab308" stroke="#eab308" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span>Pinned Utilities</span>
+      </div>
+      <div class="tools-grid" id="favoritesGrid"></div>
+    </section>
+
+    <section id="mainToolsSection">
+      <div class="section-label" id="mainGridLabel">All PDF Tools</div>
+      <div class="tools-grid" id="toolsGrid">
+
+        <div class="tool-wrapper" data-id="image-to-pdf">
+          <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
+            <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </button>
+          <a href="image-to-pdf.html" class="tool-link">
+            <div class="tool-card">
+              <div class="tool-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              </div>
+              <div class="tool-info">
+                <h3>Image to PDF</h3>
+                <p>Convert collections of PNG, JPG, WebP images seamlessly into clean presentation PDFs.</p>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="tool-wrapper" data-id="merge-pdf">
+          <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
+            <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </button>
+          <a href="merge-pdf.html" class="tool-link">
+            <div class="tool-card">
+              <div class="tool-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              </div>
+              <div class="tool-info">
+                <h3>Merge PDF</h3>
+                <p>Combine multiple PDF files into a single structured document in any selected page order.</p>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="tool-wrapper" data-id="split-pdf">
+          <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
+            <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </button>
+          <a href="split-pdf.html" class="tool-link">
+            <div class="tool-card">
+              <div class="tool-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><path d="M12 3v6M12 15v6"/></svg>
+              </div>
+              <div class="tool-info">
+                <h3>Split PDF</h3>
+                <p>Extract specific page ranges or split each separate page into isolated individual files.</p>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="tool-wrapper" data-id="compress-pdf">
+          <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
+            <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </button>
+          <a href="compress-pdf.html" class="tool-link">
+            <div class="tool-card">
+              <div class="tool-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 14h16M4 10h16M12 4v6M12 14v6"/></svg>
+              </div>
+              <div class="tool-info">
+                <h3>Compress PDF</h3>
+                <p>Optimize resource footprints and shrink down overall file sizes while keeping structural resolution high.</p>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="tool-wrapper" data-id="pdf-converter">
+          <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
+            <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </button>
+          <a href="pdf-converter.html" class="tool-link">
+            <div class="tool-card">
+              <div class="tool-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7 21l-4 1 1-4L17 3z"/></svg>
+              </div>
+              <div class="tool-info">
+                <h3>PDF Converter</h3>
+                <p>Transform files into high-quality PDFs or pull high-res image layers and text elements right out of them.</p>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="tool-wrapper" data-id="rotate-pdf">
+          <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
+            <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </button>
+          <a href="rotate-pdf.html" class="tool-link">
+            <div class="tool-card">
+              <div class="tool-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1 .57-8.38l-5.67-2.5"/></svg>
+              </div>
+              <div class="tool-info">
+                <h3>Rotate PDF</h3>
+                <p>Rotate individual pages or the entire document by any angle and save as a new PDF.</p>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div id="noResultsMessage" class="no-results-message">No matching utilities found.</div>
+    </section>
+
   </section>
 
-  <section class="features-row">
-    <div class="feature-item">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      <div>
-        <h4>Absolute Privacy</h4>
-        <p>Your documents never leave your computer. All rendering and transformations happen inside your client browser environment.</p>
-      </div>
-    </div>
-    <div class="feature-item">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-      <div>
-        <h4>Zero Friction</h4>
-        <p>No waiting rooms, no premium upload speed limits, and completely free of distracting advertisement structures.</p>
-      </div>
-    </div>
-    <div class="feature-item">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 9.4 7.55 4.24a1.79 1.79 0 0 0-2.5 1.53v12.46a1.79 1.79 0 0 0 2.5 1.53L16.5 14.6a1.79 1.79 0 0 0 0-3.2z"/></svg>
-      <div>
-        <h4>Open & Scalable</h4>
-        <p>Built with reliable, pure modern web libraries. Completely audited, transparent, and hosted open-source on GitHub.</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="faq-section">
-    <h3>Frequently Asked Questions</h3>
-    
-    <details>
-      <summary>Where are my uploaded files stored?</summary>
-      <div class="faq-content">
-        They aren't stored anywhere! DocuCraft processes your images and PDFs completely inside your browser locally using client-side JavaScript APIs. Your file details never interact with external servers.
-      </div>
-    </details>
-
-    <details>
-      <summary>Is there a file size or limit threshold?</summary>
-      <div class="faq-content">
-        No. Since processing happens natively using your computer's processing power rather than our cloud hardware resources, you can process as many documents as your system's hardware allows.
-      </div>
-    </details>
-  </section>
 </main>
 
 <footer>
@@ -1191,6 +1373,72 @@
   initializeSearchSystem();
   updatePrivacyInspectorStatistics();
   initializeLogoHoverEngine();
+
+  /* ==========================================================================
+     Category / View Navigation
+     ========================================================================== */
+  const categoriesView = document.getElementById('categoriesView');
+  const pdfView        = document.getElementById('pdfView');
+
+  function showPdfView() {
+    categoriesView.classList.add('view-hidden');
+    pdfView.classList.remove('view-hidden');
+    pdfView.classList.add('view-enter');
+    pdfView.addEventListener('animationend', () => pdfView.classList.remove('view-enter'), { once: true });
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    // keep smooth-scroll target in sync
+    if (typeof target !== 'undefined') target = 0;
+  }
+
+  function showCategoriesView() {
+    pdfView.classList.add('view-hidden');
+    categoriesView.classList.remove('view-hidden');
+    categoriesView.classList.add('view-enter');
+    categoriesView.addEventListener('animationend', () => categoriesView.classList.remove('view-enter'), { once: true });
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    if (typeof target !== 'undefined') target = 0;
+  }
+
+  document.getElementById('categoryPdf').addEventListener('click', showPdfView);
+  document.getElementById('categoryPdf').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showPdfView(); }
+  });
+  document.getElementById('backToCategoriesBtn').addEventListener('click', showCategoriesView);
+</script>
+
+<script>
+  (function () {
+    const ease = 0.07;
+    let target = window.scrollY, current = window.scrollY, raf = null;
+
+    function hasScrollParent(el) {
+      while (el && el !== document.documentElement) {
+        const s = getComputedStyle(el);
+        if ((s.overflowY === 'auto' || s.overflowY === 'scroll') && el.scrollHeight > el.clientHeight) return true;
+        el = el.parentElement;
+      }
+      return false;
+    }
+
+    window.addEventListener('wheel', (e) => {
+      if (hasScrollParent(e.target)) return;
+      e.preventDefault();
+      let delta = e.deltaY;
+      if (e.deltaMode === 1) delta *= 40;
+      else if (e.deltaMode === 2) delta *= window.innerHeight;
+      target = Math.max(0, Math.min(target + delta * 0.8, document.documentElement.scrollHeight - window.innerHeight));
+      if (!raf) raf = requestAnimationFrame(tick);
+    }, { passive: false });
+
+    function tick() {
+      current += (target - current) * ease;
+      if (Math.abs(target - current) < 0.5) { current = target; raf = null; window.scrollTo(0, current); return; }
+      window.scrollTo(0, current);
+      raf = requestAnimationFrame(tick);
+    }
+
+    window.addEventListener('scroll', () => { if (!raf) { target = window.scrollY; current = window.scrollY; } }, { passive: true });
+  })();
 </script>
 
 </body>
