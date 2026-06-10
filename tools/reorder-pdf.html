@@ -297,7 +297,7 @@
         card.className = 'page-card';
         card.draggable = true;
         card.dataset.index = idx;
-        card.appendChild(item.canvas.cloneNode());
+        card.appendChild(item.canvas);
 
         const footer = document.createElement('div');
         footer.className = 'page-card-footer';
