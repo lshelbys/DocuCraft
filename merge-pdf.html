@@ -62,7 +62,7 @@
       flex-direction: column;
     }
     header {
-      background: var(--white);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent 40%), var(--header-bg);
       padding: 16px 32px;
       display: flex;
       align-items: center;
@@ -70,7 +70,14 @@
       position: sticky;
       top: 0;
       z-index: 50;
-      border-bottom: 1px solid var(--surface-3);
+      backdrop-filter: blur(30px) saturate(200%) brightness(1.1);
+      -webkit-backdrop-filter: blur(30px) saturate(200%) brightness(1.1);
+      box-shadow:
+        var(--header-shadow),
+        inset 0 1px 1px var(--header-highlight),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+      border-bottom: 1px solid var(--header-border);
+      transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
     }
     .header-logo {
       display: flex;
@@ -96,6 +103,22 @@
       transition: color 0.8s ease-in-out;
       display: inline-block;
     }
+    .header-actions { display: flex; align-items: center; gap: 16px; }
+    .header-btn {
+      background: none;
+      border: none;
+      color: var(--header-icon-color);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: var(--transition);
+    }
+    .header-btn:hover { color: var(--header-hover); transform: scale(1.05); }
+    .header-btn svg { color: inherit; fill: none; stroke: currentColor; }
+    html[data-theme="dark"] .theme-toggle .moon-path { display: none; }
+    html:not([data-theme="dark"]) .theme-toggle .sun-path { display: none; }
     .nav-back {
       text-decoration: none;
       color: var(--header-icon-color);
@@ -204,6 +227,8 @@
     .control-btn:hover {
       background: var(--surface-2);
     }
+    .progress-bar-wrap { height: 4px; background: var(--surface-2); border-radius: 99px; overflow: hidden; margin-top: 20px; display: none; }
+    .progress-bar-fill { height: 100%; background: var(--accent); border-radius: 99px; width: 0%; transition: width 0.3s ease; }
     .btn-merge {
       width: 100%;
       margin-top: 24px;
@@ -259,16 +284,30 @@
         </h1>
       </div>
     </a>
-    <a href="./" class="nav-back">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-      Back to hub
-    </a>
+    <div class="header-actions">
+      <button id="themeToggle" class="header-btn theme-toggle" aria-label="Toggle dark mode">
+        <svg width="22" height="22" viewBox="0 0 24 24">
+          <g class="moon-path"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></g>
+          <g class="sun-path">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </g>
+        </svg>
+      </button>
+      <a href="./" class="nav-back">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Back to hub
+      </a>
+    </div>
   </header>
 
   <main>
     <div class="hero">
-      <h2>Merge PDF Workspace</h2>
-      <p>Combine disjointed document layers into a cohesive asset package sequentially.</p>
+      <h2>Merge PDF</h2>
+      <p>Combine multiple PDF files into one document in any order you choose.</p>
     </div>
 
     <div class="workspace-card">
@@ -276,13 +315,16 @@
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
         </svg>
-        <p>Drag and drop structural PDFs or click to navigate local arrays</p>
+        <p>Drag and drop PDF files here, or click to browse</p>
         <input type="file" id="fileInput" multiple accept="application/pdf" />
       </div>
 
       <div class="file-list" id="fileList"></div>
 
-      <button id="btnMerge" class="btn-merge" disabled>Execute Structural Merging</button>
+      <div class="progress-bar-wrap" id="progressWrap">
+        <div class="progress-bar-fill" id="progressFill"></div>
+      </div>
+      <button id="btnMerge" class="btn-merge" disabled>Merge PDFs</button>
       <div id="statusMsg" class="status-msg"></div>
     </div>
   </main>
@@ -296,6 +338,18 @@
     if (activeTheme === 'dark') {
       document.documentElement.setAttribute('data-theme', 'dark');
     }
+
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (isDark) {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'light');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+      }
+      resetLogoLetters();
+    });
 
     function incrementActionStats() {
       const count = parseInt(localStorage.getItem('docucraft_actions_total_count') || '0');
@@ -336,6 +390,13 @@
     const fileList = document.getElementById('fileList');
     const btnMerge = document.getElementById('btnMerge');
     const statusMsg = document.getElementById('statusMsg');
+    const progressWrap = document.getElementById('progressWrap');
+    const progressFill = document.getElementById('progressFill');
+
+    function setProgress(pct, hide = false) {
+      if (hide) { progressWrap.style.display = 'none'; progressFill.style.width = '0%'; }
+      else { progressWrap.style.display = 'block'; progressFill.style.width = `${pct}%`; }
+    }
 
     dropzone.addEventListener('click', () => fileInput.click());
     dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.style.borderColor = 'var(--accent-mid)'; });
@@ -406,40 +467,80 @@
     btnMerge.addEventListener('click', async () => {
       if (selectedFiles.length < 2) return;
       
-      statusMsg.innerText = 'Merging documents... Please wait.';
-      statusMsg.className = 'status-msg ink-2';
+      statusMsg.innerText = '';
+      statusMsg.className = 'status-msg';
       btnMerge.disabled = true;
+      setProgress(5);
 
       try {
         const mergedPdf = await PDFLib.PDFDocument.create();
-        
-        for (const file of selectedFiles) {
-          const fileArrayBuffer = await file.arrayBuffer();
+
+        for (let i = 0; i < selectedFiles.length; i++) {
+          const fileArrayBuffer = await selectedFiles[i].arrayBuffer();
           const pdfDoc = await PDFLib.PDFDocument.load(fileArrayBuffer);
           const copiedPages = await mergedPdf.copyPages(pdfDoc, pdfDoc.getPageIndices());
           copiedPages.forEach((page) => mergedPdf.addPage(page));
+          setProgress(5 + Math.round(((i + 1) / selectedFiles.length) * 85));
         }
-        
+
+        setProgress(95);
         const mergedPdfBytes = await mergedPdf.save();
-        
+        setProgress(100);
+
         const blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
         link.download = 'DocuCraft_Merged.pdf';
         link.click();
         incrementActionStats();
-        
-        statusMsg.innerText = 'PDF files merged successfully!';
+
+        statusMsg.innerText = 'PDFs merged successfully!';
         statusMsg.className = 'status-msg status-success';
       } catch (error) {
         console.error(error);
-        statusMsg.innerText = 'An error occurred while merging your PDFs. Ensure files are not corrupted or encrypted.';
+        statusMsg.innerText = 'An error occurred while merging. Ensure files are not encrypted or corrupted.';
         statusMsg.className = 'status-msg status-error';
       } finally {
         btnMerge.disabled = false;
+        setTimeout(() => setProgress(0, true), 1200);
       }
     });
     initializeLogoHoverEngine();
+  </script>
+
+  <script>
+    (function () {
+      const ease = 0.07;
+      let target = window.scrollY, current = window.scrollY, raf = null;
+
+      function hasScrollParent(el) {
+        while (el && el !== document.documentElement) {
+          const s = getComputedStyle(el);
+          if ((s.overflowY === 'auto' || s.overflowY === 'scroll') && el.scrollHeight > el.clientHeight) return true;
+          el = el.parentElement;
+        }
+        return false;
+      }
+
+      window.addEventListener('wheel', (e) => {
+        if (hasScrollParent(e.target)) return;
+        e.preventDefault();
+        let delta = e.deltaY;
+        if (e.deltaMode === 1) delta *= 40;
+        else if (e.deltaMode === 2) delta *= window.innerHeight;
+        target = Math.max(0, Math.min(target + delta * 0.8, document.documentElement.scrollHeight - window.innerHeight));
+        if (!raf) raf = requestAnimationFrame(tick);
+      }, { passive: false });
+
+      function tick() {
+        current += (target - current) * ease;
+        if (Math.abs(target - current) < 0.5) { current = target; raf = null; window.scrollTo(0, current); return; }
+        window.scrollTo(0, current);
+        raf = requestAnimationFrame(tick);
+      }
+
+      window.addEventListener('scroll', () => { if (!raf) { target = window.scrollY; current = window.scrollY; } }, { passive: true });
+    })();
   </script>
 </body>
 </html>
