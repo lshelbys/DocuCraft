@@ -314,8 +314,8 @@
     </div>
 
     <div class="workspace-card">
-      <div class="dropzone" id="dropzone">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <div class="dropzone" id="dropzone" role="button" tabindex="0" aria-label="Upload PDF file">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
         </svg>
         <p>Drag and drop your PDF here, or click to browse</p>
@@ -422,6 +422,7 @@
     }
 
     dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); } });
     dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.style.borderColor = 'var(--accent-mid)'; });
     dropzone.addEventListener('dragleave', () => { dropzone.style.borderColor = 'var(--surface-3)'; });
     dropzone.addEventListener('drop', (e) => {
@@ -436,7 +437,7 @@
 
     function handleFileSelection(file) {
       if (file.type !== 'application/pdf') {
-        showStatus("Please supply valid PDF assets for structural optimization processing.", "status-error");
+        showStatus("Please upload a valid PDF file.", "status-error");
         return;
       }
       targetFile = file;
@@ -466,7 +467,7 @@
 
       btnCompress.disabled = true;
       resultsBox.style.display = 'none';
-      showStatus("Compressing your PDF...", "ink-2");
+      showStatus("Compressing your PDF…", "");
       setProgress(20);
 
       try {
@@ -479,16 +480,19 @@
 
         const initialSize = targetFile.size;
         const optimizedSize = compressedBytes.length;
-        const reductionBytes = initialSize > optimizedSize ? optimizedSize : (initialSize * 0.92);
-        const outputBytes = initialSize > optimizedSize ? compressedBytes : new Uint8Array(arrayBuffer);
-        const savingsPercent = Math.max(0, Math.round(((initialSize - reductionBytes) / initialSize) * 100));
+        const didCompress = optimizedSize < initialSize;
+        const outputBytes = didCompress ? compressedBytes : new Uint8Array(arrayBuffer);
+        const finalSize = didCompress ? optimizedSize : initialSize;
+        const savingsPercent = didCompress ? Math.round(((initialSize - optimizedSize) / initialSize) * 100) : 0;
 
         resOrig.innerText = `Original size: ${formatBytes(initialSize)}`;
-        resComp.innerText = `Compressed size: ${formatBytes(reductionBytes)}`;
-        resRatio.innerText = `Reduction: ${savingsPercent}%`;
+        resComp.innerText = `Output size: ${formatBytes(finalSize)}`;
+        resRatio.innerText = didCompress
+          ? `Reduction: ${savingsPercent}%`
+          : 'Already optimized — no further compression possible.';
 
         setProgress(100);
-        showStatus("PDF compressed successfully.", "status-success");
+        showStatus(didCompress ? "PDF compressed successfully." : "File is already optimized — downloaded as-is.", "status-success");
         resultsBox.style.display = 'block';
 
         const blob = new Blob([outputBytes], { type: 'application/pdf' });

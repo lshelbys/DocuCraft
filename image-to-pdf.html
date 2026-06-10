@@ -666,7 +666,7 @@ viewList.addEventListener('click', () => { viewList.classList.add('active'); vie
 
 function processAndApplyFilters(item) {
   return new Promise((resolve) => {
-    if (item.brightness == 100 && item.contrast == 100 && item.rotation == 0) {
+    if (item.brightness === 100 && item.contrast === 100 && item.rotation === 0) {
       resolve(item.src);
       return;
     }
@@ -704,7 +704,11 @@ function getPageDimensions(sizeStr, orientStr, imgW, imgH) {
 convertBtn.addEventListener('click', async () => {
   const { jsPDF } = window.jspdf;
   const activeItems = items.filter(i => !i.excluded);
-  if (!activeItems.length) { alert('All cards are currently unchecked or removed.'); return; }
+  if (!activeItems.length) {
+    statusMsg.textContent = 'No images selected — check at least one image to convert.';
+    statusMsg.className = 'status-msg error-text';
+    return;
+  }
 
   convertBtn.disabled = true;
   splitBtn.disabled = true;
@@ -797,7 +801,11 @@ convertBtn.addEventListener('click', async () => {
 splitBtn.addEventListener('click', async () => {
   const { jsPDF } = window.jspdf;
   const activeItems = items.filter(i => !i.excluded);
-  if (!activeItems.length) { alert('Please check or upload files to extract.'); return; }
+  if (!activeItems.length) {
+    statusMsg.textContent = 'No images selected — check at least one image to convert.';
+    statusMsg.className = 'status-msg error-text';
+    return;
+  }
 
   splitBtn.disabled = true;
   convertBtn.disabled = true;
