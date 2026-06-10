@@ -4,9 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DocuCraft - Image to PDF Converter</title>
+  <meta name="description" content="Convert PNG, JPG, and WebP images into a single, clean PDF in your browser. Free, private, no upload required." />
+  <meta name="theme-color" content="#2d5a3d" />
+  <link rel="canonical" href="https://www.docucraft.site/image-to-pdf.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Image to PDF — DocuCraft" />
+  <meta property="og:description" content="Turn images into PDFs in your browser. Free, private, no upload." />
   <link rel="icon" type="image/svg+xml" href="icon.svg" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
@@ -491,7 +497,6 @@ function initializeLogoHoverEngine() {
   logoLink.addEventListener('mouseleave', resetLogoLetters);
 }
 
-const { jsPDF } = window.jspdf;
 let items = [];
 let dragSourceElement = null;
 
@@ -697,6 +702,7 @@ function getPageDimensions(sizeStr, orientStr, imgW, imgH) {
 }
 
 convertBtn.addEventListener('click', async () => {
+  const { jsPDF } = window.jspdf;
   const activeItems = items.filter(i => !i.excluded);
   if (!activeItems.length) { alert('All cards are currently unchecked or removed.'); return; }
 
@@ -789,6 +795,7 @@ convertBtn.addEventListener('click', async () => {
 });
 
 splitBtn.addEventListener('click', async () => {
+  const { jsPDF } = window.jspdf;
   const activeItems = items.filter(i => !i.excluded);
   if (!activeItems.length) { alert('Please check or upload files to extract.'); return; }
 
@@ -859,7 +866,7 @@ splitBtn.addEventListener('click', async () => {
     a.download = 'images-split.zip';
     a.click();
     incrementActionStats();
-    URL.revokeObjectURL(a.href);
+    setTimeout(() => URL.revokeObjectURL(a.href), 60000);
 
     statusMsg.textContent = `✓ images-split.zip downloaded (${activeItems.length} PDFs)`;
     statusMsg.className = 'status-msg success-text';
