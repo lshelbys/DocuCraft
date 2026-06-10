@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DocuCraft - Rotate PDF</title>
+  <link rel="icon" type="image/svg+xml" href="icon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --ink: #1a1a18;
+      --ink-2: #4a4a46;
+      --ink-3: #8a8a84;
+      --surface: #f7f6f2;
+      --surface-2: #eeecea;
+      --surface-3: #e4e2dd;
+      --white: #ffffff;
+      --radius: 10px;
+      --radius-lg: 16px;
+      --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      --accent: #2d5a3d;
+      --accent-light: #e8f0ea;
+      --accent-mid: #4a7c5c;
+      --danger: #c0392b;
+
+      --header-bg: rgba(255, 255, 255, 0.35);
+      --header-text: #1a1a18;
+      --header-hover: #2d5a3d;
+      --header-icon-color: #4a4a46;
+      --header-border: rgba(255, 255, 255, 0.4);
+      --header-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+      --header-highlight: rgba(255, 255, 255, 0.9);
+    }
+
+    html[data-theme="dark"] {
+      --ink: #f7f6f2;
+      --ink-2: #c4c2be;
+      --ink-3: #8a8a84;
+      --surface: #121211;
+      --surface-2: #1c1c1a;
+      --surface-3: #2a2a27;
+      --white: #1a1a18;
+
+      --header-bg: rgba(20, 20, 18, 0.45);
+      --header-text: #f7f6f2;
+      --header-hover: #7ec898;
+      --header-icon-color: #8a8a84;
+      --header-border: rgba(255, 255, 255, 0.08);
+      --header-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+      --header-highlight: rgba(255, 255, 255, 0.06);
+    }
+
+    body { font-family: 'DM Sans', sans-serif; background: var(--surface); color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; }
+
+    header {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent 40%), var(--header-bg);
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(30px) saturate(200%) brightness(1.1);
+      -webkit-backdrop-filter: blur(30px) saturate(200%) brightness(1.1);
+      box-shadow: var(--header-shadow), inset 0 1px 1px var(--header-highlight), inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+      border-bottom: 1px solid var(--header-border);
+      transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .header-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    header svg { color: #7ec898; flex-shrink: 0; }
+    .header-text h1 {
+      font-family: 'Instrument Serif', serif;
+      font-size: 24px;
+      letter-spacing: -0.01em;
+      display: flex;
+      user-select: none;
+      transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+      transform-origin: left center;
+    }
+    .header-logo:hover .header-text h1 { transform: scale(1.1); }
+    .header-text h1 .logo-letter { color: var(--header-text); transition: color 0.8s ease-in-out; display: inline-block; }
+
+    .header-actions { display: flex; align-items: center; gap: 16px; }
+    .header-btn {
+      background: none; border: none; color: var(--header-icon-color); cursor: pointer;
+      display: flex; align-items: center; justify-content: center; padding: 0; transition: var(--transition);
+    }
+    .header-btn:hover { color: var(--header-hover); transform: scale(1.05); }
+    .header-btn svg { color: inherit; fill: none; stroke: currentColor; }
+    html[data-theme="dark"] .theme-toggle .moon-path { display: none; }
+    html:not([data-theme="dark"]) .theme-toggle .sun-path { display: none; }
+    .nav-back {
+      text-decoration: none; color: var(--header-icon-color); font-size: 13px; font-weight: 500;
+      display: flex; align-items: center; gap: 6px; transition: var(--transition);
+    }
+    .nav-back:hover { color: var(--header-hover); transform: translateX(-2px); }
+
+    main { flex: 1; max-width: 900px; width: 100%; margin: 0 auto; padding: 40px 24px 60px; }
+
+    .hero { text-align: center; margin-bottom: 32px; }
+    .hero h2 { font-family: 'Instrument Serif', serif; font-size: 42px; font-weight: 400; line-height: 1.1; margin-bottom: 8px; }
+    .hero p { color: var(--ink-2); font-size: 15px; }
+
+    .workspace-card { background: var(--white); border: 1px solid var(--surface-3); border-radius: var(--radius-lg); padding: 24px; }
+
+    .dropzone {
+      border: 2px dashed var(--surface-3); border-radius: var(--radius); padding: 40px 20px;
+      text-align: center; cursor: pointer; transition: var(--transition); background: var(--white);
+    }
+    .dropzone:hover { border-color: var(--accent-mid); background: var(--accent-light); }
+    .dropzone svg { color: var(--ink-3); margin-bottom: 12px; }
+    .dropzone p { font-size: 14px; color: var(--ink-2); }
+    .dropzone input { display: none; }
+
+    .page-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 14px; margin-top: 24px; }
+
+    .page-card {
+      background: var(--surface); border: 1px solid var(--surface-3); border-radius: var(--radius);
+      overflow: hidden; text-align: center; transition: var(--transition);
+    }
+    .page-card:hover { border-color: var(--accent-mid); }
+    .page-card canvas { width: 100%; display: block; }
+    .page-card-footer { padding: 6px 8px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--surface-3); }
+    .page-num { font-size: 11px; font-weight: 600; color: var(--ink-3); }
+    .rotation-badge { font-size: 10px; font-weight: 600; color: var(--accent); background: var(--accent-light); padding: 1px 5px; border-radius: 4px; }
+    .rotate-controls { display: flex; gap: 3px; }
+    .rot-btn {
+      width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--surface-3);
+      background: var(--white); color: var(--ink-2); cursor: pointer; display: flex;
+      align-items: center; justify-content: center; transition: var(--transition); padding: 0;
+    }
+    .rot-btn:hover { background: var(--accent-light); border-color: var(--accent-mid); color: var(--accent); }
+
+    .bulk-controls {
+      display: flex; align-items: center; gap: 10px; margin-top: 20px; flex-wrap: wrap;
+    }
+    .bulk-btn {
+      padding: 8px 14px; border: 1px solid var(--surface-3); background: var(--white);
+      color: var(--ink-2); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+      border-radius: var(--radius); cursor: pointer; display: flex; align-items: center; gap: 6px;
+      transition: var(--transition);
+    }
+    .bulk-btn:hover { border-color: var(--accent-mid); color: var(--accent); background: var(--accent-light); }
+    .bulk-label { font-size: 12px; color: var(--ink-3); margin-right: 4px; }
+
+    .progress-bar-wrap { height: 4px; background: var(--surface-2); border-radius: 99px; overflow: hidden; margin-top: 20px; display: none; }
+    .progress-bar-fill { height: 100%; background: var(--accent); border-radius: 99px; width: 0%; transition: width 0.3s ease; }
+
+    .btn-save {
+      width: 100%; margin-top: 20px; padding: 14px; background: var(--ink); color: var(--white);
+      border: none; border-radius: var(--radius); font-family: 'DM Sans', sans-serif;
+      font-weight: 500; font-size: 14px; cursor: pointer; transition: var(--transition);
+    }
+    .btn-save:hover:not(:disabled) { background: #333330; }
+    .btn-save:disabled { background: var(--surface-2); color: var(--ink-3); cursor: not-allowed; border: 1px solid var(--surface-3); }
+
+    .status-msg { margin-top: 14px; font-size: 13px; text-align: center; }
+    .status-success { color: var(--accent); font-weight: 500; }
+    .status-error { color: #a33b3b; font-weight: 500; }
+
+    footer { text-align: center; padding: 20px 24px; font-size: 12px; color: var(--ink-3); border-top: 1px solid var(--surface-3); background: var(--white); margin-top: auto; }
+    footer .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); display: inline-block; margin: 0 6px; vertical-align: middle; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="./" class="header-logo">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>
+        <line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/>
+      </svg>
+      <div class="header-text">
+        <h1>
+          <span class="logo-letter">D</span><span class="logo-letter">o</span><span class="logo-letter">c</span>
+          <span class="logo-letter">u</span><span class="logo-letter">C</span><span class="logo-letter">r</span>
+          <span class="logo-letter">a</span><span class="logo-letter">f</span><span class="logo-letter">t</span>
+        </h1>
+      </div>
+    </a>
+    <div class="header-actions">
+      <button id="themeToggle" class="header-btn theme-toggle" aria-label="Toggle dark mode">
+        <svg width="22" height="22" viewBox="0 0 24 24">
+          <g class="moon-path"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></g>
+          <g class="sun-path">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </g>
+        </svg>
+      </button>
+      <a href="./" class="nav-back">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Back to hub
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <div class="hero">
+      <h2>Rotate PDF</h2>
+      <p>Rotate individual pages or all pages at once — then save a new PDF.</p>
+    </div>
+
+    <div class="workspace-card">
+      <div class="dropzone" id="dropzone">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+        </svg>
+        <p>Drag and drop your PDF here, or click to browse</p>
+        <input type="file" id="fileInput" accept="application/pdf" />
+      </div>
+
+      <div id="editorSection" style="display:none;">
+        <div class="bulk-controls">
+          <span class="bulk-label">Rotate all pages:</span>
+          <button class="bulk-btn" id="allCCW">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2.5 2v6h6M2.66 15.57a10 10 0 1 0-.57-8.38l5.67-2.5"/></svg>
+            −90°
+          </button>
+          <button class="bulk-btn" id="allCW">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1 .57-8.38l-5.67-2.5"/></svg>
+            +90°
+          </button>
+          <button class="bulk-btn" id="all180">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1 .57-8.38l-5.67-2.5"/></svg>
+            180°
+          </button>
+          <button class="bulk-btn" id="resetAll" style="margin-left:auto;">Reset all</button>
+        </div>
+
+        <div class="page-grid" id="pageGrid"></div>
+
+        <div class="progress-bar-wrap" id="progressWrap">
+          <div class="progress-bar-fill" id="progressFill"></div>
+        </div>
+
+        <button class="btn-save" id="btnSave">Save Rotated PDF</button>
+        <div class="status-msg" id="statusMsg"></div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <span class="dot"></span>No sign up required, Free forever<span class="dot"></span>
+  </footer>
+
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+
+    const activeTheme = localStorage.getItem('theme') || 'light';
+    if (activeTheme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (isDark) { document.documentElement.removeAttribute('data-theme'); localStorage.setItem('theme', 'light'); }
+      else { document.documentElement.setAttribute('data-theme', 'dark'); localStorage.setItem('theme', 'dark'); }
+      resetLogoLetters();
+    });
+
+    function incrementActionStats() {
+      const count = parseInt(localStorage.getItem('docucraft_actions_total_count') || '0');
+      localStorage.setItem('docucraft_actions_total_count', count + 1);
+    }
+
+    let activeStaggerTimeouts = [];
+    function resetLogoLetters() {
+      activeStaggerTimeouts.forEach(clearTimeout);
+      activeStaggerTimeouts = [];
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      document.querySelectorAll('.logo-letter').forEach(l => {
+        l.style.color = isDark ? '#f7f6f2' : '#1a1a18';
+      });
+    }
+    function initializeLogoHoverEngine() {
+      const logoLink = document.querySelector('.header-logo');
+      const letters = document.querySelectorAll('.logo-letter');
+      logoLink.addEventListener('mouseenter', () => {
+        activeStaggerTimeouts.forEach(clearTimeout);
+        activeStaggerTimeouts = [];
+        letters.forEach((letter, index) => {
+          const timeoutId = setTimeout(() => {
+            const randomHue = Math.floor(Math.random() * 360);
+            letter.style.color = `hsl(${randomHue}, 85%, 75%)`;
+          }, index * 120);
+          activeStaggerTimeouts.push(timeoutId);
+        });
+      });
+      logoLink.addEventListener('mouseleave', resetLogoLetters);
+    }
+
+    let pdfArrayBuffer = null;
+    let pageRotations = [];
+    let totalPages = 0;
+
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+    const editorSection = document.getElementById('editorSection');
+    const pageGrid = document.getElementById('pageGrid');
+    const btnSave = document.getElementById('btnSave');
+    const statusMsg = document.getElementById('statusMsg');
+    const progressWrap = document.getElementById('progressWrap');
+    const progressFill = document.getElementById('progressFill');
+
+    function setProgress(pct, hide = false) {
+      if (hide) { progressWrap.style.display = 'none'; progressFill.style.width = '0%'; }
+      else { progressWrap.style.display = 'block'; progressFill.style.width = `${pct}%`; }
+    }
+
+    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.style.borderColor = 'var(--accent-mid)'; });
+    dropzone.addEventListener('dragleave', () => { dropzone.style.borderColor = 'var(--surface-3)'; });
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.style.borderColor = 'var(--surface-3)';
+      if (e.dataTransfer.files.length > 0) loadPdf(e.dataTransfer.files[0]);
+    });
+    fileInput.addEventListener('change', (e) => { if (e.target.files.length > 0) loadPdf(e.target.files[0]); });
+
+    async function loadPdf(file) {
+      if (file.type !== 'application/pdf') {
+        showStatus('Please upload a valid PDF file.', 'status-error');
+        return;
+      }
+      showStatus('Loading PDF...', '');
+      try {
+        pdfArrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: pdfArrayBuffer.slice(0) }).promise;
+        totalPages = pdf.numPages;
+        pageRotations = new Array(totalPages).fill(0);
+        await renderPreviews(pdf);
+        editorSection.style.display = 'block';
+        statusMsg.textContent = '';
+        statusMsg.className = 'status-msg';
+      } catch (e) {
+        showStatus('Failed to load PDF. The file may be encrypted or corrupted.', 'status-error');
+      }
+    }
+
+    async function renderPreviews(pdf) {
+      pageGrid.innerHTML = '';
+      for (let i = 1; i <= totalPages; i++) {
+        const page = await pdf.getPage(i);
+        const viewport = page.getViewport({ scale: 0.4, rotation: pageRotations[i - 1] });
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        await page.render({ canvasContext: ctx, viewport }).promise;
+
+        const card = document.createElement('div');
+        card.className = 'page-card';
+        const rotBadge = pageRotations[i - 1] !== 0 ? `<span class="rotation-badge">${pageRotations[i - 1]}°</span>` : '';
+        card.innerHTML = `
+          <div class="page-card-footer" style="border-top:none;border-bottom:1px solid var(--surface-3);">
+            <span class="page-num">Page ${i}</span>
+            ${rotBadge}
+            <div class="rotate-controls">
+              <button class="rot-btn ccw" title="Rotate -90°">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2.5 2v6h6M2.66 15.57a10 10 0 1 0-.57-8.38l5.67-2.5"/></svg>
+              </button>
+              <button class="rot-btn cw" title="Rotate +90°">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1 .57-8.38l-5.67-2.5"/></svg>
+              </button>
+            </div>
+          </div>
+        `;
+        card.insertBefore(canvas, card.firstChild);
+
+        card.querySelector('.ccw').addEventListener('click', () => rotateOnePage(i - 1, -90));
+        card.querySelector('.cw').addEventListener('click', () => rotateOnePage(i - 1, 90));
+        pageGrid.appendChild(card);
+      }
+    }
+
+    async function rotateOnePage(pageIndex, delta) {
+      pageRotations[pageIndex] = ((pageRotations[pageIndex] + delta) % 360 + 360) % 360;
+      const pdf = await pdfjsLib.getDocument({ data: pdfArrayBuffer.slice(0) }).promise;
+      const page = await pdf.getPage(pageIndex + 1);
+      const viewport = page.getViewport({ scale: 0.4, rotation: pageRotations[pageIndex] });
+      const card = pageGrid.children[pageIndex];
+      const canvas = card.querySelector('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      await page.render({ canvasContext: ctx, viewport }).promise;
+      const rotBadge = card.querySelector('.rotation-badge');
+      if (rotBadge) rotBadge.remove();
+      if (pageRotations[pageIndex] !== 0) {
+        const badge = document.createElement('span');
+        badge.className = 'rotation-badge';
+        badge.textContent = `${pageRotations[pageIndex]}°`;
+        card.querySelector('.page-num').after(badge);
+      }
+    }
+
+    async function rotateAll(delta) {
+      for (let i = 0; i < totalPages; i++) {
+        pageRotations[i] = ((pageRotations[i] + delta) % 360 + 360) % 360;
+      }
+      const pdf = await pdfjsLib.getDocument({ data: pdfArrayBuffer.slice(0) }).promise;
+      await renderPreviews(pdf);
+    }
+
+    document.getElementById('allCCW').addEventListener('click', () => rotateAll(-90));
+    document.getElementById('allCW').addEventListener('click', () => rotateAll(90));
+    document.getElementById('all180').addEventListener('click', () => rotateAll(180));
+    document.getElementById('resetAll').addEventListener('click', async () => {
+      pageRotations = new Array(totalPages).fill(0);
+      const pdf = await pdfjsLib.getDocument({ data: pdfArrayBuffer.slice(0) }).promise;
+      await renderPreviews(pdf);
+    });
+
+    btnSave.addEventListener('click', async () => {
+      if (!pdfArrayBuffer) return;
+      btnSave.disabled = true;
+      setProgress(10);
+      showStatus('Saving rotated PDF...', '');
+
+      try {
+        const pdfDoc = await PDFLib.PDFDocument.load(pdfArrayBuffer);
+        const pages = pdfDoc.getPages();
+        setProgress(40);
+        pages.forEach((page, i) => {
+          const currentRot = page.getRotation().angle;
+          const newRot = (currentRot + pageRotations[i]) % 360;
+          page.setRotation(PDFLib.degrees(newRot));
+        });
+        setProgress(80);
+        const pdfBytes = await pdfDoc.save();
+        setProgress(100);
+
+        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'DocuCraft_Rotated.pdf';
+        link.click();
+        incrementActionStats();
+        showStatus('PDF saved successfully.', 'status-success');
+      } catch (e) {
+        console.error(e);
+        showStatus('An error occurred while saving the PDF.', 'status-error');
+      } finally {
+        btnSave.disabled = false;
+        setTimeout(() => setProgress(0, true), 1200);
+      }
+    });
+
+    function showStatus(msg, cls) {
+      statusMsg.textContent = msg;
+      statusMsg.className = `status-msg ${cls}`;
+    }
+
+    initializeLogoHoverEngine();
+  </script>
+
+  <script>
+    (function () {
+      const ease = 0.07;
+      let target = window.scrollY, current = window.scrollY, raf = null;
+
+      function hasScrollParent(el) {
+        while (el && el !== document.documentElement) {
+          const s = getComputedStyle(el);
+          if ((s.overflowY === 'auto' || s.overflowY === 'scroll') && el.scrollHeight > el.clientHeight) return true;
+          el = el.parentElement;
+        }
+        return false;
+      }
+
+      window.addEventListener('wheel', (e) => {
+        if (hasScrollParent(e.target)) return;
+        e.preventDefault();
+        let delta = e.deltaY;
+        if (e.deltaMode === 1) delta *= 40;
+        else if (e.deltaMode === 2) delta *= window.innerHeight;
+        target = Math.max(0, Math.min(target + delta * 0.8, document.documentElement.scrollHeight - window.innerHeight));
+        if (!raf) raf = requestAnimationFrame(tick);
+      }, { passive: false });
+
+      function tick() {
+        current += (target - current) * ease;
+        if (Math.abs(target - current) < 0.5) { current = target; raf = null; window.scrollTo(0, current); return; }
+        window.scrollTo(0, current);
+        raf = requestAnimationFrame(tick);
+      }
+
+      window.addEventListener('scroll', () => { if (!raf) { target = window.scrollY; current = window.scrollY; } }, { passive: true });
+    })();
+  </script>
+</body>
+</html>
