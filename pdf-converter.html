@@ -3,12 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DocuCraft - PDF Converter </title>
+  <title>DocuCraft - PDF Converter</title>
+  <meta name="description" content="Convert images and text into PDFs, or extract images and text from PDFs — entirely in your browser. Free, private, no upload required." />
+  <meta name="theme-color" content="#2d5a3d" />
+  <link rel="canonical" href="https://www.docucraft.site/pdf-converter.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="PDF Converter — DocuCraft" />
+  <meta property="og:description" content="Convert to and from PDF in your browser. Free, private, no upload." />
   <link rel="icon" type="image/svg+xml" href="icon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
-  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+  <script defer src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { 
@@ -405,7 +411,9 @@
       logoLink.addEventListener('mouseleave', resetLogoLetters);
     }
 
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+    window.addEventListener('DOMContentLoaded', () => {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+    });
 
     let currentMode = 'toPdf';
     let targetFile = null;
@@ -531,6 +539,7 @@
       a.href = URL.createObjectURL(blob);
       a.download = n;
       a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 60000);
     }
 
     function showStatus(msg, cls) { statusMsg.innerText = msg; statusMsg.className = `status-msg ${cls}`; }

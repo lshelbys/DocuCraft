@@ -3,11 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DocuCraft - Compress PDF </title>
+  <title>DocuCraft - Compress PDF</title>
+  <meta name="description" content="Compress PDF files in your browser to reduce file size while preserving quality. Free, private, no upload required." />
+  <meta name="theme-color" content="#2d5a3d" />
+  <link rel="canonical" href="https://www.docucraft.site/compress-pdf.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Compress PDF — DocuCraft" />
+  <meta property="og:description" content="Reduce PDF file size in your browser. Free, private, no upload." />
   <link rel="icon" type="image/svg+xml" href="icon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
-  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <script defer src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { 
@@ -490,6 +496,7 @@
         link.href = URL.createObjectURL(blob);
         link.download = `${targetFile.name.replace('.pdf', '')}_compressed.pdf`;
         link.click();
+        setTimeout(() => URL.revokeObjectURL(link.href), 60000);
         incrementActionStats();
 
       } catch (error) {
