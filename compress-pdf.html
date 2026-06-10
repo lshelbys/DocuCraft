@@ -20,7 +20,7 @@
       --white: #ffffff; 
       --radius: 10px; 
       --radius-lg: 16px; 
-      --transition: all 0.2s ease;
+      --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       --accent: #2d5a3d;
       --accent-light: #e8f0ea;
       --accent-mid: #4a7c5c;
@@ -36,6 +36,14 @@
     }
 
     html[data-theme="dark"] {
+      --ink: #f7f6f2;
+      --ink-2: #c4c2be;
+      --ink-3: #8a8a84;
+      --surface: #121211;
+      --surface-2: #1c1c1a;
+      --surface-3: #2a2a27;
+      --white: #1a1a18;
+
       --header-bg: rgba(20, 20, 18, 0.45);
       --header-text: #f7f6f2;
       --header-hover: #7ec898;
@@ -96,6 +104,22 @@
       transition: color 0.8s ease-in-out;
       display: inline-block;
     }
+    .header-actions { display: flex; align-items: center; gap: 16px; }
+    .header-btn {
+      background: none;
+      border: none;
+      color: var(--header-icon-color);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: var(--transition);
+    }
+    .header-btn:hover { color: var(--header-hover); transform: scale(1.05); }
+    .header-btn svg { color: inherit; fill: none; stroke: currentColor; }
+    html[data-theme="dark"] .theme-toggle .moon-path { display: none; }
+    html:not([data-theme="dark"]) .theme-toggle .sun-path { display: none; }
     .nav-back {
       text-decoration: none;
       color: var(--header-icon-color);
@@ -181,6 +205,8 @@
       font-size: 14px;
       font-weight: 500;
     }
+    .progress-bar-wrap { height: 4px; background: var(--surface-2); border-radius: 99px; overflow: hidden; margin-top: 20px; display: none; }
+    .progress-bar-fill { height: 100%; background: var(--accent); border-radius: 99px; width: 0%; transition: width 0.3s ease; }
     .btn-compress {
       width: 100%;
       margin-top: 24px;
@@ -255,16 +281,30 @@
         </h1>
       </div>
     </a>
-    <a href="./" class="nav-back">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-      Back to hub
-    </a>
+    <div class="header-actions">
+      <button id="themeToggle" class="header-btn theme-toggle" aria-label="Toggle dark mode">
+        <svg width="22" height="22" viewBox="0 0 24 24">
+          <g class="moon-path"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></g>
+          <g class="sun-path">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </g>
+        </svg>
+      </button>
+      <a href="./" class="nav-back">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Back to hub
+      </a>
+    </div>
   </header>
 
   <main>
     <div class="hero">
-      <h2>Compress PDF Workspace</h2>
-      <p>Optimize resource footprints and shrink down overall file weights securely in real-time.</p>
+      <h2>Compress PDF</h2>
+      <p>Reduce file size while preserving document quality — entirely in your browser.</p>
     </div>
 
     <div class="workspace-card">
@@ -272,7 +312,7 @@
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
         </svg>
-        <p>Drag and drop heavy target PDFs or click to navigate local systems</p>
+        <p>Drag and drop your PDF here, or click to browse</p>
         <input type="file" id="fileInput" accept="application/pdf" />
       </div>
 
@@ -285,14 +325,17 @@
         </div>
       </div>
 
-      <button id="btnCompress" class="btn-compress" disabled>Optimize Linear File Weight</button>
+      <div class="progress-bar-wrap" id="progressWrap">
+        <div class="progress-bar-fill" id="progressFill"></div>
+      </div>
+      <button id="btnCompress" class="btn-compress" disabled>Compress PDF</button>
       <div id="statusMsg" class="status-msg"></div>
 
       <div class="results-box" id="resultsBox">
-        <h4>Optimization Statistics Resolved:</h4>
-        <p id="resOrig">Original Allocation Size: 0 KB</p>
-        <p id="resComp">Optimized Structural Size: 0 KB</p>
-        <p id="resRatio">Total Data Compression: 0% Volume Decrease</p>
+        <h4>Compression Results</h4>
+        <p id="resOrig">Original size: —</p>
+        <p id="resComp">Compressed size: —</p>
+        <p id="resRatio">Reduction: —</p>
       </div>
     </div>
   </main>
@@ -306,6 +349,18 @@
     if (activeTheme === 'dark') {
       document.documentElement.setAttribute('data-theme', 'dark');
     }
+
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (isDark) {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'light');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+      }
+      resetLogoLetters();
+    });
 
     function incrementActionStats() {
       const count = parseInt(localStorage.getItem('docucraft_actions_total_count') || '0');
@@ -352,6 +407,13 @@
     const resOrig = document.getElementById('resOrig');
     const resComp = document.getElementById('resComp');
     const resRatio = document.getElementById('resRatio');
+    const progressWrap = document.getElementById('progressWrap');
+    const progressFill = document.getElementById('progressFill');
+
+    function setProgress(pct, hide = false) {
+      if (hide) { progressWrap.style.display = 'none'; progressFill.style.width = '0%'; }
+      else { progressWrap.style.display = 'block'; progressFill.style.width = `${pct}%`; }
+    }
 
     dropzone.addEventListener('click', () => fileInput.click());
     dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.style.borderColor = 'var(--accent-mid)'; });
@@ -397,28 +459,30 @@
       if (!targetFile) return;
 
       btnCompress.disabled = true;
-      showStatus("Re-indexing binary structure streams...", "ink-2");
+      resultsBox.style.display = 'none';
+      showStatus("Compressing your PDF...", "ink-2");
+      setProgress(20);
 
       try {
         const arrayBuffer = await targetFile.arrayBuffer();
+        setProgress(50);
         const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer, { updateMetadata: false });
-        
-        // Native client engine compaction algorithms
+        setProgress(70);
         const compressedBytes = await pdfDoc.save({ useObjectStreams: true });
-        
+        setProgress(90);
+
         const initialSize = targetFile.size;
         const optimizedSize = compressedBytes.length;
-
         const reductionBytes = initialSize > optimizedSize ? optimizedSize : (initialSize * 0.92);
         const outputBytes = initialSize > optimizedSize ? compressedBytes : new Uint8Array(arrayBuffer);
-
         const savingsPercent = Math.max(0, Math.round(((initialSize - reductionBytes) / initialSize) * 100));
 
-        resOrig.innerText = `Original Allocation Size: ${formatBytes(initialSize)}`;
-        resComp.innerText = `Optimized Structural Size: ${formatBytes(reductionBytes)}`;
-        resRatio.innerText = `Total Data Compression: ${savingsPercent}% Volume Decrease`;
+        resOrig.innerText = `Original size: ${formatBytes(initialSize)}`;
+        resComp.innerText = `Compressed size: ${formatBytes(reductionBytes)}`;
+        resRatio.innerText = `Reduction: ${savingsPercent}%`;
 
-        showStatus("Compression sequence terminated successfully.", "status-success");
+        setProgress(100);
+        showStatus("PDF compressed successfully.", "status-success");
         resultsBox.style.display = 'block';
 
         const blob = new Blob([outputBytes], { type: 'application/pdf' });
@@ -430,12 +494,48 @@
 
       } catch (error) {
         console.error(error);
-        showStatus("An error occurred during structural asset optimization processing.", "status-error");
+        showStatus("An error occurred while compressing. The file may be encrypted or corrupted.", "status-error");
       } finally {
         btnCompress.disabled = false;
+        setTimeout(() => setProgress(0, true), 1200);
       }
     });
     initializeLogoHoverEngine();
+  </script>
+
+  <script>
+    (function () {
+      const ease = 0.07;
+      let target = window.scrollY, current = window.scrollY, raf = null;
+
+      function hasScrollParent(el) {
+        while (el && el !== document.documentElement) {
+          const s = getComputedStyle(el);
+          if ((s.overflowY === 'auto' || s.overflowY === 'scroll') && el.scrollHeight > el.clientHeight) return true;
+          el = el.parentElement;
+        }
+        return false;
+      }
+
+      window.addEventListener('wheel', (e) => {
+        if (hasScrollParent(e.target)) return;
+        e.preventDefault();
+        let delta = e.deltaY;
+        if (e.deltaMode === 1) delta *= 40;
+        else if (e.deltaMode === 2) delta *= window.innerHeight;
+        target = Math.max(0, Math.min(target + delta * 0.8, document.documentElement.scrollHeight - window.innerHeight));
+        if (!raf) raf = requestAnimationFrame(tick);
+      }, { passive: false });
+
+      function tick() {
+        current += (target - current) * ease;
+        if (Math.abs(target - current) < 0.5) { current = target; raf = null; window.scrollTo(0, current); return; }
+        window.scrollTo(0, current);
+        raf = requestAnimationFrame(tick);
+      }
+
+      window.addEventListener('scroll', () => { if (!raf) { target = window.scrollY; current = window.scrollY; } }, { passive: true });
+    })();
   </script>
 </body>
 </html>
