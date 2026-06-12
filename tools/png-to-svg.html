@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DocuCraft - PNG to SVG</title>
+  <meta name="description" content="Vectorize PNG, JPG, or WebP images into scalable SVG files in your browser. Free, private, no upload required." />
+  <meta name="theme-color" content="#2d5a3d" />
+  <link rel="canonical" href="https://www.docucraft.site/tools/png-to-svg.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="PNG to SVG — DocuCraft" />
+  <meta property="og:description" content="Trace raster images into scalable SVG vectors in your browser. Free, private, no upload." />
+  <link rel="icon" type="image/svg+xml" href="../icon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --ink: #1a1a18; --ink-2: #4a4a46; --ink-3: #8a8a84;
+      --surface: #f7f6f2; --surface-2: #eeecea; --surface-3: #e4e2dd;
+      --white: #ffffff; --radius: 10px; --radius-lg: 16px;
+      --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      --accent: #2d5a3d; --accent-light: #e8f0ea; --accent-mid: #4a7c5c;
+      --header-bg: rgba(255,255,255,0.35); --header-text: #1a1a18;
+      --header-hover: #2d5a3d; --header-icon-color: #4a4a46;
+      --header-border: rgba(255,255,255,0.4);
+      --header-shadow: 0 4px 30px rgba(0,0,0,0.05);
+      --header-highlight: rgba(255,255,255,0.9);
+    }
+    html[data-theme="dark"] {
+      --ink: #f7f6f2; --ink-2: #c4c2be; --ink-3: #8a8a84;
+      --surface: #121211; --surface-2: #1c1c1a; --surface-3: #2a2a27; --white: #1a1a18;
+      --header-bg: rgba(20,20,18,0.45); --header-text: #f7f6f2; --header-hover: #7ec898;
+      --header-icon-color: #8a8a84; --header-border: rgba(255,255,255,0.08);
+      --header-shadow: 0 4px 30px rgba(0,0,0,0.3); --header-highlight: rgba(255,255,255,0.06);
+    }
+    body { font-family: 'DM Sans', sans-serif; background-color: var(--surface); color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; }
+    header {
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent 40%), var(--header-bg);
+      padding: 16px 32px; display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 50;
+      backdrop-filter: blur(30px) saturate(200%) brightness(1.1);
+      -webkit-backdrop-filter: blur(30px) saturate(200%) brightness(1.1);
+      box-shadow: var(--header-shadow), inset 0 1px 1px var(--header-highlight), inset 0 -1px 0 rgba(0,0,0,0.05);
+      border-bottom: 1px solid var(--header-border);
+      transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .header-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    header svg { color: #7ec898; flex-shrink: 0; }
+    .header-text h1 { font-family: 'Instrument Serif', serif; font-size: 24px; letter-spacing: -0.01em; display: flex; user-select: none; transition: transform 0.6s cubic-bezier(0.25,1,0.5,1); transform-origin: left center; }
+    .header-logo:hover .header-text h1 { transform: scale(1.1); }
+    .header-text h1 .logo-letter { color: var(--header-text); transition: color 0.8s ease-in-out; display: inline-block; }
+    .header-actions { display: flex; align-items: center; gap: 16px; }
+    .header-btn { background: none; border: none; color: var(--header-icon-color); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; transition: var(--transition); }
+    .header-btn:hover { color: var(--header-hover); transform: scale(1.05); }
+    .header-btn svg { color: inherit; fill: none; stroke: currentColor; }
+    html[data-theme="dark"] .theme-toggle .moon-path { display: none; }
+    html:not([data-theme="dark"]) .theme-toggle .sun-path { display: none; }
+    .nav-back { text-decoration: none; color: var(--header-icon-color); font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 6px; transition: var(--transition); }
+    .nav-back:hover { color: var(--header-hover); transform: translateX(-2px); }
+    main { flex: 1; max-width: 800px; width: 100%; margin: 0 auto; padding: 40px 24px 60px; }
+    .hero { text-align: center; margin-bottom: 32px; }
+    .hero h2 { font-family: 'Instrument Serif', serif; font-size: 42px; font-weight: 400; line-height: 1.1; margin-bottom: 8px; }
+    .hero p { color: var(--ink-2); font-size: 15px; }
+    .workspace-card { background: var(--white); border: 1px solid var(--surface-3); border-radius: var(--radius-lg); padding: 24px; }
+    .dropzone { border: 2px dashed var(--surface-3); border-radius: var(--radius); padding: 40px 20px; text-align: center; cursor: pointer; transition: var(--transition); background: var(--white); }
+    .dropzone:hover, .dropzone:focus { border-color: var(--accent-mid); background: var(--accent-light); outline: none; }
+    .dropzone svg { color: var(--ink-3); margin-bottom: 12px; }
+    .dropzone p { font-size: 14px; color: var(--ink-2); }
+    .dropzone .sub { font-size: 12px; color: var(--ink-3); margin-top: 4px; }
+    .dropzone input { display: none; }
+    .file-row { align-items: center; gap: 12px; padding: 12px; background: var(--surface); border-radius: var(--radius); border: 1px solid var(--surface-3); margin-top: 20px; display: none; }
+    .file-row svg { color: var(--ink-3); flex-shrink: 0; }
+    .file-name { font-size: 14px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .settings-section { margin-top: 20px; display: none; }
+    .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 520px) { .settings-grid { grid-template-columns: 1fr; } }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { font-size: 13px; font-weight: 500; color: var(--ink-2); }
+    .field select { padding: 9px 12px; border: 1px solid var(--surface-3); border-radius: var(--radius); background: var(--surface); color: var(--ink); font-family: 'DM Sans', sans-serif; font-size: 14px; transition: var(--transition); }
+    .field select:focus { outline: none; border-color: var(--accent-mid); }
+    .info-box { margin-top: 16px; padding: 12px 16px; background: var(--accent-light); border: 1px solid var(--accent-mid); border-radius: var(--radius); font-size: 13px; color: var(--accent); display: none; }
+    .result-section { margin-top: 20px; display: none; }
+    .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 560px) { .compare-grid { grid-template-columns: 1fr; } }
+    .compare-label { font-size: 11px; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; text-align: center; }
+    .compare-cell {
+      border: 1px solid var(--surface-3); border-radius: var(--radius);
+      background: conic-gradient(var(--surface-2) 90deg, transparent 90deg 180deg, var(--surface-2) 180deg 270deg, transparent 270deg) 0 0 / 16px 16px;
+      display: flex; align-items: center; justify-content: center; min-height: 180px; padding: 10px; overflow: hidden;
+    }
+    .compare-cell img { max-width: 100%; max-height: 260px; object-fit: contain; display: block; }
+    .progress-label { font-size: 12px; color: var(--ink-3); margin-top: 8px; text-align: center; display: none; }
+    .btn-action { width: 100%; margin-top: 20px; padding: 14px; background: var(--ink); color: var(--white); border: none; border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 14px; cursor: pointer; transition: var(--transition); }
+    .btn-action:hover:not(:disabled) { background: #333330; }
+    .btn-action:disabled { background: var(--surface-2); color: var(--ink-3); cursor: not-allowed; border: 1px solid var(--surface-3); }
+    .btn-secondary { background: var(--accent); }
+    .btn-secondary:hover:not(:disabled) { background: var(--accent-mid); }
+    .status-msg { margin-top: 14px; font-size: 13px; text-align: center; }
+    .status-success { color: var(--accent); font-weight: 500; }
+    .status-error { color: #a33b3b; font-weight: 500; }
+    footer { text-align: center; padding: 20px 24px; font-size: 12px; color: var(--ink-3); border-top: 1px solid var(--surface-3); background: var(--white); margin-top: auto; }
+    footer .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); display: inline-block; margin: 0 6px; vertical-align: middle; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="../#images" class="header-logo">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>
+        <line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/>
+      </svg>
+      <div class="header-text">
+        <h1>
+          <span class="logo-letter">D</span><span class="logo-letter">o</span><span class="logo-letter">c</span>
+          <span class="logo-letter">u</span><span class="logo-letter">C</span><span class="logo-letter">r</span>
+          <span class="logo-letter">a</span><span class="logo-letter">f</span><span class="logo-letter">t</span>
+        </h1>
+      </div>
+    </a>
+    <div class="header-actions">
+      <button id="themeToggle" class="header-btn theme-toggle" aria-label="Toggle dark mode">
+        <svg width="22" height="22" viewBox="0 0 24 24">
+          <g class="moon-path"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></g>
+          <g class="sun-path">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </g>
+        </svg>
+      </button>
+      <a href="../#images" class="nav-back">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Back to hub
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <div class="hero">
+      <h2>PNG to SVG</h2>
+      <p>Vectorize raster images into infinitely scalable SVG files — entirely in your browser.</p>
+    </div>
+
+    <div class="workspace-card">
+      <div class="dropzone" id="dropzone" role="button" tabindex="0" aria-label="Upload image file">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+        </svg>
+        <p>Drag and drop your image here, or click to browse</p>
+        <p class="sub">PNG, JPG, WebP, GIF, or BMP — works best with logos, icons, and flat graphics</p>
+        <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp,image/gif,image/bmp,.png,.jpg,.jpeg,.webp,.gif,.bmp" />
+      </div>
+
+      <div class="file-row" id="fileRow">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <span class="file-name" id="fileNameDisplay">image.png</span>
+      </div>
+
+      <div class="settings-section" id="settingsSection">
+        <div class="settings-grid">
+          <div class="field">
+            <label for="stylePreset">Tracing style</label>
+            <select id="stylePreset">
+              <option value="balanced" selected>Color — balanced</option>
+              <option value="detailed">Color — detailed (more paths)</option>
+              <option value="smoothed">Color — smoothed curves</option>
+              <option value="sharp">Color — sharp edges</option>
+              <option value="posterized">Posterized (few colors)</option>
+              <option value="grayscale">Grayscale</option>
+              <option value="blackwhite">Black &amp; white line art</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="traceSize">Trace resolution</label>
+            <select id="traceSize">
+              <option value="256">256 px — fastest</option>
+              <option value="512" selected>512 px — balanced</option>
+              <option value="1024">1024 px — detailed</option>
+              <option value="2048">2048 px — maximum (slow)</option>
+            </select>
+          </div>
+        </div>
+        <div class="info-box" id="infoBox"></div>
+      </div>
+
+      <div class="result-section" id="resultSection">
+        <div class="compare-grid">
+          <div>
+            <div class="compare-label">Original (raster)</div>
+            <div class="compare-cell"><img id="previewOriginal" alt="Original raster image preview" /></div>
+          </div>
+          <div>
+            <div class="compare-label">Traced (vector)</div>
+            <div class="compare-cell"><img id="previewVector" alt="Traced SVG vector preview" /></div>
+          </div>
+        </div>
+        <button id="btnDownload" class="btn-action btn-secondary">Download SVG</button>
+      </div>
+
+      <div class="progress-label" id="progressLabel"></div>
+      <button id="btnConvert" class="btn-action" disabled>Vectorize Image</button>
+      <div id="statusMsg" class="status-msg"></div>
+    </div>
+  </main>
+
+  <footer>
+    <span class="dot"></span>No sign up required, Free forever<span class="dot"></span>
+  </footer>
+
+  <script>
+    const activeTheme = localStorage.getItem('theme') || 'light';
+    if (activeTheme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (isDark) { document.documentElement.removeAttribute('data-theme'); localStorage.setItem('theme', 'light'); }
+      else { document.documentElement.setAttribute('data-theme', 'dark'); localStorage.setItem('theme', 'dark'); }
+      resetLogoLetters();
+    });
+
+    function incrementActionStats() {
+      const count = parseInt(localStorage.getItem('docucraft_actions_total_count') || '0');
+      localStorage.setItem('docucraft_actions_total_count', count + 1);
+    }
+
+    let activeStaggerTimeouts = [];
+    function resetLogoLetters() {
+      activeStaggerTimeouts.forEach(clearTimeout); activeStaggerTimeouts = [];
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      document.querySelectorAll('.logo-letter').forEach(l => { l.style.color = isDark ? '#f7f6f2' : '#1a1a18'; });
+    }
+    function initializeLogoHoverEngine() {
+      const logoLink = document.querySelector('.header-logo');
+      const letters = document.querySelectorAll('.logo-letter');
+      logoLink.addEventListener('mouseenter', () => {
+        activeStaggerTimeouts.forEach(clearTimeout); activeStaggerTimeouts = [];
+        letters.forEach((letter, index) => {
+          const id = setTimeout(() => { letter.style.color = `hsl(${Math.floor(Math.random()*360)}, 85%, 75%)`; }, index * 120);
+          activeStaggerTimeouts.push(id);
+        });
+      });
+      logoLink.addEventListener('mouseleave', resetLogoLetters);
+    }
+
+    function loadScriptWithFallback(urls) {
+      return urls.reduce((chain, url) => chain.catch(() => new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = url; s.onload = resolve;
+        s.onerror = () => { s.remove(); reject(new Error('Failed to load ' + url)); };
+        document.head.appendChild(s);
+      })), Promise.reject());
+    }
+    const IMAGETRACER_URLS = [
+      'https://cdnjs.cloudflare.com/ajax/libs/imagetracerjs/1.2.6/imagetracer_v1.2.6.min.js',
+      'https://cdn.jsdelivr.net/npm/imagetracerjs@1.2.6/imagetracer_v1.2.6.js',
+      'https://unpkg.com/imagetracerjs@1.2.6/imagetracer_v1.2.6.js'
+    ];
+
+    // ImageTracer built-in presets, plus a custom two-color option for line art.
+    const TRACE_PRESETS = {
+      balanced: 'default',
+      detailed: 'detailed',
+      smoothed: 'smoothed',
+      sharp: 'sharp',
+      posterized: 'posterized2',
+      grayscale: 'grayscale',
+      blackwhite: { colorsampling: 0, numberofcolors: 2, ltres: 1, qtres: 1 }
+    };
+
+    let targetFile = null;
+    let svgResult = null;
+    let originalUrl = null;
+    let vectorUrl = null;
+
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+    const fileRow = document.getElementById('fileRow');
+    const fileNameDisplay = document.getElementById('fileNameDisplay');
+    const settingsSection = document.getElementById('settingsSection');
+    const infoBox = document.getElementById('infoBox');
+    const resultSection = document.getElementById('resultSection');
+    const previewOriginal = document.getElementById('previewOriginal');
+    const previewVector = document.getElementById('previewVector');
+    const btnConvert = document.getElementById('btnConvert');
+    const btnDownload = document.getElementById('btnDownload');
+    const statusMsg = document.getElementById('statusMsg');
+    const progressLabel = document.getElementById('progressLabel');
+
+    function showStatus(msg, cls) { statusMsg.textContent = msg; statusMsg.className = `status-msg ${cls}`; }
+    function formatBytes(bytes) {
+      if (bytes >= 1048576) return (bytes / 1048576).toFixed(2) + ' MB';
+      return (bytes / 1024).toFixed(1) + ' KB';
+    }
+
+    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); } });
+    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.style.borderColor = 'var(--accent-mid)'; });
+    dropzone.addEventListener('dragleave', () => { dropzone.style.borderColor = 'var(--surface-3)'; });
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault(); dropzone.style.borderColor = 'var(--surface-3)';
+      if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
+    });
+    fileInput.addEventListener('change', (e) => { if (e.target.files.length > 0) handleFile(e.target.files[0]); });
+
+    function handleFile(file) {
+      const looksLikeImage = /^image\/(png|jpeg|webp|gif|bmp)$/.test(file.type) || /\.(png|jpe?g|webp|gif|bmp)$/i.test(file.name);
+      if (!looksLikeImage) { showStatus('Please upload a PNG, JPG, WebP, GIF, or BMP image.', 'status-error'); return; }
+      targetFile = file;
+      svgResult = null;
+      resultSection.style.display = 'none';
+      fileNameDisplay.textContent = `${file.name} (${formatBytes(file.size)})`;
+      fileRow.style.display = 'flex';
+      settingsSection.style.display = 'block';
+      infoBox.textContent = 'Tracing works best on logos, icons, and flat graphics. Photographs will trace, but produce large SVG files with a painted look.';
+      infoBox.style.display = 'block';
+      btnConvert.disabled = false;
+      showStatus('', '');
+    }
+
+    function decodeToCanvas(file, maxDim) {
+      return new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => {
+          URL.revokeObjectURL(url);
+          const scale = Math.min(1, maxDim / Math.max(img.naturalWidth, img.naturalHeight));
+          const w = Math.max(1, Math.round(img.naturalWidth * scale));
+          const h = Math.max(1, Math.round(img.naturalHeight * scale));
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          resolve(canvas);
+        };
+        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('This image could not be decoded.')); };
+        img.src = url;
+      });
+    }
+
+    btnConvert.addEventListener('click', async () => {
+      if (!targetFile) return;
+      btnConvert.disabled = true;
+      showStatus('', '');
+      progressLabel.style.display = 'block';
+      progressLabel.textContent = 'Loading tracing engine…';
+
+      try {
+        if (!window.ImageTracer) await loadScriptWithFallback(IMAGETRACER_URLS);
+
+        const maxDim = parseInt(document.getElementById('traceSize').value);
+        const preset = TRACE_PRESETS[document.getElementById('stylePreset').value];
+        progressLabel.textContent = 'Tracing image — this can take a moment…';
+
+        const canvas = await decodeToCanvas(targetFile, maxDim);
+        const imageData = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height);
+
+        // Tracing is synchronous; yield a frame first so the progress label can paint.
+        await new Promise(resolve => setTimeout(resolve, 50));
+        const svgString = ImageTracer.imagedataToSVG(imageData, preset);
+
+        svgResult = svgString;
+        const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+        const pathCount = (svgString.match(/<path/g) || []).length;
+
+        if (originalUrl) URL.revokeObjectURL(originalUrl);
+        if (vectorUrl) URL.revokeObjectURL(vectorUrl);
+        originalUrl = URL.createObjectURL(targetFile);
+        vectorUrl = URL.createObjectURL(svgBlob);
+        previewOriginal.src = originalUrl;
+        previewVector.src = vectorUrl;
+        resultSection.style.display = 'block';
+
+        incrementActionStats();
+        showStatus(`SVG ready — ${formatBytes(svgBlob.size)}, ${pathCount} path${pathCount !== 1 ? 's' : ''}. Adjust the style and re-trace, or download below.`, 'status-success');
+      } catch (err) {
+        console.error(err);
+        showStatus(err.message && err.message.includes('Failed to load') ? 'Could not load the tracing library. Check your connection and try again.' : 'An error occurred while tracing the image.', 'status-error');
+      } finally {
+        btnConvert.disabled = false;
+        progressLabel.style.display = 'none';
+      }
+    });
+
+    btnDownload.addEventListener('click', () => {
+      if (!svgResult) return;
+      const blob = new Blob([svgResult], { type: 'image/svg+xml;charset=utf-8' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = targetFile.name.replace(/\.[^.]+$/, '') + '.svg';
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(link.href), 60000);
+    });
+
+    initializeLogoHoverEngine();
+  </script>
+
+  <script>
+    (function () {
+      const ease = 0.07;
+      let target = window.scrollY, current = window.scrollY, raf = null;
+      function hasScrollParent(el) {
+        while (el && el !== document.documentElement) {
+          const s = getComputedStyle(el);
+          if ((s.overflowY === 'auto' || s.overflowY === 'scroll') && el.scrollHeight > el.clientHeight) return true;
+          el = el.parentElement;
+        }
+        return false;
+      }
+      window.addEventListener('wheel', (e) => {
+        if (hasScrollParent(e.target)) return;
+        e.preventDefault();
+        let delta = e.deltaY;
+        if (e.deltaMode === 1) delta *= 40;
+        else if (e.deltaMode === 2) delta *= window.innerHeight;
+        target = Math.max(0, Math.min(target + delta * 0.8, document.documentElement.scrollHeight - window.innerHeight));
+        if (!raf) raf = requestAnimationFrame(tick);
+      }, { passive: false });
+      function tick() {
+        current += (target - current) * ease;
+        if (Math.abs(target - current) < 0.5) { current = target; raf = null; window.scrollTo(0, current); return; }
+        window.scrollTo(0, current);
+        raf = requestAnimationFrame(tick);
+      }
+      window.addEventListener('scroll', () => { if (!raf) { target = window.scrollY; current = window.scrollY; } }, { passive: true });
+    })();
+  </script>
+</body>
+</html>
