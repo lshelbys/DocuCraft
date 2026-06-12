@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DocuCraft - Crop & Rotate Image</title>
+  <meta name="description" content="Crop images with aspect-ratio presets, rotate in 90° steps, and flip — all in your browser at full resolution. Free, private, no upload required." />
+  <meta name="theme-color" content="#2d5a3d" />
+  <link rel="canonical" href="https://www.docucraft.site/tools/crop-image.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Crop & Rotate Image — DocuCraft" />
+  <meta property="og:description" content="Crop, rotate, and flip images in your browser. Free, private, no upload." />
+  <link rel="icon" type="image/svg+xml" href="../icon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --ink: #1a1a18; --ink-2: #4a4a46; --ink-3: #8a8a84;
+      --surface: #f7f6f2; --surface-2: #eeecea; --surface-3: #e4e2dd;
+      --white: #ffffff; --radius: 10px; --radius-lg: 16px;
+      --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      --accent: #2d5a3d; --accent-light: #e8f0ea; --accent-mid: #4a7c5c;
+      --header-bg: rgba(255,255,255,0.35); --header-text: #1a1a18;
+      --header-hover: #2d5a3d; --header-icon-color: #4a4a46;
+      --header-border: rgba(255,255,255,0.4);
+      --header-shadow: 0 4px 30px rgba(0,0,0,0.05);
+      --header-highlight: rgba(255,255,255,0.9);
+    }
+    html[data-theme="dark"] {
+      --ink: #f7f6f2; --ink-2: #c4c2be; --ink-3: #8a8a84;
+      --surface: #121211; --surface-2: #1c1c1a; --surface-3: #2a2a27; --white: #1a1a18;
+      --header-bg: rgba(20,20,18,0.45); --header-text: #f7f6f2; --header-hover: #7ec898;
+      --header-icon-color: #8a8a84; --header-border: rgba(255,255,255,0.08);
+      --header-shadow: 0 4px 30px rgba(0,0,0,0.3); --header-highlight: rgba(255,255,255,0.06);
+    }
+    body { font-family: 'DM Sans', sans-serif; background-color: var(--surface); color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; }
+    header {
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent 40%), var(--header-bg);
+      padding: 16px 32px; display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 50;
+      backdrop-filter: blur(30px) saturate(200%) brightness(1.1);
+      -webkit-backdrop-filter: blur(30px) saturate(200%) brightness(1.1);
+      box-shadow: var(--header-shadow), inset 0 1px 1px var(--header-highlight), inset 0 -1px 0 rgba(0,0,0,0.05);
+      border-bottom: 1px solid var(--header-border);
+      transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .header-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    header svg { color: #7ec898; flex-shrink: 0; }
+    .header-text h1 { font-family: 'Instrument Serif', serif; font-size: 24px; letter-spacing: -0.01em; display: flex; user-select: none; transition: transform 0.6s cubic-bezier(0.25,1,0.5,1); transform-origin: left center; }
+    .header-logo:hover .header-text h1 { transform: scale(1.1); }
+    .header-text h1 .logo-letter { color: var(--header-text); transition: color 0.8s ease-in-out; display: inline-block; }
+    .header-actions { display: flex; align-items: center; gap: 16px; }
+    .header-btn { background: none; border: none; color: var(--header-icon-color); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; transition: var(--transition); }
+    .header-btn:hover { color: var(--header-hover); transform: scale(1.05); }
+    .header-btn svg { color: inherit; fill: none; stroke: currentColor; }
+    html[data-theme="dark"] .theme-toggle .moon-path { display: none; }
+    html:not([data-theme="dark"]) .theme-toggle .sun-path { display: none; }
+    .nav-back { text-decoration: none; color: var(--header-icon-color); font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 6px; transition: var(--transition); }
+    .nav-back:hover { color: var(--header-hover); transform: translateX(-2px); }
+    main { flex: 1; max-width: 800px; width: 100%; margin: 0 auto; padding: 40px 24px 60px; }
+    .hero { text-align: center; margin-bottom: 32px; }
+    .hero h2 { font-family: 'Instrument Serif', serif; font-size: 42px; font-weight: 400; line-height: 1.1; margin-bottom: 8px; }
+    .hero p { color: var(--ink-2); font-size: 15px; }
+    .workspace-card { background: var(--white); border: 1px solid var(--surface-3); border-radius: var(--radius-lg); padding: 24px; }
+    .dropzone { border: 2px dashed var(--surface-3); border-radius: var(--radius); padding: 40px 20px; text-align: center; cursor: pointer; transition: var(--transition); background: var(--white); }
+    .dropzone:hover, .dropzone:focus { border-color: var(--accent-mid); background: var(--accent-light); outline: none; }
+    .dropzone svg { color: var(--ink-3); margin-bottom: 12px; }
+    .dropzone p { font-size: 14px; color: var(--ink-2); }
+    .dropzone .sub { font-size: 12px; color: var(--ink-3); margin-top: 4px; }
+    .dropzone input { display: none; }
+    .file-row { align-items: center; gap: 12px; padding: 12px; background: var(--surface); border-radius: var(--radius); border: 1px solid var(--surface-3); margin-top: 20px; display: none; }
+    .file-row svg { color: var(--ink-3); flex-shrink: 0; }
+    .file-name { font-size: 14px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .file-list { margin-top: 20px; display: none; flex-direction: column; gap: 8px; }
+    .file-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: var(--surface); border: 1px solid var(--surface-3); border-radius: var(--radius); }
+    .file-item svg { color: var(--ink-3); flex-shrink: 0; }
+    .f-name { font-size: 13px; font-weight: 500; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+    .f-meta { font-size: 12px; color: var(--ink-3); white-space: nowrap; }
+    .f-status { font-size: 12px; font-weight: 600; white-space: nowrap; }
+    .f-status.ok { color: var(--accent); }
+    .f-status.err { color: #a33b3b; }
+    .f-remove { background: none; border: none; color: var(--ink-3); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 50%; transition: var(--transition); flex-shrink: 0; }
+    .f-remove:hover { color: #a33b3b; background: var(--surface-2); }
+    .settings-section { margin-top: 20px; display: none; }
+    .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 520px) { .settings-grid { grid-template-columns: 1fr; } }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { font-size: 13px; font-weight: 500; color: var(--ink-2); }
+    .field select, .field input[type="number"], .field input[type="text"] { padding: 9px 12px; border: 1px solid var(--surface-3); border-radius: var(--radius); background: var(--surface); color: var(--ink); font-family: 'DM Sans', sans-serif; font-size: 14px; transition: var(--transition); }
+    .field select:focus, .field input[type="number"]:focus, .field input[type="text"]:focus { outline: none; border-color: var(--accent-mid); }
+    .field input[type="range"] { width: 100%; accent-color: var(--accent); cursor: pointer; }
+    .field input[type="color"] { width: 100%; height: 38px; padding: 4px; border: 1px solid var(--surface-3); border-radius: var(--radius); background: var(--surface); cursor: pointer; }
+    .range-value { font-size: 12px; color: var(--ink-3); font-weight: 500; }
+    .checkbox-field { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: var(--ink-2); cursor: pointer; user-select: none; }
+    .checkbox-field input { accent-color: var(--accent); margin: 0; cursor: pointer; }
+    .info-box { margin-top: 16px; padding: 12px 16px; background: var(--accent-light); border: 1px solid var(--accent-mid); border-radius: var(--radius); font-size: 13px; color: var(--accent); display: none; }
+    .warn-box { margin-top: 16px; padding: 12px 16px; background: #fdf0ef; border: 1px solid #d9a09a; border-radius: var(--radius); font-size: 13px; color: #a33b3b; display: none; }
+    html[data-theme="dark"] .warn-box { background: #2a1c1a; border-color: #6b3a35; color: #e09a93; }
+    .progress-bar-wrap { height: 4px; background: var(--surface-2); border-radius: 99px; overflow: hidden; margin-top: 20px; display: none; }
+    .progress-bar-fill { height: 100%; background: var(--accent); border-radius: 99px; width: 0%; transition: width 0.3s ease; }
+    .progress-label { font-size: 12px; color: var(--ink-3); margin-top: 8px; text-align: center; display: none; }
+    .btn-action { width: 100%; margin-top: 20px; padding: 14px; background: var(--ink); color: var(--white); border: none; border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 14px; cursor: pointer; transition: var(--transition); }
+    .btn-action:hover:not(:disabled) { background: #333330; }
+    .btn-action:disabled { background: var(--surface-2); color: var(--ink-3); cursor: not-allowed; border: 1px solid var(--surface-3); }
+    .btn-secondary { background: var(--accent); }
+    .btn-secondary:hover:not(:disabled) { background: var(--accent-mid); }
+    .checker { background: conic-gradient(var(--surface-2) 90deg, transparent 90deg 180deg, var(--surface-2) 180deg 270deg, transparent 270deg) 0 0 / 16px 16px; }
+    .status-msg { margin-top: 14px; font-size: 13px; text-align: center; }
+    .status-success { color: var(--accent); font-weight: 500; }
+    .status-error { color: #a33b3b; font-weight: 500; }
+    footer { text-align: center; padding: 20px 24px; font-size: 12px; color: var(--ink-3); border-top: 1px solid var(--surface-3); background: var(--white); margin-top: auto; }
+    footer .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); display: inline-block; margin: 0 6px; vertical-align: middle; }
+    .toolbar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px; margin-top: 20px; }
+    .toolbar .field { flex: 1; min-width: 150px; }
+    .tool-btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 12px; border: 1px solid var(--surface-3); border-radius: var(--radius); background: var(--surface); color: var(--ink-2); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: var(--transition); }
+    .tool-btn:hover { border-color: var(--accent-mid); color: var(--accent); background: var(--accent-light); }
+    .tool-btn svg { stroke: currentColor; fill: none; }
+    /* The 10px gutter keeps crop handles clickable when the crop box sits flush against the image edge. */
+    .editor-stage { position: relative; margin: 20px auto 0; padding: 10px; border: 1px solid var(--surface-3); border-radius: var(--radius); overflow: hidden; touch-action: none; width: max-content; max-width: 100%; }
+    .editor-stage canvas { display: block; max-width: 100%; }
+    .crop-box { position: absolute; border: 1.5px solid #ffffff; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.45); cursor: move; }
+    .crop-box::before, .crop-box::after { content: ''; position: absolute; pointer-events: none; opacity: 0.5; }
+    .crop-box::before { top: 33.33%; bottom: 33.33%; left: 0; right: 0; border-top: 1px solid #fff; border-bottom: 1px solid #fff; }
+    .crop-box::after { left: 33.33%; right: 33.33%; top: 0; bottom: 0; border-left: 1px solid #fff; border-right: 1px solid #fff; }
+    .crop-handle { position: absolute; width: 14px; height: 14px; background: #ffffff; border: 2px solid var(--accent-mid); border-radius: 3px; z-index: 5; }
+    .crop-handle[data-h="nw"] { top: -8px; left: -8px; cursor: nwse-resize; }
+    .crop-handle[data-h="n"]  { top: -8px; left: calc(50% - 7px); cursor: ns-resize; }
+    .crop-handle[data-h="ne"] { top: -8px; right: -8px; cursor: nesw-resize; }
+    .crop-handle[data-h="e"]  { top: calc(50% - 7px); right: -8px; cursor: ew-resize; }
+    .crop-handle[data-h="se"] { bottom: -8px; right: -8px; cursor: nwse-resize; }
+    .crop-handle[data-h="s"]  { bottom: -8px; left: calc(50% - 7px); cursor: ns-resize; }
+    .crop-handle[data-h="sw"] { bottom: -8px; left: -8px; cursor: nesw-resize; }
+    .crop-handle[data-h="w"]  { top: calc(50% - 7px); left: -8px; cursor: ew-resize; }
+    .crop-meta { margin-top: 10px; font-size: 12px; color: var(--ink-3); text-align: center; font-weight: 500; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="../#images" class="header-logo">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>
+        <line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/>
+      </svg>
+      <div class="header-text">
+        <h1>
+          <span class="logo-letter">D</span><span class="logo-letter">o</span><span class="logo-letter">c</span>
+          <span class="logo-letter">u</span><span class="logo-letter">C</span><span class="logo-letter">r</span>
+          <span class="logo-letter">a</span><span class="logo-letter">f</span><span class="logo-letter">t</span>
+        </h1>
+      </div>
+    </a>
+    <div class="header-actions">
+      <button id="themeToggle" class="header-btn theme-toggle" aria-label="Toggle dark mode">
+        <svg width="22" height="22" viewBox="0 0 24 24">
+          <g class="moon-path"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></g>
+          <g class="sun-path">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </g>
+        </svg>
+      </button>
+      <a href="../#images" class="nav-back">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Back to hub
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <div class="hero">
+      <h2>Crop &amp; Rotate</h2>
+      <p>Crop with aspect-ratio presets, rotate, and flip — then export at full resolution, entirely in your browser.</p>
+    </div>
+
+    <div class="workspace-card">
+      <div class="dropzone" id="dropzone" role="button" tabindex="0" aria-label="Upload image file">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+        </svg>
+        <p>Drag and drop your image here, or click to browse</p>
+        <p class="sub">PNG, JPG, WebP, GIF, or BMP</p>
+        <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp,image/gif,image/bmp,.png,.jpg,.jpeg,.webp,.gif,.bmp" />
+      </div>
+
+      <div class="settings-section" id="editorSection">
+        <div class="toolbar">
+          <div class="field">
+            <label for="aspectSelect">Aspect ratio</label>
+            <select id="aspectSelect">
+              <option value="0" selected>Free</option>
+              <option value="1">Square 1:1</option>
+              <option value="1.3333">4:3</option>
+              <option value="1.5">3:2</option>
+              <option value="1.7778">16:9</option>
+              <option value="0.5625">9:16 (portrait)</option>
+            </select>
+          </div>
+          <button class="tool-btn" id="btnRotL" type="button" title="Rotate 90° left">
+            <svg width="14" height="14" viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 2v6h6M2.66 15.57a10 10 0 1 0 .57-8.38"/></svg>
+            Rotate
+          </button>
+          <button class="tool-btn" id="btnRotR" type="button" title="Rotate 90° right">
+            <svg width="14" height="14" viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38"/></svg>
+            Rotate
+          </button>
+          <button class="tool-btn" id="btnFlipH" type="button" title="Flip horizontally">
+            <svg width="14" height="14" viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="22" stroke-dasharray="3 3"/><polyline points="8 7 3 12 8 17"/><polyline points="16 7 21 12 16 17"/></svg>
+            Flip
+          </button>
+          <button class="tool-btn" id="btnFlipV" type="button" title="Flip vertically">
+            <svg width="14" height="14" viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="2" y1="12" x2="22" y2="12" stroke-dasharray="3 3"/><polyline points="7 8 12 3 17 8"/><polyline points="7 16 12 21 17 16"/></svg>
+            Flip
+          </button>
+          <button class="tool-btn" id="btnReset" type="button" title="Reset edits">Reset</button>
+        </div>
+
+        <div class="editor-stage checker" id="editorStage">
+          <canvas id="editCanvas"></canvas>
+          <div class="crop-box" id="cropBox">
+            <div class="crop-handle" data-h="nw"></div><div class="crop-handle" data-h="n"></div>
+            <div class="crop-handle" data-h="ne"></div><div class="crop-handle" data-h="e"></div>
+            <div class="crop-handle" data-h="se"></div><div class="crop-handle" data-h="s"></div>
+            <div class="crop-handle" data-h="sw"></div><div class="crop-handle" data-h="w"></div>
+          </div>
+        </div>
+        <div class="crop-meta" id="cropMeta">Crop: — × — px</div>
+
+        <div class="settings-grid" style="margin-top:16px;">
+          <div class="field">
+            <label for="outFormat">Output format</label>
+            <select id="outFormat">
+              <option value="image/png" selected>PNG (lossless)</option>
+              <option value="image/jpeg">JPG (smaller files)</option>
+              <option value="image/webp">WebP (modern, small &amp; sharp)</option>
+            </select>
+          </div>
+        </div>
+
+        <button id="btnDownload" class="btn-action">Download Cropped Image</button>
+        <div id="statusMsg" class="status-msg"></div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <span class="dot"></span>No sign up required, Free forever<span class="dot"></span>
+  </footer>
+
+  <script>
+    const activeTheme = localStorage.getItem('theme') || 'light';
+    if (activeTheme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (isDark) { document.documentElement.removeAttribute('data-theme'); localStorage.setItem('theme', 'light'); }
+      else { document.documentElement.setAttribute('data-theme', 'dark'); localStorage.setItem('theme', 'dark'); }
+      resetLogoLetters();
+    });
+
+    function incrementActionStats() {
+      const count = parseInt(localStorage.getItem('docucraft_actions_total_count') || '0');
+      localStorage.setItem('docucraft_actions_total_count', count + 1);
+    }
+
+    let activeStaggerTimeouts = [];
+    function resetLogoLetters() {
+      activeStaggerTimeouts.forEach(clearTimeout); activeStaggerTimeouts = [];
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      document.querySelectorAll('.logo-letter').forEach(l => { l.style.color = isDark ? '#f7f6f2' : '#1a1a18'; });
+    }
+    function initializeLogoHoverEngine() {
+      const logoLink = document.querySelector('.header-logo');
+      const letters = document.querySelectorAll('.logo-letter');
+      logoLink.addEventListener('mouseenter', () => {
+        activeStaggerTimeouts.forEach(clearTimeout); activeStaggerTimeouts = [];
+        letters.forEach((letter, index) => {
+          const id = setTimeout(() => { letter.style.color = `hsl(${Math.floor(Math.random()*360)}, 85%, 75%)`; }, index * 120);
+          activeStaggerTimeouts.push(id);
+        });
+      });
+      logoLink.addEventListener('mouseleave', resetLogoLetters);
+    }
+
+    function loadScriptWithFallback(urls) {
+      return urls.reduce((chain, url) => chain.catch(() => new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = url; s.onload = resolve;
+        s.onerror = () => { s.remove(); reject(new Error('Failed to load ' + url)); };
+        document.head.appendChild(s);
+      })), Promise.reject());
+    }
+    const JSZIP_URLS = [
+      'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js',
+      'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js',
+      'https://unpkg.com/jszip@3.10.1/dist/jszip.min.js'
+    ];
+
+    function formatBytes(bytes) {
+      if (bytes >= 1048576) return (bytes / 1048576).toFixed(2) + ' MB';
+      return (bytes / 1024).toFixed(1) + ' KB';
+    }
+    function downloadBlob(blob, name) {
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = name;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(link.href), 60000);
+    }
+    async function packageZip(results, zipName) {
+      if (!window.JSZip) await loadScriptWithFallback(JSZIP_URLS);
+      const zip = new JSZip();
+      const usedNames = {};
+      for (const r of results) {
+        let name = r.name;
+        if (usedNames[name] !== undefined) {
+          usedNames[name]++;
+          name = name.replace(/(\.[^.]+)$/, `_${usedNames[name]}$1`);
+        } else { usedNames[name] = 0; }
+        zip.file(name, await r.blob.arrayBuffer());
+      }
+      return zip.generateAsync({ type: 'blob' });
+    }
+
+    const SUPPORTS_WEBP_ENCODE = (() => {
+      try { return document.createElement('canvas').toDataURL('image/webp').indexOf('data:image/webp') === 0; }
+      catch (e) { return false; }
+    })();
+
+    const MAX_STAGE_W = 720, MAX_STAGE_H = 460, MIN_CROP = 24;
+
+    let sourceImage = null;
+    let targetFile = null;
+    let rotation = 0;          // 0 | 90 | 180 | 270
+    let flipH = false, flipV = false;
+    let displayScale = 1;
+    let crop = { x: 0, y: 0, w: 0, h: 0 }; // in display-canvas pixels
+
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+    const editorSection = document.getElementById('editorSection');
+    const editorStage = document.getElementById('editorStage');
+    const editCanvas = document.getElementById('editCanvas');
+    const cropBox = document.getElementById('cropBox');
+    const cropMeta = document.getElementById('cropMeta');
+    const aspectSelect = document.getElementById('aspectSelect');
+    const outFormat = document.getElementById('outFormat');
+    const btnDownload = document.getElementById('btnDownload');
+    const statusMsg = document.getElementById('statusMsg');
+
+    if (!SUPPORTS_WEBP_ENCODE) {
+      const webpOption = outFormat.querySelector('option[value="image/webp"]');
+      webpOption.disabled = true;
+      webpOption.textContent = 'WebP (not supported by this browser)';
+    }
+
+    function showStatus(msg, cls) { statusMsg.textContent = msg; statusMsg.className = `status-msg ${cls}`; }
+
+    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); } });
+    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.style.borderColor = 'var(--accent-mid)'; });
+    dropzone.addEventListener('dragleave', () => { dropzone.style.borderColor = 'var(--surface-3)'; });
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault(); dropzone.style.borderColor = 'var(--surface-3)';
+      if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
+    });
+    fileInput.addEventListener('change', (e) => { if (e.target.files.length > 0) handleFile(e.target.files[0]); });
+
+    function handleFile(file) {
+      const looksLikeImage = /^image\/(png|jpeg|webp|gif|bmp)$/.test(file.type) || /\.(png|jpe?g|webp|gif|bmp)$/i.test(file.name);
+      if (!looksLikeImage) { showStatus('Please upload a PNG, JPG, WebP, GIF, or BMP image.', 'status-error'); return; }
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        sourceImage = img;
+        targetFile = file;
+        rotation = 0; flipH = false; flipV = false;
+        editorSection.style.display = 'block';
+        renderEditor(true);
+        showStatus('', '');
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); showStatus('This image could not be decoded.', 'status-error'); };
+      img.src = url;
+    }
+
+    function orientedSize() {
+      const swap = rotation === 90 || rotation === 270;
+      return {
+        w: swap ? sourceImage.naturalHeight : sourceImage.naturalWidth,
+        h: swap ? sourceImage.naturalWidth : sourceImage.naturalHeight
+      };
+    }
+
+    function drawOriented(ctx, scale) {
+      const iw = sourceImage.naturalWidth, ih = sourceImage.naturalHeight;
+      const { w, h } = orientedSize();
+      ctx.save();
+      ctx.translate(w * scale / 2, h * scale / 2);
+      ctx.rotate(rotation * Math.PI / 180);
+      ctx.scale(flipH ? -1 : 1, flipV ? -1 : 1);
+      ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(sourceImage, -iw * scale / 2, -ih * scale / 2, iw * scale, ih * scale);
+      ctx.restore();
+    }
+
+    function renderEditor(resetCrop) {
+      const { w, h } = orientedSize();
+      displayScale = Math.min(MAX_STAGE_W / w, MAX_STAGE_H / h, 1);
+      editCanvas.width = Math.max(1, Math.round(w * displayScale));
+      editCanvas.height = Math.max(1, Math.round(h * displayScale));
+      drawOriented(editCanvas.getContext('2d'), displayScale);
+      if (resetCrop) crop = { x: 0, y: 0, w: editCanvas.width, h: editCanvas.height };
+      clampCrop();
+      syncCropBox();
+    }
+
+    function clampCrop() {
+      crop.w = Math.min(crop.w, editCanvas.width);
+      crop.h = Math.min(crop.h, editCanvas.height);
+      crop.x = Math.min(Math.max(0, crop.x), editCanvas.width - crop.w);
+      crop.y = Math.min(Math.max(0, crop.y), editCanvas.height - crop.h);
+    }
+
+    function syncCropBox() {
+      // The canvas may be CSS-shrunk on small screens; position the overlay in on-screen pixels,
+      // offset by the canvas position inside the padded stage.
+      const cssScale = editCanvas.clientWidth > 0 ? editCanvas.clientWidth / editCanvas.width : 1;
+      cropBox.style.left = (editCanvas.offsetLeft + crop.x * cssScale) + 'px';
+      cropBox.style.top = (editCanvas.offsetTop + crop.y * cssScale) + 'px';
+      cropBox.style.width = (crop.w * cssScale) + 'px';
+      cropBox.style.height = (crop.h * cssScale) + 'px';
+      const ow = Math.max(1, Math.round(crop.w / displayScale));
+      const oh = Math.max(1, Math.round(crop.h / displayScale));
+      cropMeta.textContent = `Crop: ${ow} × ${oh} px`;
+    }
+
+    function currentAspect() { return parseFloat(aspectSelect.value) || 0; }
+
+    function applyAspectPreset() {
+      const ar = currentAspect();
+      if (!ar) { syncCropBox(); return; }
+      let w = editCanvas.width, h = w / ar;
+      if (h > editCanvas.height) { h = editCanvas.height; w = h * ar; }
+      crop = {
+        x: (editCanvas.width - w) / 2,
+        y: (editCanvas.height - h) / 2,
+        w, h
+      };
+      clampCrop();
+      syncCropBox();
+    }
+
+    aspectSelect.addEventListener('change', applyAspectPreset);
+    document.getElementById('btnRotL').addEventListener('click', () => { rotation = (rotation + 270) % 360; renderEditor(true); applyAspectPreset(); });
+    document.getElementById('btnRotR').addEventListener('click', () => { rotation = (rotation + 90) % 360; renderEditor(true); applyAspectPreset(); });
+    document.getElementById('btnFlipH').addEventListener('click', () => { flipH = !flipH; renderEditor(false); });
+    document.getElementById('btnFlipV').addEventListener('click', () => { flipV = !flipV; renderEditor(false); });
+    document.getElementById('btnReset').addEventListener('click', () => {
+      rotation = 0; flipH = false; flipV = false;
+      aspectSelect.value = '0';
+      renderEditor(true);
+    });
+    window.addEventListener('resize', () => { if (sourceImage) syncCropBox(); });
+
+    // ---- pointer interaction (move + 8-handle resize) ----
+    let drag = null;
+
+    function stagePoint(e) {
+      const rect = editCanvas.getBoundingClientRect();
+      const cssScale = rect.width > 0 ? editCanvas.width / rect.width : 1;
+      return { x: (e.clientX - rect.left) * cssScale, y: (e.clientY - rect.top) * cssScale };
+    }
+
+    cropBox.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      const handle = e.target.closest('.crop-handle');
+      const p = stagePoint(e);
+      drag = handle
+        ? { kind: 'resize', h: handle.dataset.h, start: { ...crop }, px: p.x, py: p.y }
+        : { kind: 'move', start: { ...crop }, px: p.x, py: p.y };
+      cropBox.setPointerCapture(e.pointerId);
+    });
+
+    cropBox.addEventListener('pointermove', (e) => {
+      if (!drag) return;
+      const p = stagePoint(e);
+      const dx = p.x - drag.px, dy = p.y - drag.py;
+      const s = drag.start;
+      const ar = currentAspect();
+
+      if (drag.kind === 'move') {
+        crop.x = s.x + dx; crop.y = s.y + dy;
+        clampCrop(); syncCropBox();
+        return;
+      }
+
+      let { x, y, w, h } = s;
+      const hd = drag.h;
+      if (hd.includes('e')) w = s.w + dx;
+      if (hd.includes('s')) h = s.h + dy;
+      if (hd.includes('w')) { x = s.x + dx; w = s.w - dx; }
+      if (hd.includes('n')) { y = s.y + dy; h = s.h - dy; }
+
+      if (ar) {
+        if (hd === 'n' || hd === 's') { w = h * ar; }
+        else { h = w / ar; if (hd.includes('n')) y = s.y + s.h - h; }
+      }
+
+      if (w < MIN_CROP) { if (hd.includes('w')) x -= MIN_CROP - w; w = MIN_CROP; if (ar) h = w / ar; }
+      if (h < MIN_CROP) { if (hd.includes('n')) y -= MIN_CROP - h; h = MIN_CROP; if (ar) w = h * ar; }
+
+      // keep inside the canvas
+      if (x < 0) { w += x; x = 0; if (ar) h = w / ar; }
+      if (y < 0) { h += y; y = 0; if (ar) w = h * ar; }
+      if (x + w > editCanvas.width) { w = editCanvas.width - x; if (ar) h = w / ar; }
+      if (y + h > editCanvas.height) { h = editCanvas.height - y; if (ar) w = h * ar; }
+
+      crop = { x, y, w: Math.max(MIN_CROP, w), h: Math.max(MIN_CROP, h) };
+      clampCrop(); syncCropBox();
+    });
+
+    const endDrag = () => { drag = null; };
+    cropBox.addEventListener('pointerup', endDrag);
+    cropBox.addEventListener('pointercancel', endDrag);
+
+    // ---- export at full resolution ----
+    btnDownload.addEventListener('click', async () => {
+      if (!sourceImage) return;
+      btnDownload.disabled = true;
+      showStatus('Exporting…', '');
+      try {
+        const { w, h } = orientedSize();
+        const full = document.createElement('canvas');
+        full.width = w; full.height = h;
+        drawOriented(full.getContext('2d'), 1);
+
+        const sx = Math.round(crop.x / displayScale);
+        const sy = Math.round(crop.y / displayScale);
+        const sw = Math.max(1, Math.min(w - sx, Math.round(crop.w / displayScale)));
+        const sh = Math.max(1, Math.min(h - sy, Math.round(crop.h / displayScale)));
+
+        const out = document.createElement('canvas');
+        out.width = sw; out.height = sh;
+        const ctx = out.getContext('2d');
+        const mimeType = outFormat.value;
+        if (mimeType === 'image/jpeg') { ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, sw, sh); }
+        ctx.drawImage(full, sx, sy, sw, sh, 0, 0, sw, sh);
+
+        const blob = await new Promise(resolve => out.toBlob(resolve, mimeType, mimeType === 'image/png' ? undefined : 0.92));
+        if (!blob) throw new Error('Encoding failed.');
+        const ext = mimeType === 'image/jpeg' ? 'jpg' : mimeType === 'image/webp' ? 'webp' : 'png';
+        downloadBlob(blob, targetFile.name.replace(/\.[^.]+$/, '') + '_cropped.' + ext);
+        incrementActionStats();
+        showStatus(`Exported ${sw} × ${sh} px ${ext.toUpperCase()} (${formatBytes(blob.size)}).`, 'status-success');
+      } catch (err) {
+        console.error(err);
+        showStatus('An error occurred while exporting the crop.', 'status-error');
+      } finally {
+        btnDownload.disabled = false;
+      }
+    });
+
+    initializeLogoHoverEngine();
+  </script>
+
+  <script>
+    (function () {
+      const ease = 0.07;
+      let target = window.scrollY, current = window.scrollY, raf = null;
+      function hasScrollParent(el) {
+        while (el && el !== document.documentElement) {
+          const s = getComputedStyle(el);
+          if ((s.overflowY === 'auto' || s.overflowY === 'scroll') && el.scrollHeight > el.clientHeight) return true;
+          el = el.parentElement;
+        }
+        return false;
+      }
+      window.addEventListener('wheel', (e) => {
+        if (hasScrollParent(e.target)) return;
+        e.preventDefault();
+        let delta = e.deltaY;
+        if (e.deltaMode === 1) delta *= 40;
+        else if (e.deltaMode === 2) delta *= window.innerHeight;
+        target = Math.max(0, Math.min(target + delta * 0.8, document.documentElement.scrollHeight - window.innerHeight));
+        if (!raf) raf = requestAnimationFrame(tick);
+      }, { passive: false });
+      function tick() {
+        current += (target - current) * ease;
+        if (Math.abs(target - current) < 0.5) { current = target; raf = null; window.scrollTo(0, current); return; }
+        window.scrollTo(0, current);
+        raf = requestAnimationFrame(tick);
+      }
+      window.addEventListener('scroll', () => { if (!raf) { target = window.scrollY; current = window.scrollY; } }, { passive: true });
+    })();
+  </script>
+</body>
+</html>

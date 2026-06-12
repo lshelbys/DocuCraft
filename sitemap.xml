@@ -16,4 +16,14 @@
   <url><loc>https://www.docucraft.site/tools/svg-to-png.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://www.docucraft.site/tools/heic-to-jpg.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://www.docucraft.site/tools/png-to-ico.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.docucraft.site/tools/resize-image.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.docucraft.site/tools/compress-image.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.docucraft.site/tools/crop-image.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.docucraft.site/tools/exif-remover.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.docucraft.site/tools/watermark-image.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.docucraft.site/tools/redact-image.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.docucraft.site/tools/background-remover.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.docucraft.site/tools/palette-extractor.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.docucraft.site/tools/gif-frames.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.docucraft.site/tools/image-to-base64.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
 </urlset>
