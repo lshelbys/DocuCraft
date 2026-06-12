@@ -1,6 +1,6 @@
 # DocuCraft
 
-DocuCraft is an all-in-one, privacy-focused platform designed to streamline your document workflow. Built to be entirely frictionless, it allows users to manage, convert, and manipulate PDF documents completely free of charge, with no sign-ups, no ads, and zero hassle.
+DocuCraft is an all-in-one, privacy-focused platform designed to streamline your document workflow. Built to be entirely frictionless, it allows users to manage, convert, and manipulate PDF documents and images completely free of charge, with no sign-ups, no ads, and zero hassle.
 
 Live Demo: https://lshelbys.github.io/DocuCraft/
 
@@ -14,6 +14,16 @@ DocuCraft comes packed with essential tools to handle everyday document tasks se
 * **📉 Compress PDF:** Optimize and shrink overall file sizes for easier sharing while maintaining high structural visual resolution.
 * **🔄 PDF Converter:** Transform external files into high-quality PDFs, or instantly extract high-resolution image layers and raw text elements from existing PDF documents.
 * **🛡️ Privacy Inspector:** Track your local activity and verify that zero data is transmitted to external servers.
+
+### 🖼️ Image Utilities
+
+A dedicated tab of image conversion tools, all running entirely in your browser:
+
+* **🔁 Image Converter:** Convert PNG, JPG, WebP, GIF, BMP, and AVIF images to any format — in bulk, with quality control.
+* **✒️ PNG to SVG:** Vectorize raster graphics into infinitely scalable SVG files with tunable tracing styles.
+* **🧩 SVG to PNG:** Rasterize SVG vector files into crisp PNG, JPG, or WebP images at any resolution.
+* **📱 HEIC to JPG:** Convert iPhone HEIC photos into universally supported JPG or PNG files, individually or in batches.
+* **🌐 PNG to ICO:** Bundle any image into a multi-size favicon.ico (16 px to 256 px) for your website.
 
 ## 🌟 Key Highlights
 
