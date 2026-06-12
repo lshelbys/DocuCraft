@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DocuCraft - Palette Extractor</title>
+  <meta name="description" content="Extract the dominant colors from any image as HEX and RGB codes, in your browser. Free, private, no upload required." />
+  <meta name="theme-color" content="#2d5a3d" />
+  <link rel="canonical" href="https://www.docucraft.site/tools/palette-extractor.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Palette Extractor — DocuCraft" />
+  <meta property="og:description" content="Extract dominant color palettes from images in your browser. Free, private, no upload." />
+  <link rel="icon" type="image/svg+xml" href="../icon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --ink: #1a1a18; --ink-2: #4a4a46; --ink-3: #8a8a84;
+      --surface: #f7f6f2; --surface-2: #eeecea; --surface-3: #e4e2dd;
+      --white: #ffffff; --radius: 10px; --radius-lg: 16px;
+      --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      --accent: #2d5a3d; --accent-light: #e8f0ea; --accent-mid: #4a7c5c;
+      --header-bg: rgba(255,255,255,0.35); --header-text: #1a1a18;
+      --header-hover: #2d5a3d; --header-icon-color: #4a4a46;
+      --header-border: rgba(255,255,255,0.4);
+      --header-shadow: 0 4px 30px rgba(0,0,0,0.05);
+      --header-highlight: rgba(255,255,255,0.9);
+    }
+    html[data-theme="dark"] {
+      --ink: #f7f6f2; --ink-2: #c4c2be; --ink-3: #8a8a84;
+      --surface: #121211; --surface-2: #1c1c1a; --surface-3: #2a2a27; --white: #1a1a18;
+      --header-bg: rgba(20,20,18,0.45); --header-text: #f7f6f2; --header-hover: #7ec898;
+      --header-icon-color: #8a8a84; --header-border: rgba(255,255,255,0.08);
+      --header-shadow: 0 4px 30px rgba(0,0,0,0.3); --header-highlight: rgba(255,255,255,0.06);
+    }
+    body { font-family: 'DM Sans', sans-serif; background-color: var(--surface); color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; }
+    header {
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent 40%), var(--header-bg);
+      padding: 16px 32px; display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 50;
+      backdrop-filter: blur(30px) saturate(200%) brightness(1.1);
+      -webkit-backdrop-filter: blur(30px) saturate(200%) brightness(1.1);
+      box-shadow: var(--header-shadow), inset 0 1px 1px var(--header-highlight), inset 0 -1px 0 rgba(0,0,0,0.05);
+      border-bottom: 1px solid var(--header-border);
+      transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .header-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    header svg { color: #7ec898; flex-shrink: 0; }
+    .header-text h1 { font-family: 'Instrument Serif', serif; font-size: 24px; letter-spacing: -0.01em; display: flex; user-select: none; transition: transform 0.6s cubic-bezier(0.25,1,0.5,1); transform-origin: left center; }
+    .header-logo:hover .header-text h1 { transform: scale(1.1); }
+    .header-text h1 .logo-letter { color: var(--header-text); transition: color 0.8s ease-in-out; display: inline-block; }
+    .header-actions { display: flex; align-items: center; gap: 16px; }
+    .header-btn { background: none; border: none; color: var(--header-icon-color); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; transition: var(--transition); }
+    .header-btn:hover { color: var(--header-hover); transform: scale(1.05); }
+    .header-btn svg { color: inherit; fill: none; stroke: currentColor; }
+    html[data-theme="dark"] .theme-toggle .moon-path { display: none; }
+    html:not([data-theme="dark"]) .theme-toggle .sun-path { display: none; }
+    .nav-back { text-decoration: none; color: var(--header-icon-color); font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 6px; transition: var(--transition); }
+    .nav-back:hover { color: var(--header-hover); transform: translateX(-2px); }
+    main { flex: 1; max-width: 800px; width: 100%; margin: 0 auto; padding: 40px 24px 60px; }
+    .hero { text-align: center; margin-bottom: 32px; }
+    .hero h2 { font-family: 'Instrument Serif', serif; font-size: 42px; font-weight: 400; line-height: 1.1; margin-bottom: 8px; }
+    .hero p { color: var(--ink-2); font-size: 15px; }
+    .workspace-card { background: var(--white); border: 1px solid var(--surface-3); border-radius: var(--radius-lg); padding: 24px; }
+    .dropzone { border: 2px dashed var(--surface-3); border-radius: var(--radius); padding: 40px 20px; text-align: center; cursor: pointer; transition: var(--transition); background: var(--white); }
+    .dropzone:hover, .dropzone:focus { border-color: var(--accent-mid); background: var(--accent-light); outline: none; }
+    .dropzone svg { color: var(--ink-3); margin-bottom: 12px; }
+    .dropzone p { font-size: 14px; color: var(--ink-2); }
+    .dropzone .sub { font-size: 12px; color: var(--ink-3); margin-top: 4px; }
+    .dropzone input { display: none; }
+    .file-row { align-items: center; gap: 12px; padding: 12px; background: var(--surface); border-radius: var(--radius); border: 1px solid var(--surface-3); margin-top: 20px; display: none; }
+    .file-row svg { color: var(--ink-3); flex-shrink: 0; }
+    .file-name { font-size: 14px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .file-list { margin-top: 20px; display: none; flex-direction: column; gap: 8px; }
+    .file-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: var(--surface); border: 1px solid var(--surface-3); border-radius: var(--radius); }
+    .file-item svg { color: var(--ink-3); flex-shrink: 0; }
+    .f-name { font-size: 13px; font-weight: 500; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+    .f-meta { font-size: 12px; color: var(--ink-3); white-space: nowrap; }
+    .f-status { font-size: 12px; font-weight: 600; white-space: nowrap; }
+    .f-status.ok { color: var(--accent); }
+    .f-status.err { color: #a33b3b; }
+    .f-remove { background: none; border: none; color: var(--ink-3); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 50%; transition: var(--transition); flex-shrink: 0; }
+    .f-remove:hover { color: #a33b3b; background: var(--surface-2); }
+    .settings-section { margin-top: 20px; display: none; }
+    .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 520px) { .settings-grid { grid-template-columns: 1fr; } }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { font-size: 13px; font-weight: 500; color: var(--ink-2); }
+    .field select, .field input[type="number"], .field input[type="text"] { padding: 9px 12px; border: 1px solid var(--surface-3); border-radius: var(--radius); background: var(--surface); color: var(--ink); font-family: 'DM Sans', sans-serif; font-size: 14px; transition: var(--transition); }
+    .field select:focus, .field input[type="number"]:focus, .field input[type="text"]:focus { outline: none; border-color: var(--accent-mid); }
+    .field input[type="range"] { width: 100%; accent-color: var(--accent); cursor: pointer; }
+    .field input[type="color"] { width: 100%; height: 38px; padding: 4px; border: 1px solid var(--surface-3); border-radius: var(--radius); background: var(--surface); cursor: pointer; }
+    .range-value { font-size: 12px; color: var(--ink-3); font-weight: 500; }
+    .checkbox-field { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: var(--ink-2); cursor: pointer; user-select: none; }
+    .checkbox-field input { accent-color: var(--accent); margin: 0; cursor: pointer; }
+    .info-box { margin-top: 16px; padding: 12px 16px; background: var(--accent-light); border: 1px solid var(--accent-mid); border-radius: var(--radius); font-size: 13px; color: var(--accent); display: none; }
+    .warn-box { margin-top: 16px; padding: 12px 16px; background: #fdf0ef; border: 1px solid #d9a09a; border-radius: var(--radius); font-size: 13px; color: #a33b3b; display: none; }
+    html[data-theme="dark"] .warn-box { background: #2a1c1a; border-color: #6b3a35; color: #e09a93; }
+    .progress-bar-wrap { height: 4px; background: var(--surface-2); border-radius: 99px; overflow: hidden; margin-top: 20px; display: none; }
+    .progress-bar-fill { height: 100%; background: var(--accent); border-radius: 99px; width: 0%; transition: width 0.3s ease; }
+    .progress-label { font-size: 12px; color: var(--ink-3); margin-top: 8px; text-align: center; display: none; }
+    .btn-action { width: 100%; margin-top: 20px; padding: 14px; background: var(--ink); color: var(--white); border: none; border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 14px; cursor: pointer; transition: var(--transition); }
+    .btn-action:hover:not(:disabled) { background: #333330; }
+    .btn-action:disabled { background: var(--surface-2); color: var(--ink-3); cursor: not-allowed; border: 1px solid var(--surface-3); }
+    .btn-secondary { background: var(--accent); }
+    .btn-secondary:hover:not(:disabled) { background: var(--accent-mid); }
+    .checker { background: conic-gradient(var(--surface-2) 90deg, transparent 90deg 180deg, var(--surface-2) 180deg 270deg, transparent 270deg) 0 0 / 16px 16px; }
+    .status-msg { margin-top: 14px; font-size: 13px; text-align: center; }
+    .status-success { color: var(--accent); font-weight: 500; }
+    .status-error { color: #a33b3b; font-weight: 500; }
+    footer { text-align: center; padding: 20px 24px; font-size: 12px; color: var(--ink-3); border-top: 1px solid var(--surface-3); background: var(--white); margin-top: auto; }
+    footer .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); display: inline-block; margin: 0 6px; vertical-align: middle; }
+    .palette-preview { margin-top: 20px; border: 1px solid var(--surface-3); border-radius: var(--radius); overflow: hidden; display: none; justify-content: center; }
+    .palette-preview img { display: block; max-width: 100%; max-height: 300px; object-fit: contain; }
+    .swatch-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 10px; margin-top: 16px; }
+    .swatch { border: 1px solid var(--surface-3); border-radius: var(--radius); overflow: hidden; cursor: pointer; transition: var(--transition); background: var(--white); }
+    .swatch:hover { transform: translateY(-2px); border-color: var(--accent-mid); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .swatch-color { height: 56px; }
+    .swatch-info { padding: 8px; text-align: center; }
+    .swatch-hex { font-size: 12px; font-weight: 600; font-family: monospace; }
+    .swatch-rgb { font-size: 10px; color: var(--ink-3); margin-top: 2px; font-family: monospace; }
+    .swatch-copied { font-size: 10px; color: var(--accent); font-weight: 600; }
+    .copy-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    .copy-row .btn-action { margin-top: 0; flex: 1; min-width: 160px; padding: 11px; font-size: 13px; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="../#images" class="header-logo">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>
+        <line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/>
+      </svg>
+      <div class="header-text">
+        <h1>
+          <span class="logo-letter">D</span><span class="logo-letter">o</span><span class="logo-letter">c</span>
+          <span class="logo-letter">u</span><span class="logo-letter">C</span><span class="logo-letter">r</span>
+          <span class="logo-letter">a</span><span class="logo-letter">f</span><span class="logo-letter">t</span>
+        </h1>
+      </div>
+    </a>
+    <div class="header-actions">
+      <button id="themeToggle" class="header-btn theme-toggle" aria-label="Toggle dark mode">
+        <svg width="22" height="22" viewBox="0 0 24 24">
+          <g class="moon-path"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></g>
+          <g class="sun-path">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </g>
+        </svg>
+      </button>
+      <a href="../#images" class="nav-back">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Back to hub
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <div class="hero">
+      <h2>Palette Extractor</h2>
+      <p>Pull the dominant colors out of any image as ready-to-copy HEX and RGB codes — entirely in your browser.</p>
+    </div>
+
+    <div class="workspace-card">
+      <div class="dropzone" id="dropzone" role="button" tabindex="0" aria-label="Upload image file">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+        </svg>
+        <p>Drag and drop your image here, or click to browse</p>
+        <p class="sub">PNG, JPG, WebP, GIF, or BMP</p>
+        <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp,image/gif,image/bmp,.png,.jpg,.jpeg,.webp,.gif,.bmp" />
+      </div>
+
+      <div class="settings-section" id="settingsSection">
+        <div class="settings-grid">
+          <div class="field">
+            <label for="colorCount">Number of colors</label>
+            <select id="colorCount">
+              <option value="4">4 colors</option>
+              <option value="6" selected>6 colors</option>
+              <option value="8">8 colors</option>
+              <option value="12">12 colors</option>
+            </select>
+          </div>
+        </div>
+        <div class="palette-preview" id="palettePreview"><img id="previewImg" alt="Uploaded image preview" /></div>
+        <div class="swatch-row" id="swatchRow"></div>
+        <div class="copy-row" id="copyRow" style="display:none;">
+          <button class="btn-action" id="btnCopyAll" type="button">Copy All HEX Codes</button>
+          <button class="btn-action btn-secondary" id="btnDownloadPalette" type="button">Download Palette PNG</button>
+        </div>
+        <div class="info-box" id="infoBox" style="display:block;">Click any swatch to copy its HEX code. Colors are sorted by how much of the image they cover.</div>
+      </div>
+
+      <div id="statusMsg" class="status-msg"></div>
+    </div>
+  </main>
+
+  <footer>
+    <span class="dot"></span>No sign up required, Free forever<span class="dot"></span>
+  </footer>
+
+  <script>
+    const activeTheme = localStorage.getItem('theme') || 'light';
+    if (activeTheme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (isDark) { document.documentElement.removeAttribute('data-theme'); localStorage.setItem('theme', 'light'); }
+      else { document.documentElement.setAttribute('data-theme', 'dark'); localStorage.setItem('theme', 'dark'); }
+      resetLogoLetters();
+    });
+
+    function incrementActionStats() {
+      const count = parseInt(localStorage.getItem('docucraft_actions_total_count') || '0');
+      localStorage.setItem('docucraft_actions_total_count', count + 1);
+    }
+
+    let activeStaggerTimeouts = [];
+    function resetLogoLetters() {
+      activeStaggerTimeouts.forEach(clearTimeout); activeStaggerTimeouts = [];
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      document.querySelectorAll('.logo-letter').forEach(l => { l.style.color = isDark ? '#f7f6f2' : '#1a1a18'; });
+    }
+    function initializeLogoHoverEngine() {
+      const logoLink = document.querySelector('.header-logo');
+      const letters = document.querySelectorAll('.logo-letter');
+      logoLink.addEventListener('mouseenter', () => {
+        activeStaggerTimeouts.forEach(clearTimeout); activeStaggerTimeouts = [];
+        letters.forEach((letter, index) => {
+          const id = setTimeout(() => { letter.style.color = `hsl(${Math.floor(Math.random()*360)}, 85%, 75%)`; }, index * 120);
+          activeStaggerTimeouts.push(id);
+        });
+      });
+      logoLink.addEventListener('mouseleave', resetLogoLetters);
+    }
+
+    function loadScriptWithFallback(urls) {
+      return urls.reduce((chain, url) => chain.catch(() => new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = url; s.onload = resolve;
+        s.onerror = () => { s.remove(); reject(new Error('Failed to load ' + url)); };
+        document.head.appendChild(s);
+      })), Promise.reject());
+    }
+    const JSZIP_URLS = [
+      'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js',
+      'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js',
+      'https://unpkg.com/jszip@3.10.1/dist/jszip.min.js'
+    ];
+
+    function formatBytes(bytes) {
+      if (bytes >= 1048576) return (bytes / 1048576).toFixed(2) + ' MB';
+      return (bytes / 1024).toFixed(1) + ' KB';
+    }
+    function downloadBlob(blob, name) {
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = name;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(link.href), 60000);
+    }
+    async function packageZip(results, zipName) {
+      if (!window.JSZip) await loadScriptWithFallback(JSZIP_URLS);
+      const zip = new JSZip();
+      const usedNames = {};
+      for (const r of results) {
+        let name = r.name;
+        if (usedNames[name] !== undefined) {
+          usedNames[name]++;
+          name = name.replace(/(\.[^.]+)$/, `_${usedNames[name]}$1`);
+        } else { usedNames[name] = 0; }
+        zip.file(name, await r.blob.arrayBuffer());
+      }
+      return zip.generateAsync({ type: 'blob' });
+    }
+
+    let sourceImage = null;
+    let palette = [];
+
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+    const settingsSection = document.getElementById('settingsSection');
+    const colorCount = document.getElementById('colorCount');
+    const palettePreview = document.getElementById('palettePreview');
+    const previewImg = document.getElementById('previewImg');
+    const swatchRow = document.getElementById('swatchRow');
+    const copyRow = document.getElementById('copyRow');
+    const btnCopyAll = document.getElementById('btnCopyAll');
+    const btnDownloadPalette = document.getElementById('btnDownloadPalette');
+    const statusMsg = document.getElementById('statusMsg');
+
+    function showStatus(msg, cls) { statusMsg.textContent = msg; statusMsg.className = `status-msg ${cls}`; }
+
+    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); } });
+    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.style.borderColor = 'var(--accent-mid)'; });
+    dropzone.addEventListener('dragleave', () => { dropzone.style.borderColor = 'var(--surface-3)'; });
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault(); dropzone.style.borderColor = 'var(--surface-3)';
+      if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
+    });
+    fileInput.addEventListener('change', (e) => { if (e.target.files.length > 0) handleFile(e.target.files[0]); });
+    colorCount.addEventListener('change', () => { if (sourceImage) extractAndRender(); });
+
+    function handleFile(file) {
+      const looksLikeImage = /^image\/(png|jpeg|webp|gif|bmp)$/.test(file.type) || /\.(png|jpe?g|webp|gif|bmp)$/i.test(file.name);
+      if (!looksLikeImage) { showStatus('Please upload a PNG, JPG, WebP, GIF, or BMP image.', 'status-error'); return; }
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        sourceImage = img;
+        previewImg.src = url;
+        palettePreview.style.display = 'flex';
+        settingsSection.style.display = 'block';
+        extractAndRender();
+        showStatus('', '');
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); showStatus('This image could not be decoded.', 'status-error'); };
+      img.src = url;
+    }
+
+    /* ---------------- median-cut color quantization ---------------- */
+
+    function channelRange(pixels, ch) {
+      let min = 255, max = 0;
+      for (const p of pixels) { if (p[ch] < min) min = p[ch]; if (p[ch] > max) max = p[ch]; }
+      return max - min;
+    }
+
+    function extractPalette(imageData, count) {
+      const data = imageData.data;
+      const pixels = [];
+      for (let i = 0; i < data.length; i += 4) {
+        if (data[i + 3] < 128) continue; // skip transparent pixels
+        pixels.push([data[i], data[i + 1], data[i + 2]]);
+      }
+      if (pixels.length === 0) return [];
+
+      let boxes = [pixels];
+      while (boxes.length < count) {
+        let bestIndex = -1, bestScore = -1;
+        boxes.forEach((box, i) => {
+          if (box.length < 2) return;
+          const score = Math.max(channelRange(box, 0), channelRange(box, 1), channelRange(box, 2)) * Math.log(box.length + 1);
+          if (score > bestScore) { bestScore = score; bestIndex = i; }
+        });
+        if (bestIndex < 0) break;
+        const box = boxes.splice(bestIndex, 1)[0];
+        const ranges = [channelRange(box, 0), channelRange(box, 1), channelRange(box, 2)];
+        const ch = ranges.indexOf(Math.max(ranges[0], ranges[1], ranges[2]));
+        box.sort((a, b) => a[ch] - b[ch]);
+        const mid = box.length >> 1;
+        boxes.push(box.slice(0, mid), box.slice(mid));
+      }
+
+      return boxes.map(box => {
+        let r = 0, g = 0, b = 0;
+        for (const p of box) { r += p[0]; g += p[1]; b += p[2]; }
+        const n = box.length;
+        return { rgb: [Math.round(r / n), Math.round(g / n), Math.round(b / n)], count: n };
+      }).sort((a, b) => b.count - a.count);
+    }
+
+    function toHex(rgb) {
+      return '#' + rgb.map(v => v.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function copyText(text) {
+      try { await navigator.clipboard.writeText(text); return true; }
+      catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = text; document.body.appendChild(ta);
+        ta.select();
+        const ok = document.execCommand('copy');
+        ta.remove();
+        return ok;
+      }
+    }
+
+    function extractAndRender() {
+      // 100×100 sampling keeps quantization instant without changing the result noticeably.
+      const sample = document.createElement('canvas');
+      const scale = Math.min(100 / sourceImage.naturalWidth, 100 / sourceImage.naturalHeight, 1);
+      sample.width = Math.max(1, Math.round(sourceImage.naturalWidth * scale));
+      sample.height = Math.max(1, Math.round(sourceImage.naturalHeight * scale));
+      const ctx = sample.getContext('2d');
+      ctx.drawImage(sourceImage, 0, 0, sample.width, sample.height);
+      palette = extractPalette(ctx.getImageData(0, 0, sample.width, sample.height), parseInt(colorCount.value));
+
+      swatchRow.innerHTML = '';
+      palette.forEach(color => {
+        const hex = toHex(color.rgb);
+        const swatch = document.createElement('div');
+        swatch.className = 'swatch';
+        swatch.setAttribute('role', 'button');
+        swatch.setAttribute('tabindex', '0');
+        swatch.setAttribute('aria-label', `Copy color ${hex}`);
+        swatch.innerHTML = `
+          <div class="swatch-color" style="background:${hex};"></div>
+          <div class="swatch-info">
+            <div class="swatch-hex">${hex}</div>
+            <div class="swatch-rgb">rgb(${color.rgb.join(', ')})</div>
+          </div>`;
+        const copyThis = async () => {
+          if (await copyText(hex)) {
+            const info = swatch.querySelector('.swatch-rgb');
+            const old = info.textContent;
+            info.textContent = 'Copied!';
+            info.className = 'swatch-copied';
+            setTimeout(() => { info.textContent = old; info.className = 'swatch-rgb'; }, 1200);
+          }
+        };
+        swatch.addEventListener('click', copyThis);
+        swatch.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); copyThis(); } });
+        swatchRow.appendChild(swatch);
+      });
+      copyRow.style.display = palette.length > 0 ? 'flex' : 'none';
+      if (palette.length > 0) incrementActionStats();
+    }
+
+    btnCopyAll.addEventListener('click', async () => {
+      const all = palette.map(c => toHex(c.rgb)).join('\n');
+      if (await copyText(all)) showStatus(`${palette.length} HEX codes copied to clipboard.`, 'status-success');
+      else showStatus('Could not access the clipboard.', 'status-error');
+    });
+
+    btnDownloadPalette.addEventListener('click', async () => {
+      if (palette.length === 0) return;
+      const sw = 160, shColor = 120, shLabel = 44;
+      const canvas = document.createElement('canvas');
+      canvas.width = sw * palette.length;
+      canvas.height = shColor + shLabel;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      palette.forEach((color, i) => {
+        const hex = toHex(color.rgb);
+        ctx.fillStyle = hex;
+        ctx.fillRect(i * sw, 0, sw, shColor);
+        ctx.fillStyle = '#1a1a18';
+        ctx.font = '600 17px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(hex, i * sw + sw / 2, shColor + 29);
+      });
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+      if (blob) {
+        downloadBlob(blob, 'palette.png');
+        showStatus('Palette strip downloaded as PNG.', 'status-success');
+      }
+    });
+
+    initializeLogoHoverEngine();
+  </script>
+
+  <script>
+    (function () {
+      const ease = 0.07;
+      let target = window.scrollY, current = window.scrollY, raf = null;
+      function hasScrollParent(el) {
+        while (el && el !== document.documentElement) {
+          const s = getComputedStyle(el);
+          if ((s.overflowY === 'auto' || s.overflowY === 'scroll') && el.scrollHeight > el.clientHeight) return true;
+          el = el.parentElement;
+        }
+        return false;
+      }
+      window.addEventListener('wheel', (e) => {
+        if (hasScrollParent(e.target)) return;
+        e.preventDefault();
+        let delta = e.deltaY;
+        if (e.deltaMode === 1) delta *= 40;
+        else if (e.deltaMode === 2) delta *= window.innerHeight;
+        target = Math.max(0, Math.min(target + delta * 0.8, document.documentElement.scrollHeight - window.innerHeight));
+        if (!raf) raf = requestAnimationFrame(tick);
+      }, { passive: false });
+      function tick() {
+        current += (target - current) * ease;
+        if (Math.abs(target - current) < 0.5) { current = target; raf = null; window.scrollTo(0, current); return; }
+        window.scrollTo(0, current);
+        raf = requestAnimationFrame(tick);
+      }
+      window.addEventListener('scroll', () => { if (!raf) { target = window.scrollY; current = window.scrollY; } }, { passive: true });
+    })();
+  </script>
+</body>
+</html>

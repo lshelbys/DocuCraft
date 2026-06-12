@@ -24,6 +24,16 @@ A dedicated tab of image conversion tools, all running entirely in your browser:
 * **🧩 SVG to PNG:** Rasterize SVG vector files into crisp PNG, JPG, or WebP images at any resolution.
 * **📱 HEIC to JPG:** Convert iPhone HEIC photos into universally supported JPG or PNG files, individually or in batches.
 * **🌐 PNG to ICO:** Bundle any image into a multi-size favicon.ico (16 px to 256 px) for your website.
+* **📐 Image Resizer:** Resize photos by pixels or percentage with locked aspect ratio — single images or whole batches.
+* **🗜️ Image Compressor:** Shrink file sizes with a quality dial, or compress straight to a target size like 200 KB.
+* **✂️ Crop & Rotate:** Crop with aspect-ratio presets, rotate in 90° steps, and flip — exported at full resolution.
+* **🕵️ EXIF Viewer & Remover:** Inspect hidden photo metadata — camera, dates, GPS location — and strip it losslessly.
+* **🛡️ Watermark Image:** Stamp text watermarks — diagonal, tiled, or corner placement — onto photos in bulk.
+* **🔒 Blur & Redact:** Pixelate, blur, or black-out faces and private details before sharing screenshots.
+* **🪄 Background Remover (Beta):** Erase backgrounds with on-device AI — the model runs entirely in your browser.
+* **🎨 Palette Extractor:** Pull the dominant colors out of any image as ready-to-copy HEX and RGB codes.
+* **🎞️ GIF Frame Extractor:** Split an animated GIF into its individual frames as PNG or JPG images.
+* **💻 Image to Base64:** Encode images as data URIs with ready-made HTML, CSS, and Markdown snippets.
 
 ## 🌟 Key Highlights
 
