@@ -905,6 +905,115 @@
   </style>
   <link rel="stylesheet" href="/app.css" />
   <script src="/app.js" defer></script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://www.docucraft.site/#org",
+      "name": "DocuCraft",
+      "url": "https://www.docucraft.site/",
+      "logo": "https://www.docucraft.site/icon-512.png"
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://www.docucraft.site/#website",
+      "name": "DocuCraft",
+      "url": "https://www.docucraft.site/",
+      "publisher": {
+        "@id": "https://www.docucraft.site/#org"
+      }
+    },
+    {
+      "@type": "WebApplication",
+      "@id": "https://www.docucraft.site/#app",
+      "name": "DocuCraft",
+      "url": "https://www.docucraft.site/",
+      "description": "DocuCraft is a free, privacy-first PDF and image toolkit. Compress, merge, split, and convert PDFs — plus convert PNG, JPG, WebP, HEIC, SVG, and ICO images — entirely in your browser. No sign-up, no ads, no uploads.",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any (modern web browser)",
+      "browserRequirements": "Requires JavaScript. Runs entirely client-side.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": [
+        "Image to PDF",
+        "Merge PDF",
+        "Split PDF",
+        "Compress PDF",
+        "PDF Converter",
+        "Rotate PDF",
+        "Reorder Pages",
+        "Add Page Numbers",
+        "Watermark PDF",
+        "PDF to Images",
+        "Image Converter",
+        "PNG to SVG",
+        "SVG to PNG",
+        "HEIC to JPG",
+        "PNG to ICO",
+        "Image Resizer",
+        "Image Compressor",
+        "Crop & Rotate",
+        "EXIF Viewer & Remover",
+        "Watermark Image",
+        "Blur & Redact",
+        "Background Remover",
+        "Palette Extractor",
+        "GIF Frame Extractor",
+        "Image to Base64"
+      ],
+      "publisher": {
+        "@id": "https://www.docucraft.site/#org"
+      },
+      "isPartOf": {
+        "@id": "https://www.docucraft.site/#website"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://www.docucraft.site/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Where are my uploaded files stored?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "They aren't stored anywhere! DocuCraft processes your images and PDFs completely inside your browser locally using client-side JavaScript APIs. Your file details never interact with external servers."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is there a file size or limit threshold?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Since processing happens natively using your computer's processing power rather than our cloud hardware resources, you can process as many documents as your system's hardware allows."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does it work offline?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Mostly yes. Once the page has loaded, all PDF processing works without an internet connection. The only online dependency is loading the font from Google Fonts on first visit."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I use DocuCraft for commercial work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. DocuCraft is completely free with no usage restrictions. Process as many documents as you need for personal or professional purposes."
+          }
+        }
+      ]
+    }
+  ]
+}
+  </script>
 </head>
 <body>
 
