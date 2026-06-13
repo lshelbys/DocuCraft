@@ -2,10 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>DocuCraft - Background Remover</title>
   <meta name="description" content="Remove image backgrounds with AI that runs entirely in your browser — photos never leave your device. Free, private, no upload required." />
   <meta name="theme-color" content="#2d5a3d" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="DocuCraft" />
   <link rel="canonical" href="https://www.docucraft.site/tools/background-remover.html" />
   <meta name="robots" content="index, follow, max-image-preview:large" />
   <meta property="og:type" content="website" />
@@ -131,6 +137,8 @@
     .compare-cell img { max-width: 100%; max-height: 280px; object-fit: contain; display: block; }
     .diag-box { display: none; margin-top: 12px; padding: 12px 14px; background: var(--surface-2); border: 1px solid var(--surface-3); border-radius: var(--radius); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; line-height: 1.5; color: var(--ink-2); white-space: pre-wrap; word-break: break-word; text-align: left; user-select: text; }
   </style>
+  <link rel="stylesheet" href="/app.css" />
+  <script src="/app.js" defer></script>
 </head>
 <body>
 

@@ -2,10 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>DocuCraft - GIF Frame Extractor</title>
   <meta name="description" content="Split an animated GIF into individual PNG or JPG frames in your browser. Free, private, no upload required." />
   <meta name="theme-color" content="#2d5a3d" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="DocuCraft" />
   <link rel="canonical" href="https://www.docucraft.site/tools/gif-frames.html" />
   <meta name="robots" content="index, follow, max-image-preview:large" />
   <meta property="og:type" content="website" />
@@ -129,6 +135,8 @@
     .frame-item canvas { display: block; width: 100%; height: 72px; object-fit: contain; }
     .frame-item span { display: block; font-size: 10px; font-weight: 600; color: var(--ink-3); text-align: center; padding: 4px; }
   </style>
+  <link rel="stylesheet" href="/app.css" />
+  <script src="/app.js" defer></script>
 </head>
 <body>
 
