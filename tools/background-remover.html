@@ -182,9 +182,9 @@
           <div class="field">
             <label for="modelQuality">Model quality</label>
             <select id="modelQuality">
-              <option value="default" selected>Balanced (default)</option>
-              <option value="isnet">Best quality — larger download, slower</option>
-              <option value="isnet_quint8">Fastest — smaller download, rougher edges</option>
+              <option value="default" selected>Standard (default)</option>
+              <option value="medium">Best quality — larger model, slower</option>
+              <option value="small">Fastest — smaller model, rougher edges</option>
             </select>
           </div>
         </div>
@@ -465,7 +465,7 @@
         // scenery with no clear subject — and explain it rather than leaving a blank panel.
         const keptFraction = await opaqueFraction(blob);
         if (keptFraction < 0.02) {
-          const hint = chosenModel === 'isnet' ? '' : ' You can also try the Best quality model above.';
+          const hint = chosenModel === 'medium' ? '' : ' You can also try the Best quality model above.';
           showStatus(`The AI couldn't isolate a clear subject in this image, so almost everything was removed. This model works best on a distinct subject — a person, product, or animal — against a separate background; full scenery shots like landscapes often can't be separated.${hint}`, 'status-error');
         } else {
           showStatus(`Background removed (${formatBytes(blob.size)} PNG with transparency).`, 'status-success');
