@@ -117,6 +117,7 @@
     .compare-label { font-size: 11px; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; text-align: center; }
     .compare-cell { border: 1px solid var(--surface-3); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; min-height: 180px; padding: 10px; overflow: hidden; }
     .compare-cell img { max-width: 100%; max-height: 280px; object-fit: contain; display: block; }
+    .diag-box { display: none; margin-top: 12px; padding: 12px 14px; background: var(--surface-2); border: 1px solid var(--surface-3); border-radius: var(--radius); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; line-height: 1.5; color: var(--ink-2); white-space: pre-wrap; word-break: break-word; text-align: left; user-select: text; }
   </style>
 </head>
 <body>
@@ -202,6 +203,7 @@
       <div class="progress-label" id="progressLabel"></div>
       <button id="btnConvert" class="btn-action" disabled>Remove Background</button>
       <div id="statusMsg" class="status-msg"></div>
+      <pre id="diagBox" class="diag-box" aria-label="Technical error details"></pre>
     </div>
   </main>
 
@@ -284,14 +286,19 @@
       return zip.generateAsync({ type: 'blob' });
     }
 
-    // @imgly/background-removal is ESM-only; these CDNs resolve its dependency
-    // graph for direct browser import. Model/wasm assets come from publicPath.
+    // @imgly/background-removal is ESM-only and pulls in onnxruntime-web (WASM +
+    // workers). esm.sh resolves that dependency graph most reliably for a direct
+    // browser import; jsDelivr's +esm and unpkg are fallbacks. Model/wasm assets
+    // come from publicPath. esm.sh's default publicPath is left in place when its
+    // module is used, since it already points at compatible assets.
     const BG_MODULE_URLS = [
-      'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/+esm',
       'https://esm.sh/@imgly/background-removal@1.4.5',
+      'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/+esm',
       'https://unpkg.com/@imgly/background-removal@1.4.5/dist/index.mjs'
     ];
-    const BG_PUBLIC_PATH = 'https://cdn.jsdelivr.net/npm/@imgly/background-removal-data@1.4.5/dist/';
+    const BG_PUBLIC_PATH = 'https://staticimgly.com/@imgly/background-removal-data/1.4.5/dist/';
+
+    function shortHost(url) { try { return new URL(url).host; } catch (e) { return url; } }
 
     let removeBackgroundFn = null;
     let targetFile = null;
@@ -310,6 +317,7 @@
     const btnConvert = document.getElementById('btnConvert');
     const btnDownload = document.getElementById('btnDownload');
     const statusMsg = document.getElementById('statusMsg');
+    const diagBox = document.getElementById('diagBox');
     const progressWrap = document.getElementById('progressWrap');
     const progressFill = document.getElementById('progressFill');
     const progressLabel = document.getElementById('progressLabel');
@@ -341,25 +349,32 @@
       settingsSection.style.display = 'block';
       btnConvert.disabled = false;
       showStatus('', '');
+      diagBox.style.display = 'none';
     }
 
     async function loadBgModule() {
       if (removeBackgroundFn) return removeBackgroundFn;
-      let lastError = null;
+      const failures = [];
       for (const url of BG_MODULE_URLS) {
         try {
-          const mod = await import(url);
-          const fn = mod.removeBackground || mod.default;
+          const mod = await import(/* @vite-ignore */ url);
+          const fn = mod.removeBackground || (mod.default && mod.default.removeBackground) || mod.default;
           if (typeof fn === 'function') { removeBackgroundFn = fn; return fn; }
-        } catch (err) { lastError = err; }
+          failures.push(`${shortHost(url)}: imported, but no removeBackground export`);
+        } catch (err) {
+          failures.push(`${shortHost(url)}: ${err.name || 'Error'}: ${err.message || err}`);
+        }
       }
-      throw lastError || new Error('Module load failed.');
+      const e = new Error('Could not import the library from any CDN — ' + failures.join('  •  '));
+      e.stage = 'import';
+      throw e;
     }
 
     btnConvert.addEventListener('click', async () => {
       if (!targetFile) return;
       btnConvert.disabled = true;
       showStatus('', '');
+      diagBox.style.display = 'none';
       setProgress(3);
       progressLabel.style.display = 'block';
       progressLabel.textContent = 'Loading AI engine…';
@@ -368,19 +383,25 @@
         const removeBackground = await loadBgModule();
         setProgress(8);
 
-        const blob = await removeBackground(targetFile, {
-          publicPath: BG_PUBLIC_PATH,
-          progress: (key, current, total) => {
-            const pct = total > 0 ? Math.round((current / total) * 100) : 0;
-            if (key.startsWith('fetch')) {
-              progressLabel.textContent = `Downloading model… ${pct}%`;
-              setProgress(8 + Math.round(pct * 0.5));
-            } else {
-              progressLabel.textContent = 'Analyzing image…';
-              setProgress(60 + Math.round(pct * 0.35));
+        let blob;
+        try {
+          blob = await removeBackground(targetFile, {
+            publicPath: BG_PUBLIC_PATH,
+            progress: (key, current, total) => {
+              const pct = total > 0 ? Math.round((current / total) * 100) : 0;
+              if (key.startsWith('fetch')) {
+                progressLabel.textContent = `Downloading model… ${pct}%`;
+                setProgress(8 + Math.round(pct * 0.5));
+              } else {
+                progressLabel.textContent = 'Analyzing image…';
+                setProgress(60 + Math.round(pct * 0.35));
+              }
             }
-          }
-        });
+          });
+        } catch (runErr) {
+          runErr.stage = runErr.stage || 'run';
+          throw runErr;
+        }
 
         resultBlob = blob;
         if (originalUrl) URL.revokeObjectURL(originalUrl);
@@ -396,7 +417,13 @@
         showStatus(`Background removed (${formatBytes(blob.size)} PNG with transparency).`, 'status-success');
       } catch (err) {
         console.error(err);
-        showStatus('Could not run the AI model. This beta tool needs to download its model from a CDN on first use — check your connection and try again.', 'status-error');
+        const stageText = err.stage === 'import'
+          ? 'loading the AI library'
+          : 'downloading the model or processing the image';
+        const detail = (err && err.message) ? err.message : String(err);
+        showStatus(`Background removal failed while ${stageText}.`, 'status-error');
+        diagBox.textContent = detail;
+        diagBox.style.display = 'block';
       } finally {
         btnConvert.disabled = false;
         progressLabel.style.display = 'none';
