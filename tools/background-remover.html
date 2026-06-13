@@ -178,8 +178,18 @@
       </div>
 
       <div class="settings-section" id="settingsSection">
+        <div class="settings-grid">
+          <div class="field">
+            <label for="modelQuality">Model quality</label>
+            <select id="modelQuality">
+              <option value="default" selected>Balanced (default)</option>
+              <option value="isnet">Best quality — larger download, slower</option>
+              <option value="isnet_quint8">Fastest — smaller download, rougher edges</option>
+            </select>
+          </div>
+        </div>
         <div class="info-box" id="infoBox" style="display:block;">
-          The first run downloads an AI model (roughly 40&nbsp;MB) from a CDN, then caches it. The actual processing happens entirely on your device — the photo itself is never uploaded anywhere.
+          The first run downloads an AI model (roughly 40&nbsp;MB) from a CDN, then caches it. The actual processing happens entirely on your device — the photo itself is never uploaded anywhere. Works best on a clear subject (person, product, animal) against a distinct background; full scenery shots like landscapes often can't be separated. If edges look rough or too much is kept, try <strong>Best quality</strong>.
         </div>
       </div>
 
@@ -318,6 +328,36 @@
     const btnDownload = document.getElementById('btnDownload');
     const statusMsg = document.getElementById('statusMsg');
     const diagBox = document.getElementById('diagBox');
+    const modelQuality = document.getElementById('modelQuality');
+
+    // Fraction of pixels that are meaningfully opaque, sampled on a small canvas.
+    // Used to detect an effectively empty result (subject erased entirely).
+    function opaqueFraction(blob) {
+      return new Promise((resolve) => {
+        const url = URL.createObjectURL(blob);
+        const img = new Image();
+        img.onload = () => {
+          URL.revokeObjectURL(url);
+          const scale = Math.min(256 / img.naturalWidth, 256 / img.naturalHeight, 1);
+          const w = Math.max(1, Math.round(img.naturalWidth * scale));
+          const h = Math.max(1, Math.round(img.naturalHeight * scale));
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          try {
+            const data = ctx.getImageData(0, 0, w, h).data;
+            let opaque = 0;
+            for (let i = 3; i < data.length; i += 4) if (data[i] > 32) opaque++;
+            resolve(opaque / (w * h));
+          } catch (e) {
+            resolve(1); // can't sample → assume fine, don't show a false warning
+          }
+        };
+        img.onerror = () => { URL.revokeObjectURL(url); resolve(1); };
+        img.src = url;
+      });
+    }
     const progressWrap = document.getElementById('progressWrap');
     const progressFill = document.getElementById('progressFill');
     const progressLabel = document.getElementById('progressLabel');
@@ -383,21 +423,27 @@
         const removeBackground = await loadBgModule();
         setProgress(8);
 
+        // Only the default keeps the library's own model choice (the verified,
+        // working path); other values are opt-in and override it.
+        const config = {
+          publicPath: BG_PUBLIC_PATH,
+          progress: (key, current, total) => {
+            const pct = total > 0 ? Math.round((current / total) * 100) : 0;
+            if (key.startsWith('fetch')) {
+              progressLabel.textContent = `Downloading model… ${pct}%`;
+              setProgress(8 + Math.round(pct * 0.5));
+            } else {
+              progressLabel.textContent = 'Analyzing image…';
+              setProgress(60 + Math.round(pct * 0.35));
+            }
+          }
+        };
+        const chosenModel = modelQuality.value;
+        if (chosenModel !== 'default') config.model = chosenModel;
+
         let blob;
         try {
-          blob = await removeBackground(targetFile, {
-            publicPath: BG_PUBLIC_PATH,
-            progress: (key, current, total) => {
-              const pct = total > 0 ? Math.round((current / total) * 100) : 0;
-              if (key.startsWith('fetch')) {
-                progressLabel.textContent = `Downloading model… ${pct}%`;
-                setProgress(8 + Math.round(pct * 0.5));
-              } else {
-                progressLabel.textContent = 'Analyzing image…';
-                setProgress(60 + Math.round(pct * 0.35));
-              }
-            }
-          });
+          blob = await removeBackground(targetFile, config);
         } catch (runErr) {
           runErr.stage = runErr.stage || 'run';
           throw runErr;
@@ -414,7 +460,16 @@
         setProgress(100);
 
         incrementActionStats();
-        showStatus(`Background removed (${formatBytes(blob.size)} PNG with transparency).`, 'status-success');
+
+        // Detect the model erasing (almost) everything — a known failure on
+        // scenery with no clear subject — and explain it rather than leaving a blank panel.
+        const keptFraction = await opaqueFraction(blob);
+        if (keptFraction < 0.02) {
+          const hint = chosenModel === 'isnet' ? '' : ' You can also try the Best quality model above.';
+          showStatus(`The AI couldn't isolate a clear subject in this image, so almost everything was removed. This model works best on a distinct subject — a person, product, or animal — against a separate background; full scenery shots like landscapes often can't be separated.${hint}`, 'status-error');
+        } else {
+          showStatus(`Background removed (${formatBytes(blob.size)} PNG with transparency).`, 'status-success');
+        }
       } catch (err) {
         console.error(err);
         const stageText = err.stage === 'import'
