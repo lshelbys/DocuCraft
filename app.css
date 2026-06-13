@@ -1,0 +1,62 @@
+/* ==========================================================================
+   DocuCraft — shared mobile / app-shell behavior (loaded site-wide after the
+   per-page inline styles so these rules win where they overlap).
+   ========================================================================== */
+
+/* Keep text at the author's size and stop iOS from inflating it on rotation. */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  /* Disable double-tap-to-zoom and the 300ms tap delay (pinch is blocked in app.js). */
+  touch-action: manipulation;
+}
+
+/* No grey flash on tap; feels native. */
+* { -webkit-tap-highlight-color: transparent; }
+
+/* Stop the rubber-band / pull-to-refresh overscroll so it reads as an app, not a page. */
+html, body {
+  overscroll-behavior: none;
+  overflow-x: hidden;
+}
+
+/* Don't let the OS pop a callout/selection menu on long-press of UI chrome,
+   but keep text selectable inside outputs (Base64, EXIF, diagnostics, etc.). */
+header, footer, button, .tool-card, .category-card, .recent-chip,
+.hub-tab, .size-chip, .swatch, .frame-item, .nav-back, .header-logo, label {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Respect the home-indicator / notch when launched standalone. */
+footer { padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
+
+@media (max-width: 600px) {
+  /* iOS zooms the whole page when focusing a control whose text is < 16px.
+     Pin form controls to 16px on phones so tapping a field never zooms. */
+  input, select, textarea,
+  .field select, .field input, .search-bar {
+    font-size: 16px !important;
+  }
+
+  /* Use the small viewport more efficiently and keep tap targets comfortable. */
+  header { padding: 14px 18px; }
+  main { padding-left: 16px; padding-right: 16px; }
+  .hero h2 { font-size: 32px; }
+  .hub-hero h2 { font-size: 32px; }
+  .workspace-card { padding: 18px; }
+  .btn-action { padding: 15px; }
+
+  /* Let the category tab switcher span the width instead of clipping. */
+  .hub-tabs { width: 100%; }
+  .hub-tab { flex: 1; justify-content: center; }
+}
+
+/* Comfortable minimum hit area for icon-only controls on touch screens. */
+@media (hover: none) and (pointer: coarse) {
+  .header-btn, .github-link, .favorite-toggle-btn, .f-remove, .search-clear-btn {
+    min-width: 40px;
+    min-height: 40px;
+  }
+}
