@@ -473,7 +473,7 @@
     // Stepped halving keeps downscales sharp; a single drawImage jump looks muddy at large ratios.
     function scaleToCanvas(source, sw, sh, tw, th, fillWhite) {
       let cur = source, cw = sw, ch = sh;
-      while (cw / 2 >= tw && ch / 2 >= th && cw > 64 && ch > 64) {
+      while ((cw / 2 >= tw || ch / 2 >= th) && cw > 64 && ch > 64) {
         const half = document.createElement('canvas');
         half.width = Math.max(tw, Math.floor(cw / 2));
         half.height = Math.max(th, Math.floor(ch / 2));

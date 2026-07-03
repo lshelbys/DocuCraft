@@ -250,9 +250,9 @@
               <p>Save a specific range of pages as a single PDF file.</p>
               <div class="range-inputs" id="range-inputs" style="opacity: 0.5; pointer-events: none;">
                 <span>From page:</span>
-                <input type="number" id="start-page" min="1" value="1">
+                <input type="number" id="start-page" min="1" value="1" disabled>
                 <span>to page:</span>
-                <input type="number" id="end-page" min="1" value="1">
+                <input type="number" id="end-page" min="1" value="1" disabled>
               </div>
             </div>
           </div>
@@ -359,23 +359,33 @@
       if (modeRange.checked) {
         rangeInputs.style.opacity = "1";
         rangeInputs.style.pointerEvents = "auto";
+        startPage.disabled = false;
+        endPage.disabled = false;
       } else {
         rangeInputs.style.opacity = "0.5";
         rangeInputs.style.pointerEvents = "none";
+        startPage.disabled = true;
+        endPage.disabled = true;
       }
     }
+
+    let loadToken = 0;
 
     async function handleFile(file) {
       if (!file || file.type !== "application/pdf") {
         showStatus("Please upload a valid PDF file.", "status-error");
         return;
       }
+      const token = ++loadToken;
       activeFile = file;
       showStatus("Reading PDF…", "");
 
       try {
-        arrayBuffer = await file.arrayBuffer();
-        const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer, { updateMetadata: false });
+        const buf = await file.arrayBuffer();
+        const pdfDoc = await PDFLib.PDFDocument.load(buf, { updateMetadata: false });
+        if (token !== loadToken) return; // a newer file was selected while this one was loading
+
+        arrayBuffer = buf;
         totalPages = pdfDoc.getPageCount();
 
         fileNameText.textContent = file.name;
@@ -389,6 +399,7 @@
         configBox.style.display = "block";
         statusMsg.style.display = "none";
       } catch (e) {
+        if (token !== loadToken) return;
         console.error(e);
         showStatus("Failed to read PDF. The file may be encrypted or corrupted.", "status-error");
       }
@@ -409,7 +420,7 @@
           }
 
           const zip = new JSZip();
-          const baseName = activeFile.name.replace('.pdf', '');
+          const baseName = activeFile.name.replace(/\.pdf$/i, '');
 
           for (let i = 0; i < totalPages; i++) {
             const singlePdf = await PDFLib.PDFDocument.create();
@@ -446,7 +457,7 @@
           copiedPages.forEach(page => rangedPdf.addPage(page));
 
           const pdfBytes = await rangedPdf.save();
-          downloadBlob(pdfBytes, `${activeFile.name.replace('.pdf', '')}_pages_${start}-${end}.pdf`, "application/pdf");
+          downloadBlob(pdfBytes, `${activeFile.name.replace(/\.pdf$/i, '')}_pages_${start}-${end}.pdf`, "application/pdf");
           incrementActionStats();
           showStatus("Pages extracted and downloaded successfully!", "status-success");
         }

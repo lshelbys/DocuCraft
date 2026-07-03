@@ -471,7 +471,7 @@
     function formatBytes(bytes) {
       if (bytes === 0) return '0 Bytes';
       const k = 1024;
-      const sizes = ['Bytes', 'KB', 'MB'];
+      const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
       const i = Math.floor(Math.log(bytes) / Math.log(k));
       return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
@@ -500,16 +500,16 @@
 
         const initialSize = targetFile.size;
         const optimizedSize = compressedBytes.length;
-        const didCompress = optimizedSize < initialSize;
+        const savingsPercent = Math.round(((initialSize - optimizedSize) / initialSize) * 100);
+        const didCompress = optimizedSize < initialSize && savingsPercent >= 1;
         const outputBytes = didCompress ? compressedBytes : new Uint8Array(arrayBuffer);
         const finalSize = didCompress ? optimizedSize : initialSize;
-        const savingsPercent = didCompress ? Math.round(((initialSize - optimizedSize) / initialSize) * 100) : 0;
 
         resOrig.innerText = `Original size: ${formatBytes(initialSize)}`;
         resComp.innerText = `Output size: ${formatBytes(finalSize)}`;
         resRatio.innerText = didCompress
           ? `Reduction: ${savingsPercent}%`
-          : 'Already optimized — no further compression possible.';
+          : 'Already optimized — this PDF has little to no removable overhead.';
 
         setProgress(100);
         showStatus(didCompress ? "PDF compressed successfully." : "File is already optimized — downloaded as-is.", "status-success");
@@ -518,7 +518,7 @@
         const blob = new Blob([outputBytes], { type: 'application/pdf' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = `${targetFile.name.replace('.pdf', '')}_compressed.pdf`;
+        link.download = `${targetFile.name.replace(/\.pdf$/i, '')}_compressed.pdf`;
         link.click();
         setTimeout(() => URL.revokeObjectURL(link.href), 60000);
         incrementActionStats();
