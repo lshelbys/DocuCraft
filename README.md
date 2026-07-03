@@ -11,8 +11,13 @@ DocuCraft comes packed with essential tools to handle everyday document tasks se
 * **📷 Image to PDF:** Convert collections of PNG, JPG, and WebP images effortlessly into clean, well-structured presentation PDFs.
 * **🔀 Merge PDF:** Combine multiple PDF files into a single, cohesive document while retaining full control over page order.
 * **✂️ Split PDF:** Extract specific page ranges or isolate individual pages into separate, standalone files.
-* **📉 Compress PDF:** Optimize and shrink overall file sizes for easier sharing while maintaining high structural visual resolution.
+* **📉 Compress PDF:** Optimize PDF structure to shave off excess file size for easier sharing.
 * **🔄 PDF Converter:** Transform external files into high-quality PDFs, or instantly extract high-resolution image layers and raw text elements from existing PDF documents.
+* **🔃 Rotate PDF:** Rotate individual pages or an entire document 90°, 180°, or 270°.
+* **🔢 Reorder Pages:** Drag and drop to rearrange or delete pages before saving.
+* **🔖 Add Page Numbers:** Stamp customizable page numbers in any corner or position.
+* **🛡️ Watermark PDF:** Overlay diagonal, tiled, or corner text watermarks across every page.
+* **🖼️ PDF to Images:** Export every page of a PDF as a high-resolution PNG or JPG image.
 * **🛡️ Privacy Inspector:** Track your local activity and verify that zero data is transmitted to external servers.
 
 ### 🖼️ Image Utilities

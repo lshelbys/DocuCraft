@@ -1619,8 +1619,17 @@
   /* ==========================================================================
      Bookmarking / Pinned Utilities Engine Logic
      ========================================================================== */
+  function safeParseArray(key) {
+    try {
+      const val = JSON.parse(localStorage.getItem(key));
+      return Array.isArray(val) ? val : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
   function initializeFavoritesSystem() {
-    let starredIds = JSON.parse(localStorage.getItem('docucraft_pinned')) || [];
+    let starredIds = safeParseArray('docucraft_pinned');
     
     document.querySelectorAll('#toolsGrid .favorite-toggle-btn, #imageToolsGrid .favorite-toggle-btn').forEach(btn => {
       const wrapperCard = btn.closest('.tool-wrapper');
@@ -1634,8 +1643,8 @@
         e.preventDefault();
         e.stopPropagation(); 
         
-        starredIds = JSON.parse(localStorage.getItem('docucraft_pinned')) || [];
-        
+        starredIds = safeParseArray('docucraft_pinned');
+
         if (btn.classList.contains('starred')) {
           btn.classList.remove('starred');
           starredIds = starredIds.filter(id => id !== toolId);
@@ -1653,7 +1662,7 @@
   }
 
   function renderFavoritesDeck() {
-    const starredIds = JSON.parse(localStorage.getItem('docucraft_pinned')) || [];
+    const starredIds = safeParseArray('docucraft_pinned');
     favoritesGrid.innerHTML = '';
     
     if (starredIds.length === 0) {
@@ -1669,14 +1678,17 @@
       if (starredIds.includes(toolId)) {
         const clone = coreSourceCard.cloneNode(true);
         const cloneBtn = clone.querySelector('.favorite-toggle-btn');
-        
+
         cloneBtn.addEventListener('click', (e) => {
           e.preventDefault();
           e.stopPropagation();
-          
+
           const primaryBtn = coreSourceCard.querySelector('.favorite-toggle-btn');
           if (primaryBtn) primaryBtn.click();
         });
+
+        const cloneLink = clone.querySelector('.tool-link');
+        if (cloneLink) cloneLink.addEventListener('click', () => recordToolVisit(toolId));
 
         if (coreSourceCard.style.display === 'none') {
           clone.style.display = 'none';
@@ -1796,6 +1808,14 @@
     tabPdf.addEventListener('click', () => selectTab('pdf'));
     tabImages.addEventListener('click', () => selectTab('images'));
     applyTab(startTab);
+
+    window.addEventListener('hashchange', () => {
+      const tab = window.location.hash.replace('#', '');
+      if ((tab === 'images' || tab === 'pdf') && tab !== activeTab) {
+        localStorage.setItem('docucraft_active_tab', tab);
+        applyTab(tab, true);
+      }
+    });
   }
 
   function updatePrivacyInspectorStatistics() {
@@ -1851,7 +1871,7 @@
   const RECENT_MAX    = 4;
 
   function recordToolVisit(toolId) {
-    let recent = JSON.parse(localStorage.getItem(RECENT_KEY)) || [];
+    let recent = safeParseArray(RECENT_KEY);
     recent = recent.filter(id => id !== toolId);
     recent.unshift(toolId);
     if (recent.length > RECENT_MAX) recent.length = RECENT_MAX;
@@ -1859,7 +1879,7 @@
   }
 
   function renderRecentStrip() {
-    const recent = JSON.parse(localStorage.getItem(RECENT_KEY)) || [];
+    const recent = safeParseArray(RECENT_KEY);
     if (recent.length === 0) { recentSection.style.display = 'none'; return; }
 
     recentStrip.innerHTML = '';
