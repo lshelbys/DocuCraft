@@ -342,8 +342,8 @@
           let label;
           if (format === 'n') label = `${pageNum}`;
           else if (format === 'page-n') label = `Page ${pageNum}`;
-          else if (format === 'n-of-total') label = `${pageNum} / ${startNum + totalPages - 1}`;
-          else label = `Page ${pageNum} of ${startNum + totalPages - 1}`;
+          else if (format === 'n-of-total') label = `${pageNum} / ${totalPages}`;
+          else label = `Page ${pageNum} of ${totalPages}`;
 
           const textWidth = font.widthOfTextAtSize(label, fontSize);
           const [pos1, pos2] = selectedPosition.split('-');
@@ -383,6 +383,7 @@
 
   <script>
     (function () {
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       const ease = 0.07;
       let target = window.scrollY, current = window.scrollY, raf = null;
       function hasScrollParent(el) {
@@ -394,6 +395,7 @@
         return false;
       }
       window.addEventListener('wheel', (e) => {
+        if (e.ctrlKey || e.metaKey) return;
         if (hasScrollParent(e.target)) return;
         e.preventDefault();
         let delta = e.deltaY;

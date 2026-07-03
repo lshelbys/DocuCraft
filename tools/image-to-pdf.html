@@ -256,7 +256,7 @@
     .list-view .preview-card .page-num { font-size: 12px; }
 
     .img-adjust-panel { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(20,20,18,.88); padding: 6px 8px; display: none; flex-direction: column; gap: 4px; }
-    .preview-card:hover .img-adjust-panel { display: flex; }
+    .preview-card:hover .img-adjust-panel, .preview-card:focus-within .img-adjust-panel { display: flex; }
     .list-view .preview-card .img-adjust-panel { display: none !important; }
 
     .adj-row { display: flex; align-items: center; gap: 6px; }
@@ -264,12 +264,12 @@
     .adj-row input[type="range"] { flex: 1; accent-color: #7ec898; height: 3px; cursor: pointer; }
 
     .rotate-overlay { position: absolute; top: 6px; left: 6px; display: flex; gap: 4px; opacity: 0; transition: opacity .2s; }
-    .preview-card:hover .rotate-overlay { opacity: 1; }
+    .preview-card:hover .rotate-overlay, .preview-card:focus-within .rotate-overlay { opacity: 1; }
     .rotate-btn { width: 24px; height: 24px; border-radius: 50%; border: none; background: rgba(0,0,0,.6); color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; transition: background .15s; }
     .rotate-btn:hover { background: rgba(0,0,0,.85); }
 
     .card-select { position: absolute; top: 6px; right: 6px; width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; opacity: 0; transition: opacity .15s; }
-    .preview-card:hover .card-select, .card-select:checked { opacity: 1; }
+    .preview-card:hover .card-select, .preview-card:focus-within .card-select, .card-select:checked, .card-select:focus { opacity: 1; }
     .list-view .preview-card .card-select { position: static; opacity: 1; order: -1; }
 
     .drag-hint { position: absolute; top: 6px; left: 34px; background: rgba(0,0,0,.5); color: white; font-size: 10px; padding: 2px 6px; border-radius: 4px; opacity: 0; transition: opacity .2s; }
@@ -293,7 +293,7 @@
     .convert-btn:disabled { opacity: .4; cursor: not-allowed; }
     .convert-btn.success { background: var(--accent); }
 
-    .split-btn { background: var(--white); color: var(--ink); border: 1.5px solid var(--surface-3); border-radius: var(--radius); padding: 14px 18px; font-size: 14px; font-family: 'DM Sans', sans-serif; font-weight: 600; cursor: pointer; display: flex; align-items: gap: 7px; transition: border-color .15s, background .15s; white-space: nowrap; text-decoration: none; align-items: center;}
+    .split-btn { background: var(--white); color: var(--ink); border: 1.5px solid var(--surface-3); border-radius: var(--radius); padding: 14px 18px; font-size: 14px; font-family: 'DM Sans', sans-serif; font-weight: 600; cursor: pointer; display: flex; gap: 7px; transition: border-color .15s, background .15s; white-space: nowrap; text-decoration: none; align-items: center;}
     .split-btn:hover:not(:disabled) { border-color: var(--accent-mid); background: var(--accent-light); }
     .split-btn:disabled { opacity: .4; cursor: not-allowed; }
 
@@ -670,8 +670,8 @@ function setupDragAndDrop(card) {
       const srcId = dragSourceElement.getAttribute('data-id');
       const targetId = card.getAttribute('data-id');
       const srcIndex = items.findIndex(i => i.id === srcId);
-      const targetIndex = items.findIndex(i => i.id === targetId);
       const [moved] = items.splice(srcIndex, 1);
+      const targetIndex = items.findIndex(i => i.id === targetId);
       items.splice(targetIndex, 0, moved);
       renderCards();
     }
@@ -684,12 +684,8 @@ clearAllBtn.addEventListener('click', () => { items = []; renderCards(); statusM
 viewGrid.addEventListener('click', () => { viewGrid.classList.add('active'); viewList.classList.remove('active'); previewGrid.classList.remove('list-view'); });
 viewList.addEventListener('click', () => { viewList.classList.add('active'); viewGrid.classList.remove('active'); previewGrid.classList.add('list-view'); });
 
-function processAndApplyFilters(item) {
+function processAndApplyFilters(item, quality) {
   return new Promise((resolve) => {
-    if (item.brightness === 100 && item.contrast === 100 && item.rotation === 0) {
-      resolve(item.src);
-      return;
-    }
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     const img = new Image();
@@ -702,7 +698,7 @@ function processAndApplyFilters(item) {
       ctx.rotate(angle);
       ctx.filter = `brightness(${item.brightness}%) contrast(${item.contrast}%)`;
       ctx.drawImage(img, -img.naturalWidth / 2, -img.naturalHeight / 2);
-      resolve(canvas.toDataURL('image/jpeg', 0.95));
+      resolve(canvas.toDataURL('image/jpeg', quality));
     };
     img.src = item.src;
   });
@@ -839,10 +835,11 @@ splitBtn.addEventListener('click', async () => {
     const orientOpt = document.getElementById('orientation').value;
     const fitOpt = document.getElementById('imageFit').value;
     const marginOpt = parseFloat(document.getElementById('margins').value);
+    const qOpt = parseFloat(jpegQuality.value);
 
     for (let i = 0; i < activeItems.length; i++) {
       const item = activeItems[i];
-      const processedSrc = await processAndApplyFilters(item);
+      const processedSrc = await processAndApplyFilters(item, qOpt);
       const { pW, pH } = getPageDimensions(sizeOpt, orientOpt, item.width, item.height);
 
       const pdf = new jsPDF({ orientation: pW > pH ? 'l' : 'p', unit: 'mm', format: [pW, pH] });
@@ -923,6 +920,7 @@ initializeLogoHoverEngine();
 
 <script>
   (function () {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const ease = 0.07;
     let target = window.scrollY, current = window.scrollY, raf = null;
 
@@ -936,6 +934,7 @@ initializeLogoHoverEngine();
     }
 
     window.addEventListener('wheel', (e) => {
+      if (e.ctrlKey || e.metaKey) return;
       if (hasScrollParent(e.target)) return;
       e.preventDefault();
       let delta = e.deltaY;

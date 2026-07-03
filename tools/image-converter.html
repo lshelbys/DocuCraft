@@ -374,9 +374,31 @@
       });
     }
 
+    function isSvgFile(file) {
+      return file.type === 'image/svg+xml' || /\.svg$/i.test(file.name);
+    }
+
+    async function getSvgIntrinsicSize(file) {
+      try {
+        const text = await file.text();
+        const root = new DOMParser().parseFromString(text, 'image/svg+xml').documentElement;
+        if (!root || root.nodeName === 'parsererror') return null;
+        let width = 0, height = 0;
+        const wAttr = root.getAttribute('width'), hAttr = root.getAttribute('height');
+        if (wAttr && hAttr && !isNaN(parseFloat(wAttr)) && !isNaN(parseFloat(hAttr))) {
+          width = parseFloat(wAttr); height = parseFloat(hAttr);
+        }
+        if (!width || !height) {
+          const vb = (root.getAttribute('viewBox') || '').trim().split(/[\s,]+/).map(Number);
+          if (vb.length === 4 && vb[2] > 0 && vb[3] > 0) { width = vb[2]; height = vb[3]; }
+        }
+        if (!width || !height || width <= 0 || height <= 0) return null;
+        return { width, height };
+      } catch (e) { return null; }
+    }
+
     async function decodeImage(file) {
-      const isSvg = file.type === 'image/svg+xml' || /\.svg$/i.test(file.name);
-      if (!isSvg && window.createImageBitmap) {
+      if (!isSvgFile(file) && window.createImageBitmap) {
         try { return await createImageBitmap(file); } catch (e) { /* fall back to <img> decoding below */ }
       }
       return decodeViaImgElement(file);
@@ -384,8 +406,14 @@
 
     async function convertOne(file, mimeType, quality) {
       const source = await decodeImage(file);
-      const width = source.width || source.naturalWidth || 1024;
-      const height = source.height || source.naturalHeight || 1024;
+      let width = source.width || source.naturalWidth || 1024;
+      let height = source.height || source.naturalHeight || 1024;
+      if (isSvgFile(file)) {
+        // <img> elements default undersized SVGs (no width/height/viewBox-only) to
+        // a 300x150 intrinsic size — read the real size from the SVG markup instead.
+        const svgSize = await getSvgIntrinsicSize(file);
+        if (svgSize) { width = Math.round(svgSize.width); height = Math.round(svgSize.height); }
+      }
       const canvas = document.createElement('canvas');
       canvas.width = width;
       canvas.height = height;
@@ -478,6 +506,7 @@
 
   <script>
     (function () {
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       const ease = 0.07;
       let target = window.scrollY, current = window.scrollY, raf = null;
       function hasScrollParent(el) {
@@ -489,6 +518,7 @@
         return false;
       }
       window.addEventListener('wheel', (e) => {
+        if (e.ctrlKey || e.metaKey) return;
         if (hasScrollParent(e.target)) return;
         e.preventDefault();
         let delta = e.deltaY;

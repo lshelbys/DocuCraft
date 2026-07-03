@@ -242,8 +242,14 @@
       logoLink.addEventListener('mouseleave', resetLogoLetters);
     }
 
+    function formatBytes(bytes) {
+      if (bytes >= 1048576) return (bytes / 1048576).toFixed(2) + ' MB';
+      return (bytes / 1024).toFixed(1) + ' KB';
+    }
+
     let targetFile = null;
     let totalPages = 0;
+    let cachedPdf = null;
 
     const dropzone = document.getElementById('dropzone');
     const fileInput = document.getElementById('fileInput');
@@ -279,9 +285,10 @@
       showStatus('Reading PDF…', '');
       try {
         const ab = await file.arrayBuffer();
-        const pdf = await pdfjsLib.getDocument({ data: ab }).promise;
-        totalPages = pdf.numPages;
-        fileNameDisplay.textContent = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+        if (cachedPdf) cachedPdf.destroy();
+        cachedPdf = await pdfjsLib.getDocument({ data: ab }).promise;
+        totalPages = cachedPdf.numPages;
+        fileNameDisplay.textContent = `${file.name} (${formatBytes(file.size)})`;
         fileRow.style.display = 'flex';
         settingsSection.style.display = 'block';
         infoBox.textContent = `${totalPages} page${totalPages !== 1 ? 's' : ''} detected — each will be saved as a separate image file inside a ZIP.`;
@@ -311,8 +318,7 @@
       try {
         if (!window.JSZip) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
 
-        const ab = await targetFile.arrayBuffer();
-        const pdf = await pdfjsLib.getDocument({ data: ab }).promise;
+        const pdf = cachedPdf;
         const scale = parseFloat(document.getElementById('imgScale').value);
         const format = document.getElementById('imgFormat').value;
         const mimeType = format === 'jpeg' ? 'image/jpeg' : 'image/png';
@@ -363,6 +369,7 @@
 
   <script>
     (function () {
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       const ease = 0.07;
       let target = window.scrollY, current = window.scrollY, raf = null;
       function hasScrollParent(el) {
@@ -374,6 +381,7 @@
         return false;
       }
       window.addEventListener('wheel', (e) => {
+        if (e.ctrlKey || e.metaKey) return;
         if (hasScrollParent(e.target)) return;
         e.preventDefault();
         let delta = e.deltaY;

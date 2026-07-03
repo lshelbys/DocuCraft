@@ -317,12 +317,16 @@
     });
     fileInput.addEventListener('change', (e) => { if (e.target.files.length > 0) handleFile(e.target.files[0]); });
 
+    let readToken = 0;
+
     function handleFile(file) {
       const looksLikeImage = file.type.startsWith('image/') || /\.(png|jpe?g|webp|gif|bmp|avif|svg|ico)$/i.test(file.name);
       if (!looksLikeImage) { showStatus('Please upload an image file.', 'status-error'); return; }
+      const token = ++readToken;
       targetFile = file;
       const reader = new FileReader();
       reader.onload = () => {
+        if (token !== readToken) return; // a newer file was dropped while this one was reading
         dataUri = reader.result;
         previewThumb.src = dataUri;
         b64Preview.style.display = 'flex';
@@ -337,8 +341,22 @@
         incrementActionStats();
         showStatus('', '');
       };
-      reader.onerror = () => showStatus('This file could not be read.', 'status-error');
+      reader.onerror = () => {
+        if (token !== readToken) return;
+        dataUri = ''; targetFile = null;
+        b64Preview.style.display = 'none';
+        b64Output.style.display = 'none';
+        copyRow.style.display = 'none';
+        showStatus('This file could not be read.', 'status-error');
+      };
       reader.readAsDataURL(file);
+    }
+
+    function escapeAttr(str) {
+      return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+    function escapeMdLabel(str) {
+      return str.replace(/([\\\[\]])/g, '\\$1');
     }
 
     async function copyText(text, label) {
@@ -358,13 +376,13 @@
       if (dataUri) copyText(dataUri, 'Data URI');
     });
     document.getElementById('btnCopyHtml').addEventListener('click', () => {
-      if (dataUri) copyText(`<img src="${dataUri}" alt="${targetFile.name.replace(/\.[^.]+$/, '')}" />`, 'HTML <img> tag');
+      if (dataUri) copyText(`<img src="${dataUri}" alt="${escapeAttr(targetFile.name.replace(/\.[^.]+$/, ''))}" />`, 'HTML <img> tag');
     });
     document.getElementById('btnCopyCss').addEventListener('click', () => {
       if (dataUri) copyText(`background-image: url('${dataUri}');`, 'CSS rule');
     });
     document.getElementById('btnCopyMd').addEventListener('click', () => {
-      if (dataUri) copyText(`![${targetFile.name.replace(/\.[^.]+$/, '')}](${dataUri})`, 'Markdown');
+      if (dataUri) copyText(`![${escapeMdLabel(targetFile.name.replace(/\.[^.]+$/, ''))}](${dataUri})`, 'Markdown');
     });
 
     initializeLogoHoverEngine();
@@ -372,6 +390,7 @@
 
   <script>
     (function () {
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       const ease = 0.07;
       let target = window.scrollY, current = window.scrollY, raf = null;
       function hasScrollParent(el) {
@@ -383,6 +402,7 @@
         return false;
       }
       window.addEventListener('wheel', (e) => {
+        if (e.ctrlKey || e.metaKey) return;
         if (hasScrollParent(e.target)) return;
         e.preventDefault();
         let delta = e.deltaY;

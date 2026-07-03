@@ -327,6 +327,7 @@
     let pdfArrayBuffer = null;
     let pageRotations = [];
     let totalPages = 0;
+    let cachedPdf = null;
 
     const dropzone = document.getElementById('dropzone');
     const fileInput = document.getElementById('fileInput');
@@ -361,10 +362,11 @@
       showStatus('Loading PDF...', '');
       try {
         pdfArrayBuffer = await file.arrayBuffer();
-        const pdf = await pdfjsLib.getDocument({ data: pdfArrayBuffer.slice(0) }).promise;
-        totalPages = pdf.numPages;
+        if (cachedPdf) cachedPdf.destroy();
+        cachedPdf = await pdfjsLib.getDocument({ data: pdfArrayBuffer.slice(0) }).promise;
+        totalPages = cachedPdf.numPages;
         pageRotations = new Array(totalPages).fill(0);
-        await renderPreviews(pdf);
+        await renderPreviews(cachedPdf);
         editorSection.style.display = 'block';
         statusMsg.textContent = '';
         statusMsg.className = 'status-msg';
@@ -377,7 +379,7 @@
       pageGrid.innerHTML = '';
       for (let i = 1; i <= totalPages; i++) {
         const page = await pdf.getPage(i);
-        const viewport = page.getViewport({ scale: 0.4, rotation: pageRotations[i - 1] });
+        const viewport = page.getViewport({ scale: 0.4, rotation: (page.rotate + pageRotations[i - 1]) % 360 });
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = viewport.width;
@@ -411,9 +413,8 @@
 
     async function rotateOnePage(pageIndex, delta) {
       pageRotations[pageIndex] = ((pageRotations[pageIndex] + delta) % 360 + 360) % 360;
-      const pdf = await pdfjsLib.getDocument({ data: pdfArrayBuffer.slice(0) }).promise;
-      const page = await pdf.getPage(pageIndex + 1);
-      const viewport = page.getViewport({ scale: 0.4, rotation: pageRotations[pageIndex] });
+      const page = await cachedPdf.getPage(pageIndex + 1);
+      const viewport = page.getViewport({ scale: 0.4, rotation: (page.rotate + pageRotations[pageIndex]) % 360 });
       const card = pageGrid.children[pageIndex];
       const canvas = card.querySelector('canvas');
       const ctx = canvas.getContext('2d');
@@ -434,8 +435,7 @@
       for (let i = 0; i < totalPages; i++) {
         pageRotations[i] = ((pageRotations[i] + delta) % 360 + 360) % 360;
       }
-      const pdf = await pdfjsLib.getDocument({ data: pdfArrayBuffer.slice(0) }).promise;
-      await renderPreviews(pdf);
+      await renderPreviews(cachedPdf);
     }
 
     document.getElementById('allCCW').addEventListener('click', () => rotateAll(-90));
@@ -443,8 +443,7 @@
     document.getElementById('all180').addEventListener('click', () => rotateAll(180));
     document.getElementById('resetAll').addEventListener('click', async () => {
       pageRotations = new Array(totalPages).fill(0);
-      const pdf = await pdfjsLib.getDocument({ data: pdfArrayBuffer.slice(0) }).promise;
-      await renderPreviews(pdf);
+      await renderPreviews(cachedPdf);
     });
 
     btnSave.addEventListener('click', async () => {
@@ -493,6 +492,7 @@
 
   <script>
     (function () {
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       const ease = 0.07;
       let target = window.scrollY, current = window.scrollY, raf = null;
 
@@ -506,6 +506,7 @@
       }
 
       window.addEventListener('wheel', (e) => {
+        if (e.ctrlKey || e.metaKey) return;
         if (hasScrollParent(e.target)) return;
         e.preventDefault();
         let delta = e.deltaY;

@@ -473,7 +473,7 @@
     // Stepped halving keeps downscales sharp; a single drawImage jump looks muddy at large ratios.
     function scaleToCanvas(source, sw, sh, tw, th, fillWhite) {
       let cur = source, cw = sw, ch = sh;
-      while (cw / 2 >= tw && ch / 2 >= th && cw > 64 && ch > 64) {
+      while ((cw / 2 >= tw || ch / 2 >= th) && cw > 64 && ch > 64) {
         const half = document.createElement('canvas');
         half.width = Math.max(tw, Math.floor(cw / 2));
         half.height = Math.max(th, Math.floor(ch / 2));
@@ -577,6 +577,7 @@
 
   <script>
     (function () {
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       const ease = 0.07;
       let target = window.scrollY, current = window.scrollY, raf = null;
       function hasScrollParent(el) {
@@ -588,6 +589,7 @@
         return false;
       }
       window.addEventListener('wheel', (e) => {
+        if (e.ctrlKey || e.metaKey) return;
         if (hasScrollParent(e.target)) return;
         e.preventDefault();
         let delta = e.deltaY;

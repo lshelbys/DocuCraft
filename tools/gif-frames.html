@@ -352,22 +352,25 @@
 
     async function decodeWithImageDecoder(buffer) {
       const decoder = new ImageDecoder({ data: buffer, type: 'image/gif' });
-      await decoder.tracks.ready;
-      await decoder.completed.catch(() => {});
-      const count = Math.min(decoder.tracks.selectedTrack.frameCount, MAX_FRAMES);
-      const out = [];
-      for (let i = 0; i < count; i++) {
-        const { image } = await decoder.decode({ frameIndex: i });
-        const canvas = document.createElement('canvas');
-        canvas.width = image.displayWidth;
-        canvas.height = image.displayHeight;
-        canvas.getContext('2d').drawImage(image, 0, 0);
-        image.close();
-        out.push(canvas);
-        if (i % 20 === 19) { progressLabel.textContent = `Decoding frame ${i + 1}…`; await new Promise(r => setTimeout(r, 0)); }
+      try {
+        await decoder.tracks.ready;
+        await decoder.completed.catch(() => {});
+        const count = Math.min(decoder.tracks.selectedTrack.frameCount, MAX_FRAMES);
+        const out = [];
+        for (let i = 0; i < count; i++) {
+          const { image } = await decoder.decode({ frameIndex: i });
+          const canvas = document.createElement('canvas');
+          canvas.width = image.displayWidth;
+          canvas.height = image.displayHeight;
+          canvas.getContext('2d').drawImage(image, 0, 0);
+          image.close();
+          out.push(canvas);
+          if (i % 20 === 19) { progressLabel.textContent = `Decoding frame ${i + 1}…`; await new Promise(r => setTimeout(r, 0)); }
+        }
+        return out;
+      } finally {
+        decoder.close();
       }
-      decoder.close();
-      return out;
     }
 
     async function decodeWithGifuct(buffer) {
@@ -545,6 +548,7 @@
 
   <script>
     (function () {
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       const ease = 0.07;
       let target = window.scrollY, current = window.scrollY, raf = null;
       function hasScrollParent(el) {
@@ -556,6 +560,7 @@
         return false;
       }
       window.addEventListener('wheel', (e) => {
+        if (e.ctrlKey || e.metaKey) return;
         if (hasScrollParent(e.target)) return;
         e.preventDefault();
         let delta = e.deltaY;

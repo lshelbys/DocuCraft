@@ -487,6 +487,11 @@
       return str.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     }
 
+    function formatBytes(bytes) {
+      if (bytes >= 1048576) return (bytes / 1048576).toFixed(2) + ' MB';
+      return (bytes / 1024).toFixed(1) + ' KB';
+    }
+
     function updateUI() {
       fileList.innerHTML = '';
 
@@ -501,7 +506,7 @@
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="9" cy="6" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="18" r="1"/><circle cx="15" cy="6" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="18" r="1"/></svg>
             </span>
             <span class="file-name">${escapeHtml(file.name)}</span>
-            <span class="file-size">(${(file.size / 1024).toFixed(1)} KB)</span>
+            <span class="file-size">(${formatBytes(file.size)})</span>
           </div>
           <div class="item-controls">
             <button class="control-btn" data-action="up" title="Move Up" aria-label="Move up">↑</button>
@@ -606,6 +611,7 @@
 
   <script>
     (function () {
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       const ease = 0.07;
       let target = window.scrollY, current = window.scrollY, raf = null;
 
@@ -619,6 +625,7 @@
       }
 
       window.addEventListener('wheel', (e) => {
+        if (e.ctrlKey || e.metaKey) return;
         if (hasScrollParent(e.target)) return;
         e.preventDefault();
         let delta = e.deltaY;

@@ -210,11 +210,11 @@
           <div class="field">
             <label>Color</label>
             <div class="color-swatches">
-              <div class="swatch active" data-r="0.5" data-g="0.5" data-b="0.5" style="background:#808080;" title="Gray"></div>
-              <div class="swatch" data-r="0.1" data-g="0.1" data-b="0.1" style="background:#1a1a1a;" title="Black"></div>
-              <div class="swatch" data-r="0.7" data-g="0.1" data-b="0.1" style="background:#b31a1a;" title="Red"></div>
-              <div class="swatch" data-r="0.1" data-g="0.2" data-b="0.6" style="background:#1a3399;" title="Blue"></div>
-              <div class="swatch" data-r="0.18" data-g="0.36" data-b="0.24" style="background:#2d5a3d;" title="Green"></div>
+              <div class="swatch active" data-r="0.5" data-g="0.5" data-b="0.5" style="background:#808080;" title="Gray" role="button" tabindex="0" aria-pressed="true" aria-label="Gray"></div>
+              <div class="swatch" data-r="0.1" data-g="0.1" data-b="0.1" style="background:#1a1a1a;" title="Black" role="button" tabindex="0" aria-pressed="false" aria-label="Black"></div>
+              <div class="swatch" data-r="0.7" data-g="0.1" data-b="0.1" style="background:#b31a1a;" title="Red" role="button" tabindex="0" aria-pressed="false" aria-label="Red"></div>
+              <div class="swatch" data-r="0.1" data-g="0.2" data-b="0.6" style="background:#1a3399;" title="Blue" role="button" tabindex="0" aria-pressed="false" aria-label="Blue"></div>
+              <div class="swatch" data-r="0.18" data-g="0.36" data-b="0.24" style="background:#2d5a3d;" title="Green" role="button" tabindex="0" aria-pressed="false" aria-label="Green"></div>
             </div>
           </div>
           <div class="field">
@@ -321,12 +321,15 @@
     document.getElementById('wmAngle').addEventListener('change', updatePreview);
 
     document.querySelectorAll('.swatch').forEach(sw => {
-      sw.addEventListener('click', () => {
-        document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+      const selectSwatch = () => {
+        document.querySelectorAll('.swatch').forEach(s => { s.classList.remove('active'); s.setAttribute('aria-pressed', 'false'); });
         sw.classList.add('active');
+        sw.setAttribute('aria-pressed', 'true');
         selectedColor = { r: parseFloat(sw.dataset.r), g: parseFloat(sw.dataset.g), b: parseFloat(sw.dataset.b) };
         updatePreview();
-      });
+      };
+      sw.addEventListener('click', selectSwatch);
+      sw.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectSwatch(); } });
     });
 
     dropzone.addEventListener('click', () => fileInput.click());
@@ -408,6 +411,7 @@
 
   <script>
     (function () {
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       const ease = 0.07;
       let target = window.scrollY, current = window.scrollY, raf = null;
       function hasScrollParent(el) {
@@ -419,6 +423,7 @@
         return false;
       }
       window.addEventListener('wheel', (e) => {
+        if (e.ctrlKey || e.metaKey) return;
         if (hasScrollParent(e.target)) return;
         e.preventDefault();
         let delta = e.deltaY;
