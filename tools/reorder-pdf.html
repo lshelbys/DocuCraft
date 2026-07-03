@@ -287,6 +287,7 @@
         const pdf = await pdfjsLib.getDocument({ data: pdfArrayBuffer.slice(0) }).promise;
         pageOrder = Array.from({ length: pdf.numPages }, (_, i) => ({ originalIndex: i, canvas: null }));
         await renderCanvases(pdf);
+        pdf.destroy(); // thumbnails are cached on canvases; the parsed doc isn't needed again
         editorSection.style.display = 'block';
         showStatus('', '');
       } catch (e) {
@@ -311,6 +312,7 @@
 
     function renderGrid() {
       pageCountLabel.textContent = `${pageOrder.length} page${pageOrder.length !== 1 ? 's' : ''}`;
+      btnSave.disabled = pageOrder.length === 0;
       pageGrid.innerHTML = '';
       pageOrder.forEach((item, idx) => {
         const card = document.createElement('div');
@@ -388,7 +390,7 @@
         console.error(err);
         showStatus('An error occurred while saving the PDF.', 'status-error');
       } finally {
-        btnSave.disabled = false;
+        btnSave.disabled = pageOrder.length === 0;
         setTimeout(() => setProgress(0, true), 1200);
       }
     });
