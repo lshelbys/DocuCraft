@@ -268,13 +268,17 @@
         .sort((a, b) => a - b);
     }
 
+    let loadToken = 0;
+
     function handleFile(file) {
       const looksLikeImage = /^image\/(png|jpeg|webp)$/.test(file.type) || /\.(png|jpe?g|webp)$/i.test(file.name);
       if (!looksLikeImage) { showStatus('Please upload a PNG, JPG, or WebP image.', 'status-error'); return; }
+      const token = ++loadToken;
       const url = URL.createObjectURL(file);
       const img = new Image();
       img.onload = () => {
         URL.revokeObjectURL(url);
+        if (token !== loadToken) return; // a newer file was dropped while this one was decoding
         sourceImage = img;
         targetFile = file;
         fileNameDisplay.textContent = `${file.name} (${img.naturalWidth} × ${img.naturalHeight} px)`;
@@ -289,7 +293,11 @@
         refreshPreviews();
         showStatus('', '');
       };
-      img.onerror = () => { URL.revokeObjectURL(url); showStatus('This image could not be decoded.', 'status-error'); };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        if (token !== loadToken) return;
+        showStatus('This image could not be decoded.', 'status-error');
+      };
       img.src = url;
     }
 

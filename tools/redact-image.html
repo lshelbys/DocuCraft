@@ -273,20 +273,6 @@
       logoLink.addEventListener('mouseleave', resetLogoLetters);
     }
 
-    function loadScriptWithFallback(urls) {
-      return urls.reduce((chain, url) => chain.catch(() => new Promise((resolve, reject) => {
-        const s = document.createElement('script');
-        s.src = url; s.onload = resolve;
-        s.onerror = () => { s.remove(); reject(new Error('Failed to load ' + url)); };
-        document.head.appendChild(s);
-      })), Promise.reject());
-    }
-    const JSZIP_URLS = [
-      'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js',
-      'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js',
-      'https://unpkg.com/jszip@3.10.1/dist/jszip.min.js'
-    ];
-
     function formatBytes(bytes) {
       if (bytes >= 1048576) return (bytes / 1048576).toFixed(2) + ' MB';
       return (bytes / 1024).toFixed(1) + ' KB';
@@ -297,20 +283,6 @@
       link.download = name;
       link.click();
       setTimeout(() => URL.revokeObjectURL(link.href), 60000);
-    }
-    async function packageZip(results, zipName) {
-      if (!window.JSZip) await loadScriptWithFallback(JSZIP_URLS);
-      const zip = new JSZip();
-      const usedNames = {};
-      for (const r of results) {
-        let name = r.name;
-        if (usedNames[name] !== undefined) {
-          usedNames[name]++;
-          name = name.replace(/(\.[^.]+)$/, `_${usedNames[name]}$1`);
-        } else { usedNames[name] = 0; }
-        zip.file(name, await r.blob.arrayBuffer());
-      }
-      return zip.generateAsync({ type: 'blob' });
     }
 
     const MAX_STAGE_W = 720, MAX_STAGE_H = 460;
