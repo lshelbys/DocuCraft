@@ -31,8 +31,7 @@
   <link rel="icon" type="image/svg+xml" href="../icon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
-  <script defer src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <!-- PDF libraries are loaded dynamically on demand -->
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { 
@@ -387,58 +386,27 @@
   </footer>
 
   <script>
-    const activeTheme = localStorage.getItem('theme') || 'light';
-    if (activeTheme === 'dark') {
-      document.documentElement.setAttribute('data-theme', 'dark');
+    function loadScript(src) {
+      return new Promise((resolve, reject) => {
+        if (document.querySelector(`script[src="${src}"]`)) return resolve();
+        const s = document.createElement('script');
+        s.src = src;
+        s.onload = resolve;
+        s.onerror = reject;
+        document.head.appendChild(s);
+      });
     }
 
-    document.getElementById('themeToggle').addEventListener('click', () => {
-      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-      if (isDark) {
-        document.documentElement.removeAttribute('data-theme');
-        localStorage.setItem('theme', 'light');
-      } else {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        localStorage.setItem('theme', 'dark');
+    async function loadPdfLib() {
+      await loadScript('https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js');
+    }
+
+    async function loadPdfJs() {
+      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js');
+      if (window.pdfjsLib) {
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
       }
-      resetLogoLetters();
-    });
-
-    function incrementActionStats() {
-      const count = parseInt(localStorage.getItem('docucraft_actions_total_count') || '0');
-      localStorage.setItem('docucraft_actions_total_count', count + 1);
     }
-
-    let activeStaggerTimeouts = [];
-    function resetLogoLetters() {
-      activeStaggerTimeouts.forEach(clearTimeout);
-      activeStaggerTimeouts = [];
-      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-      document.querySelectorAll('.logo-letter').forEach(l => {
-        l.style.color = isDark ? '#f7f6f2' : '#1a1a18';
-      });
-    }
-
-    function initializeLogoHoverEngine() {
-      const logoLink = document.querySelector('.header-logo');
-      const letters = document.querySelectorAll('.logo-letter');
-      logoLink.addEventListener('mouseenter', () => {
-        activeStaggerTimeouts.forEach(clearTimeout);
-        activeStaggerTimeouts = [];
-        letters.forEach((letter, index) => {
-          const timeoutId = setTimeout(() => {
-            const randomHue = Math.floor(Math.random() * 360);
-            letter.style.color = `hsl(${randomHue}, 85%, 75%)`;
-          }, index * 120);
-          activeStaggerTimeouts.push(timeoutId);
-        });
-      });
-      logoLink.addEventListener('mouseleave', resetLogoLetters);
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
-    });
 
     let currentMode = 'toPdf';
     let targetFile = null;
@@ -535,6 +503,8 @@
     });
 
     async function convertImageToPdf(file) {
+      setProgress(20);
+      await loadPdfLib();
       setProgress(30);
       const pdfDoc = await PDFLib.PDFDocument.create();
       const arrayBuffer = await file.arrayBuffer();
@@ -552,6 +522,8 @@
     }
 
     async function convertPdfToElements(file) {
+      setProgress(10);
+      await loadPdfJs();
       const arrayBuffer = await file.arrayBuffer();
       setProgress(20);
       const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
@@ -599,38 +571,5 @@
   <script>
     (function () {
       if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-      const ease = 0.07;
-      let target = window.scrollY, current = window.scrollY, raf = null;
-
-      function hasScrollParent(el) {
-        while (el && el !== document.documentElement) {
-          const s = getComputedStyle(el);
-          if ((s.overflowY === 'auto' || s.overflowY === 'scroll') && el.scrollHeight > el.clientHeight) return true;
-          el = el.parentElement;
-        }
-        return false;
-      }
-
-      window.addEventListener('wheel', (e) => {
-        if (e.ctrlKey || e.metaKey) return;
-        if (hasScrollParent(e.target)) return;
-        e.preventDefault();
-        let delta = e.deltaY;
-        if (e.deltaMode === 1) delta *= 40;
-        else if (e.deltaMode === 2) delta *= window.innerHeight;
-        target = Math.max(0, Math.min(target + delta * 0.8, document.documentElement.scrollHeight - window.innerHeight));
-        if (!raf) raf = requestAnimationFrame(tick);
-      }, { passive: false });
-
-      function tick() {
-        current += (target - current) * ease;
-        if (Math.abs(target - current) < 0.5) { current = target; raf = null; window.scrollTo(0, current); return; }
-        window.scrollTo(0, current);
-        raf = requestAnimationFrame(tick);
-      }
-
-      window.addEventListener('scroll', () => { if (!raf) { target = window.scrollY; current = window.scrollY; } }, { passive: true });
-    })();
-  </script>
 </body>
 </html>
