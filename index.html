@@ -77,6 +77,10 @@
       --header-highlight: rgba(255, 255, 255, 0.06);
     }
 
+    html {
+      scroll-behavior: smooth;
+    }
+    
     body {
       font-family: 'DM Sans', sans-serif;
       background: var(--surface);
@@ -138,7 +142,7 @@
     /* Create beautiful slow-fading properties unique to each text token */
     .header-text h1 .logo-letter {
       color: var(--header-text);
-      transition: color 0.8s ease-in-out;
+      transition: color 0.4s ease-out;
       display: inline-block;
     }
 
@@ -909,7 +913,7 @@
 <body>
 
 <header>
-  <a href="/" class="header-logo" id="logoLink">
+  <a href="/" class="header-logo" id="logoLink" aria-label="DocuCraft Home">
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
       <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>
       <line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/>
@@ -1018,7 +1022,7 @@
     <div class="tools-grid" id="toolsGrid">
 
       <div class="tool-wrapper" data-id="image-to-pdf">
-        <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
+        <button class="favorite-toggle-btn" aria-label="Toggle pin for this tool" aria-pressed="false" type="button">
           <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </button>
         <a href="tools/image-to-pdf.html" class="tool-link">
@@ -1035,7 +1039,7 @@
       </div>
 
       <div class="tool-wrapper" data-id="merge-pdf">
-        <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
+        <button class="favorite-toggle-btn" aria-label="Toggle pin for this tool" aria-pressed="false" type="button">
           <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </button>
         <a href="tools/merge-pdf.html" class="tool-link">
@@ -1052,7 +1056,7 @@
       </div>
 
       <div class="tool-wrapper" data-id="split-pdf">
-        <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
+        <button class="favorite-toggle-btn" aria-label="Toggle pin for this tool" aria-pressed="false" type="button">
           <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </button>
         <a href="tools/split-pdf.html" class="tool-link">
@@ -1069,7 +1073,7 @@
       </div>
 
       <div class="tool-wrapper" data-id="compress-pdf">
-        <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
+        <button class="favorite-toggle-btn" aria-label="Toggle pin for this tool" aria-pressed="false" type="button">
           <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </button>
         <a href="tools/compress-pdf.html" class="tool-link">
@@ -1086,7 +1090,7 @@
       </div>
 
       <div class="tool-wrapper" data-id="pdf-converter">
-        <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
+        <button class="favorite-toggle-btn" aria-label="Toggle pin for this tool" aria-pressed="false" type="button">
           <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </button>
         <a href="tools/pdf-converter.html" class="tool-link">
@@ -1103,7 +1107,7 @@
       </div>
 
       <div class="tool-wrapper" data-id="rotate-pdf">
-        <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
+        <button class="favorite-toggle-btn" aria-label="Toggle pin for this tool" aria-pressed="false" type="button">
           <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </button>
         <a href="tools/rotate-pdf.html" class="tool-link">
@@ -1120,7 +1124,7 @@
       </div>
 
       <div class="tool-wrapper" data-id="reorder-pdf">
-        <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
+        <button class="favorite-toggle-btn" aria-label="Toggle pin for this tool" aria-pressed="false" type="button">
           <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </button>
         <a href="tools/reorder-pdf.html" class="tool-link">
@@ -1137,7 +1141,7 @@
       </div>
 
       <div class="tool-wrapper" data-id="page-numbers">
-        <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
+        <button class="favorite-toggle-btn" aria-label="Toggle pin for this tool" aria-pressed="false" type="button">
           <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </button>
         <a href="tools/page-numbers.html" class="tool-link">
@@ -1154,7 +1158,7 @@
       </div>
 
       <div class="tool-wrapper" data-id="watermark-pdf">
-        <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
+        <button class="favorite-toggle-btn" aria-label="Toggle pin for this tool" aria-pressed="false" type="button">
           <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </button>
         <a href="tools/watermark-pdf.html" class="tool-link">
@@ -1171,7 +1175,7 @@
       </div>
 
       <div class="tool-wrapper" data-id="pdf-to-images">
-        <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
+        <button class="favorite-toggle-btn" aria-label="Toggle pin for this tool" aria-pressed="false" type="button">
           <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </button>
         <a href="tools/pdf-to-images.html" class="tool-link">
@@ -1195,7 +1199,7 @@
     <div class="tools-grid" id="imageToolsGrid">
 
       <div class="tool-wrapper" data-id="image-converter">
-        <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
+        <button class="favorite-toggle-btn" aria-label="Toggle pin for this tool" aria-pressed="false" type="button">
           <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </button>
         <a href="tools/image-converter.html" class="tool-link">
@@ -1212,7 +1216,7 @@
       </div>
 
       <div class="tool-wrapper" data-id="png-to-svg">
-        <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
+        <button class="favorite-toggle-btn" aria-label="Toggle pin for this tool" aria-pressed="false" type="button">
           <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </button>
         <a href="tools/png-to-svg.html" class="tool-link">
@@ -1229,7 +1233,7 @@
       </div>
 
       <div class="tool-wrapper" data-id="svg-to-png">
-        <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
+        <button class="favorite-toggle-btn" aria-label="Toggle pin for this tool" aria-pressed="false" type="button">
           <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </button>
         <a href="tools/svg-to-png.html" class="tool-link">
@@ -1246,7 +1250,7 @@
       </div>
 
       <div class="tool-wrapper" data-id="heic-to-jpg">
-        <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
+        <button class="favorite-toggle-btn" aria-label="Toggle pin for this tool" aria-pressed="false" type="button">
           <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </button>
         <a href="tools/heic-to-jpg.html" class="tool-link">
@@ -1263,7 +1267,7 @@
       </div>
 
       <div class="tool-wrapper" data-id="png-to-ico">
-        <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
+        <button class="favorite-toggle-btn" aria-label="Toggle pin for this tool" aria-pressed="false" type="button">
           <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </button>
         <a href="tools/png-to-ico.html" class="tool-link">
@@ -1280,7 +1284,7 @@
       </div>
 
       <div class="tool-wrapper" data-id="resize-image">
-        <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
+        <button class="favorite-toggle-btn" aria-label="Toggle pin for this tool" aria-pressed="false" type="button">
           <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </button>
         <a href="tools/resize-image.html" class="tool-link">
@@ -1297,7 +1301,7 @@
       </div>
 
       <div class="tool-wrapper" data-id="compress-image">
-        <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
+        <button class="favorite-toggle-btn" aria-label="Toggle pin for this tool" aria-pressed="false" type="button">
           <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </button>
         <a href="tools/compress-image.html" class="tool-link">
@@ -1314,7 +1318,7 @@
       </div>
 
       <div class="tool-wrapper" data-id="crop-image">
-        <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
+        <button class="favorite-toggle-btn" aria-label="Toggle pin for this tool" aria-pressed="false" type="button">
           <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </button>
         <a href="tools/crop-image.html" class="tool-link">
@@ -1331,7 +1335,7 @@
       </div>
 
       <div class="tool-wrapper" data-id="exif-remover">
-        <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
+        <button class="favorite-toggle-btn" aria-label="Toggle pin for this tool" aria-pressed="false" type="button">
           <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </button>
         <a href="tools/exif-remover.html" class="tool-link">
@@ -1348,7 +1352,7 @@
       </div>
 
       <div class="tool-wrapper" data-id="watermark-image">
-        <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
+        <button class="favorite-toggle-btn" aria-label="Toggle pin for this tool" aria-pressed="false" type="button">
           <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </button>
         <a href="tools/watermark-image.html" class="tool-link">
@@ -1365,7 +1369,7 @@
       </div>
 
       <div class="tool-wrapper" data-id="redact-image">
-        <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
+        <button class="favorite-toggle-btn" aria-label="Toggle pin for this tool" aria-pressed="false" type="button">
           <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </button>
         <a href="tools/redact-image.html" class="tool-link">
@@ -1382,7 +1386,7 @@
       </div>
 
       <div class="tool-wrapper" data-id="background-remover">
-        <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
+        <button class="favorite-toggle-btn" aria-label="Toggle pin for this tool" aria-pressed="false" type="button">
           <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </button>
         <a href="tools/background-remover.html" class="tool-link">
@@ -1399,7 +1403,7 @@
       </div>
 
       <div class="tool-wrapper" data-id="palette-extractor">
-        <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
+        <button class="favorite-toggle-btn" aria-label="Toggle pin for this tool" aria-pressed="false" type="button">
           <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </button>
         <a href="tools/palette-extractor.html" class="tool-link">
@@ -1416,7 +1420,7 @@
       </div>
 
       <div class="tool-wrapper" data-id="gif-frames">
-        <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
+        <button class="favorite-toggle-btn" aria-label="Toggle pin for this tool" aria-pressed="false" type="button">
           <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </button>
         <a href="tools/gif-frames.html" class="tool-link">
@@ -1433,7 +1437,7 @@
       </div>
 
       <div class="tool-wrapper" data-id="image-to-base64">
-        <button class="favorite-toggle-btn" aria-label="Pin tool" type="button">
+        <button class="favorite-toggle-btn" aria-label="Toggle pin for this tool" aria-pressed="false" type="button">
           <svg width="16" height="16" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </button>
         <a href="tools/image-to-base64.html" class="tool-link">
@@ -1746,13 +1750,20 @@
     }
 
     const matchCounts = new Map();
+    const searchTerms = query.split(' ').filter(term => term.length > 0);
+    
     [toolsGrid, imageToolsGrid].forEach(grid => {
       let matchesFound = 0;
       grid.querySelectorAll('.tool-wrapper').forEach(card => {
         const title = card.querySelector('h3').textContent.toLowerCase();
         const description = card.querySelector('p').textContent.toLowerCase();
+        
+        // Match if ALL search terms are found anywhere in title or description
+        const isMatch = searchTerms.length === 0 || searchTerms.every(term => 
+          title.includes(term) || description.includes(term)
+        );
 
-        if (title.includes(query) || description.includes(query)) {
+        if (isMatch) {
           card.style.display = 'block';
           matchesFound++;
         } else {
@@ -1919,42 +1930,7 @@
   renderRecentStrip();
 </script>
 
-<script>
-  (function () {
-    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const ease = 0.07;
-    let target = window.scrollY, current = window.scrollY, raf = null;
-
-    function hasScrollParent(el) {
-      while (el && el !== document.documentElement) {
-        const s = getComputedStyle(el);
-        if ((s.overflowY === 'auto' || s.overflowY === 'scroll') && el.scrollHeight > el.clientHeight) return true;
-        el = el.parentElement;
-      }
-      return false;
-    }
-
-    window.addEventListener('wheel', (e) => {
-      if (e.ctrlKey || e.metaKey) return;
-      if (hasScrollParent(e.target)) return;
-      e.preventDefault();
-      let delta = e.deltaY;
-      if (e.deltaMode === 1) delta *= 40;
-      else if (e.deltaMode === 2) delta *= window.innerHeight;
-      target = Math.max(0, Math.min(target + delta * 0.8, document.documentElement.scrollHeight - window.innerHeight));
-      if (!raf) raf = requestAnimationFrame(tick);
-    }, { passive: false });
-
-    function tick() {
-      current += (target - current) * ease;
-      if (Math.abs(target - current) < 0.5) { current = target; raf = null; window.scrollTo(0, current); return; }
-      window.scrollTo(0, current);
-      raf = requestAnimationFrame(tick);
-    }
-
-    window.addEventListener('scroll', () => { if (!raf) { target = window.scrollY; current = window.scrollY; } }, { passive: true });
-  })();
-</script>
+<!-- Native smooth scrolling is handled by CSS html { scroll-behavior: smooth; } if needed, avoiding custom JS scroll jacking -->
 
 </body>
 </html>
