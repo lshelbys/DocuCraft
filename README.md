@@ -48,6 +48,20 @@ A dedicated tab of image conversion tools, all running entirely in your browser:
 
 ## 🛠️ Tech Stack
 
-*(Feel free to update this section based on your project's specific backend or frontend framework)*
+DocuCraft is a purely client-side application built with modern web technologies:
 * **Frontend:** HTML5, CSS3, JavaScript (ES6+)
 * **Deployment & Hosting:** GitHub Pages
+
+## 🤝 Contributing
+
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📝 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
