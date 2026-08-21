@@ -558,26 +558,23 @@ function handleFiles(fileList) {
   if (!incoming.length) return;
 
   incoming.forEach(file => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        items.push({
-          id: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2),
-          file: file,
-          src: e.target.result,
-          width: img.naturalWidth,
-          height: img.naturalHeight,
-          rotation: 0,
-          brightness: 100,
-          contrast: 100,
-          excluded: false
-        });
-        renderCards();
-      };
-      img.src = e.target.result;
+    const objUrl = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      items.push({
+        id: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2),
+        file: file,
+        src: objUrl,
+        width: img.naturalWidth,
+        height: img.naturalHeight,
+        rotation: 0,
+        brightness: 100,
+        contrast: 100,
+        excluded: false
+      });
+      renderCards();
     };
-    reader.readAsDataURL(file);
+    img.src = objUrl;
   });
 }
 
@@ -653,7 +650,11 @@ function renderCards() {
 
     card.querySelector('.up-btn').addEventListener('click', () => { if(index > 0) { [items[index], items[index-1]] = [items[index-1], items[index]]; renderCards(); } });
     card.querySelector('.down-btn').addEventListener('click', () => { if(index < items.length-1) { [items[index], items[index+1]] = [items[index+1], items[index]]; renderCards(); } });
-    card.querySelector('.delete-btn').addEventListener('click', () => { items.splice(index, 1); renderCards(); });
+    card.querySelector('.delete-btn').addEventListener('click', () => { 
+      URL.revokeObjectURL(items[index].src);
+      items.splice(index, 1); 
+      renderCards(); 
+    });
 
     setupDragAndDrop(card);
     previewGrid.appendChild(card);
@@ -680,7 +681,12 @@ function setupDragAndDrop(card) {
   card.addEventListener('dragend', () => { card.classList.remove('dragging-card'); Array.from(previewGrid.children).forEach(c => c.classList.remove('drag-over')); }, false);
 }
 
-clearAllBtn.addEventListener('click', () => { items = []; renderCards(); statusMsg.textContent = ''; });
+clearAllBtn.addEventListener('click', () => { 
+  items.forEach(item => URL.revokeObjectURL(item.src));
+  items = []; 
+  renderCards(); 
+  statusMsg.textContent = ''; 
+});
 viewGrid.addEventListener('click', () => { viewGrid.classList.add('active'); viewList.classList.remove('active'); previewGrid.classList.remove('list-view'); });
 viewList.addEventListener('click', () => { viewList.classList.add('active'); viewGrid.classList.remove('active'); previewGrid.classList.add('list-view'); });
 
@@ -699,13 +705,11 @@ function processAndApplyFilters(item, quality) {
       ctx.filter = `brightness(${item.brightness}%) contrast(${item.contrast}%)`;
       ctx.drawImage(img, -img.naturalWidth / 2, -img.naturalHeight / 2);
       resolve(canvas.toDataURL('image/jpeg', quality));
-    };
     img.src = item.src;
   });
 }
 
 function getPageDimensions(sizeStr, orientStr, imgW, imgH) {
-  const map = { a4: [210, 297], letter: [215.9, 279.4], a3: [297, 420], legal: [215.9, 355.6] };
   let dims = map[sizeStr] || map.a4;
   let pW = dims[0];
   let pH = dims[1];
@@ -714,7 +718,6 @@ function getPageDimensions(sizeStr, orientStr, imgW, imgH) {
   } else if (orientStr === 'l') {
     pW = dims[1]; pH = dims[0];
   }
-  return { pW, pH };
 }
 
 convertBtn.addEventListener('click', async () => {
@@ -921,39 +924,6 @@ initializeLogoHoverEngine();
 <script>
   (function () {
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const ease = 0.07;
-    let target = window.scrollY, current = window.scrollY, raf = null;
-
-    function hasScrollParent(el) {
-      while (el && el !== document.documentElement) {
-        const s = getComputedStyle(el);
-        if ((s.overflowY === 'auto' || s.overflowY === 'scroll') && el.scrollHeight > el.clientHeight) return true;
-        el = el.parentElement;
-      }
-      return false;
-    }
-
-    window.addEventListener('wheel', (e) => {
-      if (e.ctrlKey || e.metaKey) return;
-      if (hasScrollParent(e.target)) return;
-      e.preventDefault();
-      let delta = e.deltaY;
-      if (e.deltaMode === 1) delta *= 40;
-      else if (e.deltaMode === 2) delta *= window.innerHeight;
-      target = Math.max(0, Math.min(target + delta * 0.8, document.documentElement.scrollHeight - window.innerHeight));
-      if (!raf) raf = requestAnimationFrame(tick);
-    }, { passive: false });
-
-    function tick() {
-      current += (target - current) * ease;
-      if (Math.abs(target - current) < 0.5) { current = target; raf = null; window.scrollTo(0, current); return; }
-      window.scrollTo(0, current);
-      raf = requestAnimationFrame(tick);
-    }
-
-    window.addEventListener('scroll', () => { if (!raf) { target = window.scrollY; current = window.scrollY; } }, { passive: true });
-  })();
-</script>
 
 </body>
 </html>

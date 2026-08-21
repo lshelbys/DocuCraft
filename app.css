@@ -18,6 +18,7 @@ html {
 html, body {
   overscroll-behavior: none;
   overflow-x: hidden;
+  overflow-y: auto; /* Fix: explicitly allow vertical scrolling since we removed the custom scroll JS */
 }
 
 /* Don't let the OS pop a callout/selection menu on long-press of UI chrome,

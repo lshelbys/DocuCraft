@@ -457,34 +457,5 @@
   <script>
     (function () {
       if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-      const ease = 0.07;
-      let target = window.scrollY, current = window.scrollY, raf = null;
-      function hasScrollParent(el) {
-        while (el && el !== document.documentElement) {
-          const s = getComputedStyle(el);
-          if ((s.overflowY === 'auto' || s.overflowY === 'scroll') && el.scrollHeight > el.clientHeight) return true;
-          el = el.parentElement;
-        }
-        return false;
-      }
-      window.addEventListener('wheel', (e) => {
-        if (e.ctrlKey || e.metaKey) return;
-        if (hasScrollParent(e.target)) return;
-        e.preventDefault();
-        let delta = e.deltaY;
-        if (e.deltaMode === 1) delta *= 40;
-        else if (e.deltaMode === 2) delta *= window.innerHeight;
-        target = Math.max(0, Math.min(target + delta * 0.8, document.documentElement.scrollHeight - window.innerHeight));
-        if (!raf) raf = requestAnimationFrame(tick);
-      }, { passive: false });
-      function tick() {
-        current += (target - current) * ease;
-        if (Math.abs(target - current) < 0.5) { current = target; raf = null; window.scrollTo(0, current); return; }
-        window.scrollTo(0, current);
-        raf = requestAnimationFrame(tick);
-      }
-      window.addEventListener('scroll', () => { if (!raf) { target = window.scrollY; current = window.scrollY; } }, { passive: true });
-    })();
-  </script>
 </body>
 </html>

@@ -26,3 +26,44 @@
     lastTap = now;
   }, { passive: false });
 })();
+
+// Shared logic for theme, logo animation, and action tracking
+document.addEventListener('DOMContentLoaded', function() {
+  const activeTheme = localStorage.getItem('theme') || 'light';
+  if (activeTheme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+
+  const themeToggle = document.getElementById('themeToggle');
+  if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (isDark) { document.documentElement.removeAttribute('data-theme'); localStorage.setItem('theme', 'light'); }
+      else { document.documentElement.setAttribute('data-theme', 'dark'); localStorage.setItem('theme', 'dark'); }
+      resetLogoLetters();
+    });
+  }
+
+  let activeStaggerTimeouts = [];
+  function resetLogoLetters() {
+    activeStaggerTimeouts.forEach(clearTimeout); activeStaggerTimeouts = [];
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    document.querySelectorAll('.logo-letter').forEach(l => { l.style.color = isDark ? '#f7f6f2' : '#1a1a18'; });
+  }
+
+  const logoLink = document.querySelector('.header-logo');
+  if (logoLink) {
+    const letters = document.querySelectorAll('.logo-letter');
+    logoLink.addEventListener('mouseenter', () => {
+      activeStaggerTimeouts.forEach(clearTimeout); activeStaggerTimeouts = [];
+      letters.forEach((letter, index) => {
+        const id = setTimeout(() => { letter.style.color = `hsl(${Math.floor(Math.random()*360)}, 85%, 75%)`; }, index * 120);
+        activeStaggerTimeouts.push(id);
+      });
+    });
+    logoLink.addEventListener('mouseleave', resetLogoLetters);
+  }
+});
+
+window.incrementActionStats = function() {
+  const count = parseInt(localStorage.getItem('docucraft_actions_total_count') || '0');
+  localStorage.setItem('docucraft_actions_total_count', count + 1);
+};
